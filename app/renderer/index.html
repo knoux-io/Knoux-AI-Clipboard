@@ -1,0 +1,476 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knoux Clipboard AI - Your Clipboard... Finally Thinks.</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="./assets/icons/favicon.ico" type="image/x-icon">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="msapplication-TileColor" content="#1a1a2e">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:;">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/apple-touch-icon.png">
+    <link rel="mask-icon" href="./assets/icons/safari-pinned-tab.svg" color="#1a1a2e">
+    
+    <!-- Windows Tile -->
+    <meta name="msapplication-config" content="./assets/icons/browserconfig.xml">
+    
+    <style>
+        /* Critical CSS for initial loading */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        #root {
+            height: 100%;
+            width: 100%;
+        }
+        
+        /* Loading Screen */
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loading-content {
+            text-align: center;
+            max-width: 400px;
+            padding: 2rem;
+        }
+        
+        .loading-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 2rem;
+            animation: pulse 2s infinite;
+        }
+        
+        .loading-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .loading-subtitle {
+            font-size: 1rem;
+            color: #8a8a9e;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+        
+        .loading-progress {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .loading-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .loading-stats {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 0.85rem;
+            color: #8a8a9e;
+            margin-top: 1rem;
+        }
+        
+        .loading-feature {
+            font-size: 0.9rem;
+            color: #a0a0b0;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-style: italic;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.7; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.7; transform: scale(0.98); }
+        }
+        
+        /* Fade out animation */
+        .fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* Error State */
+        .error-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            background: #0f0f1a;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10000;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            color: #ff4757;
+        }
+        
+        .error-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #ff6b81;
+        }
+        
+        .error-message {
+            font-size: 1rem;
+            color: #8a8a9e;
+            margin-bottom: 2rem;
+            max-width: 500px;
+            line-height: 1.5;
+        }
+        
+        .error-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .error-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .error-button-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .error-button-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+        }
+        
+        .error-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Dark mode by default */
+        @media (prefers-color-scheme: light) {
+            body {
+                background: #f5f5f7;
+                color: #333;
+            }
+            
+            .loading-screen {
+                background: linear-gradient(135deg, #f5f5f7 0%, #ffffff 100%);
+            }
+            
+            .loading-subtitle {
+                color: #666;
+            }
+            
+            .loading-progress {
+                background: rgba(0, 0, 0, 0.1);
+            }
+            
+            .loading-feature {
+                color: #555;
+                border-top-color: rgba(0, 0, 0, 0.1);
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            .loading-screen,
+            .error-screen {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <svg class="loading-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M50 10L90 30V70L50 90L10 70V30L50 10Z" fill="url(#gradient)" stroke="url(#gradient)" stroke-width="2"/>
+                <path d="M35 40L45 50L65 30" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#667eea"/>
+                        <stop offset="100%" stop-color="#764ba2"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            
+            <h1 class="loading-title">Knoux Clipboard AI</h1>
+            <p class="loading-subtitle">Your Clipboard... Finally Thinks.</p>
+            
+            <div class="loading-progress">
+                <div class="loading-progress-bar" id="progressBar"></div>
+            </div>
+            
+            <div class="loading-stats">
+                <span id="loadingStep">Initializing...</span>
+                <span id="loadingTime">0s</span>
+            </div>
+            
+            <div class="loading-feature" id="loadingFeature">
+                Loading intelligent clipboard features...
+            </div>
+        </div>
+    </div>
+    
+    <!-- Error Screen (hidden by default) -->
+    <div class="error-screen" id="errorScreen">
+        <div class="error-icon">⚠️</div>
+        <h2 class="error-title" id="errorTitle">Application Error</h2>
+        <p class="error-message" id="errorMessage">An unexpected error occurred while loading the application.</p>
+        <div class="error-actions">
+            <button class="error-button error-button-primary" id="retryButton">Retry</button>
+            <button class="error-button error-button-secondary" id="devToolsButton">Open DevTools</button>
+        </div>
+    </div>
+    
+    <!-- Main Application Root -->
+    <div id="root"></div>
+    
+    <!-- Loading Script -->
+    <script>
+        // Loading screen management
+        const loadingScreen = document.getElementById('loadingScreen');
+        const errorScreen = document.getElementById('errorScreen');
+        const progressBar = document.getElementById('progressBar');
+        const loadingStep = document.getElementById('loadingStep');
+        const loadingTime = document.getElementById('loadingTime');
+        const loadingFeature = document.getElementById('loadingFeature');
+        const errorTitle = document.getElementById('errorTitle');
+        const errorMessage = document.getElementById('errorMessage');
+        const retryButton = document.getElementById('retryButton');
+        const devToolsButton = document.getElementById('devToolsButton');
+        
+        const startTime = Date.now();
+        let currentProgress = 0;
+        let currentStep = 0;
+        
+        const loadingSteps = [
+            { text: 'Initializing application...', duration: 500 },
+            { text: 'Loading core modules...', duration: 800 },
+            { text: 'Setting up clipboard engine...', duration: 600 },
+            { text: 'Initializing AI services...', duration: 900 },
+            { text: 'Loading user interface...', duration: 700 },
+            { text: 'Preparing for launch...', duration: 400 }
+        ];
+        
+        const featureMessages = [
+            'Smart clipboard monitoring activated',
+            'AI content analysis ready',
+            'Security scanning enabled',
+            'History management loaded',
+            'Real-time suggestions active',
+            'Ready to think with your clipboard'
+        ];
+        
+        // Update loading timer
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            loadingTime.textContent = `${elapsed}s`;
+        }
+        
+        // Update progress
+        function updateProgress() {
+            if (currentStep >= loadingSteps.length) {
+                currentProgress = 100;
+            } else {
+                const stepProgress = (currentStep / loadingSteps.length) * 100;
+                currentProgress = Math.min(stepProgress, 100);
+            }
+            
+            progressBar.style.width = `${currentProgress}%`;
+            
+            if (currentStep < loadingSteps.length) {
+                loadingStep.textContent = loadingSteps[currentStep].text;
+                loadingFeature.textContent = featureMessages[currentStep % featureMessages.length];
+            }
+        }
+        
+        // Advance to next loading step
+        function nextStep() {
+            if (currentStep < loadingSteps.length) {
+                currentStep++;
+                updateProgress();
+                
+                if (currentStep < loadingSteps.length) {
+                    setTimeout(nextStep, loadingSteps[currentStep].duration);
+                } else {
+                    // All steps complete, wait a moment then fade out
+                    setTimeout(() => {
+                        loadingScreen.classList.add('fade-out');
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                        }, 500);
+                    }, 500);
+                }
+            }
+        }
+        
+        // Show error screen
+        function showError(title, message) {
+            errorTitle.textContent = title;
+            errorMessage.textContent = message;
+            loadingScreen.style.display = 'none';
+            errorScreen.style.display = 'flex';
+        }
+        
+        // Hide error screen
+        function hideError() {
+            errorScreen.style.display = 'none';
+            loadingScreen.style.display = 'flex';
+            loadingScreen.classList.remove('fade-out');
+            // Restart loading
+            currentStep = 0;
+            currentProgress = 0;
+            updateProgress();
+            nextStep();
+        }
+        
+        // Initialize loading animation
+        function initLoading() {
+            updateTimer();
+            updateProgress();
+            
+            // Start timer updates
+            const timerInterval = setInterval(updateTimer, 1000);
+            
+            // Start loading steps
+            setTimeout(nextStep, loadingSteps[0].duration);
+            
+            // Stop timer when loading is complete
+            setTimeout(() => {
+                clearInterval(timerInterval);
+            }, loadingSteps.reduce((sum, step) => sum + step.duration, 0) + 1000);
+        }
+        
+        // Event listeners for error screen buttons
+        retryButton.addEventListener('click', () => {
+            location.reload();
+        });
+        
+        devToolsButton.addEventListener('click', () => {
+            if (window.knoux && typeof window.knoux.openDevTools === 'function') {
+                window.knoux.openDevTools();
+            }
+        });
+        
+        // Check if Electron context is available
+        function checkElectronContext() {
+            return typeof window !== 'undefined' && 
+                   window.process && 
+                   window.process.type === 'renderer';
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!checkElectronContext()) {
+                showError(
+                    'Environment Error',
+                    'This application must run within Electron. Please launch it from the desktop application.'
+                );
+                return;
+            }
+            
+            initLoading();
+            
+            // Global error handler
+            window.addEventListener('error', (event) => {
+                console.error('Global error:', event.error);
+                showError(
+                    'Runtime Error',
+                    event.error?.message || 'An unexpected error occurred'
+                );
+            });
+            
+            window.addEventListener('unhandledrejection', (event) => {
+                console.error('Unhandled promise rejection:', event.reason);
+                showError(
+                    'Promise Error',
+                    event.reason?.message || 'An asynchronous operation failed'
+                );
+            });
+        });
+        
+        // Expose some utilities to window for debugging
+        window.__KNOUX_DEBUG = {
+            showLoading: () => {
+                loadingScreen.style.display = 'flex';
+                loadingScreen.classList.remove('fade-out');
+                initLoading();
+            },
+            showError: (title, message) => showError(title, message),
+            getLoadTime: () => Math.floor((Date.now() - startTime) / 1000)
+        };
+    </script>
+</body>
+</html>
