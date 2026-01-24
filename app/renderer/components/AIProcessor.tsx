@@ -33,7 +33,7 @@ import {
   Target,
   BarChart
 } from 'lucide-react';
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { useAI } from '../hooks/useAI';
 import {
   AIAnalysis,
@@ -180,7 +180,7 @@ export const AIProcessor: React.FC<AIProcessorProps> = ({
         setTimeout(() => setSuccessMessage(null), 3000);
       }
     } catch (error) {
-      logger.error('Failed to load clipboard content', error as Error);
+      llog.error('Failed to load clipboard content', error as Error);
     }
   };
 
@@ -200,7 +200,7 @@ export const AIProcessor: React.FC<AIProcessorProps> = ({
     setSuggestions([]);
 
     try {
-      logger.debug('Processing content', { mode: processingMode, contentLength: content.length });
+      llog.debug('Processing content', { mode: processingMode, contentLength: content.length });
 
       const startTime = Date.now();
       let result: any;
@@ -286,7 +286,7 @@ export const AIProcessor: React.FC<AIProcessorProps> = ({
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error('Failed to process content', error as Error);
+      llog.error('Failed to process content', error as Error);
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -1119,3 +1119,4 @@ export const AIProcessor: React.FC<AIProcessorProps> = ({
     </div>
   );
 };
+

@@ -5,7 +5,7 @@
  * Clipboard Intelligence • Desktop Precision • Premium Engineering
  */
 
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { AI, CONTENT_TYPES } from '../../shared/constants';
 import { ContentClassification, TextLocation } from '../../shared/types';
 import { ProgrammingLanguage, ContentCategory, TextType } from '../../shared/enums';
@@ -100,7 +100,7 @@ export class ContentSummarizer {
       return;
     }
 
-    this.logger.info('Initializing content summarizer');
+    this.llog.info('Initializing content summarizer');
 
     try {
       // Ensure dependencies are initialized
@@ -113,9 +113,9 @@ export class ContentSummarizer {
       }
 
       this.isInitialized = true;
-      this.logger.info('Content summarizer initialized successfully');
+      this.llog.info('Content summarizer initialized successfully');
     } catch (error) {
-      this.logger.error('Failed to initialize summarizer', error as Error);
+      this.llog.error('Failed to initialize summarizer', error as Error);
       throw error;
     }
   }
@@ -138,7 +138,7 @@ export class ContentSummarizer {
       throw new Error('Cannot summarize empty content');
     }
 
-    this.logger.debug('Summarizing content', {
+    this.llog.debug('Summarizing content', {
       contentLength: content.length,
       options,
     });
@@ -148,7 +148,7 @@ export class ContentSummarizer {
     const cachedResult = this.summaryCache.get(cacheKey);
     
     if (cachedResult && this.isCacheValid(cachedResult.timestamp)) {
-      this.logger.debug('Summary cache hit', { cacheKey });
+      this.llog.debug('Summary cache hit', { cacheKey });
       
       const processingTimeMs = Date.now() - startTime;
       return this.createSummaryResult(
@@ -257,7 +257,7 @@ export class ContentSummarizer {
         options
       );
 
-      this.logger.info('Content summarized successfully', {
+      this.llog.info('Content summarized successfully', {
         originalLength: content.length,
         summaryLength: summary.length,
         compressionRatio: result.compressionRatio,
@@ -268,7 +268,7 @@ export class ContentSummarizer {
       return result;
 
     } catch (error) {
-      this.logger.error('Content summarization failed', error as Error, {
+      this.llog.error('Content summarization failed', error as Error, {
         contentLength: content.length,
       });
 
@@ -289,7 +289,7 @@ export class ContentSummarizer {
     keyPoints: string[];
     metadata: SummaryMetadata;
   }> {
-    this.logger.debug('Summarizing code content', {
+    this.llog.debug('Summarizing code content', {
       language: classification.language,
       length: content.length,
     });
@@ -366,7 +366,7 @@ export class ContentSummarizer {
     keyPoints: string[];
     metadata: SummaryMetadata;
   }> {
-    this.logger.debug('Summarizing data content', {
+    this.llog.debug('Summarizing data content', {
       type: classification.primaryType,
       length: content.length,
     });
@@ -394,7 +394,7 @@ export class ContentSummarizer {
           break;
       }
     } catch (error) {
-      this.logger.warn('Failed to parse data structure', error as Error);
+      this.llog.warn('Failed to parse data structure', error as Error);
       structureInfo = 'Unable to parse data structure';
       keyPoints = ['Data structure parsing failed'];
     }
@@ -419,7 +419,7 @@ export class ContentSummarizer {
     keyPoints: string[];
     metadata: SummaryMetadata;
   }> {
-    this.logger.debug('Summarizing email content', { length: content.length });
+    this.llog.debug('Summarizing email content', { length: content.length });
 
     // Extract email components
     const fromMatch = content.match(/From:\s*(.+)/i);
@@ -471,7 +471,7 @@ export class ContentSummarizer {
     keyPoints: string[];
     metadata: SummaryMetadata;
   }> {
-    this.logger.debug('Summarizing prompt content', { length: content.length });
+    this.llog.debug('Summarizing prompt content', { length: content.length });
 
     // Analyze prompt structure
     const hasContext = content.toLowerCase().includes('context') || content.includes('background');
@@ -519,7 +519,7 @@ export class ContentSummarizer {
     keyPoints: string[];
     metadata: SummaryMetadata;
   }> {
-    this.logger.debug('Summarizing text content', { length: content.length });
+    this.llog.debug('Summarizing text content', { length: content.length });
 
     // Use AI engine for better text summarization
     try {
@@ -540,7 +540,7 @@ export class ContentSummarizer {
       return { summary, keyPoints, metadata };
 
     } catch (error) {
-      this.logger.warn('AI summarization failed, using heuristic', error as Error);
+      this.llog.warn('AI summarization failed, using heuristic', error as Error);
       
       // Fallback to heuristic summarization
       return this.summarizeTextHeuristic(content, classification, options);
@@ -1121,7 +1121,7 @@ export class ContentSummarizer {
       keysToDelete.forEach(key => this.summaryCache.delete(key));
       
       if (keysToDelete.length > 0) {
-        this.logger.debug('Cleaned up summary cache', { count: keysToDelete.length });
+        this.llog.debug('Cleaned up summary cache', { count: keysToDelete.length });
       }
     }
   }
@@ -1131,7 +1131,7 @@ export class ContentSummarizer {
    */
   public clearCache(): void {
     this.summaryCache.clear();
-    this.logger.debug('Summary cache cleared');
+    this.llog.debug('Summary cache cleared');
   }
 
   /**
@@ -1152,3 +1152,4 @@ export class ContentSummarizer {
     return this.isInitialized;
   }
 }
+

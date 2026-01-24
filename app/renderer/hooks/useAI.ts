@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { logger, createLogger } from '../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { AI, ERROR_CODES } from '../shared/constants';
 import { 
   AIAnalysis, 
@@ -108,7 +108,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
     return () => {
       abortController.current?.abort();
       activeRequests.current.clear();
-      logger.debug('AI hook cleanup completed');
+      llog.debug('AI hook cleanup completed');
     };
   }, []);
 
@@ -140,7 +140,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
     abortController.current?.abort();
     abortController.current = new AbortController();
     
-    logger.debug(`AI operation started: ${operationType}`);
+    llog.debug(`AI operation started: ${operationType}`);
   }, []);
 
   /**
@@ -156,7 +156,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
       ...(error && { error }),
     }));
     
-    logger.debug(`AI operation ended: ${operationType}`, { error });
+    llog.debug(`AI operation ended: ${operationType}`, { error });
   }, []);
 
   /**
@@ -164,7 +164,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
    */
   const canMakeRequest = useCallback((requestId: string): boolean => {
     if (activeRequests.current.size >= hookConfig.maxConcurrentRequests) {
-      logger.warn('Concurrent request limit reached', {
+      llog.warn('Concurrent request limit reached', {
         current: activeRequests.current.size,
         limit: hookConfig.maxConcurrentRequests,
       });
@@ -172,7 +172,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
     }
     
     if (activeRequests.current.has(requestId)) {
-      logger.warn('Duplicate request ID', { requestId });
+      llog.warn('Duplicate request ID', { requestId });
       return false;
     }
     
@@ -226,7 +226,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
             cacheHits: prev.cacheHits + 1,
           }));
           updateProgress(100, 'Cache hit');
-          logger.debug('Analysis cache hit', { cacheKey });
+          llog.debug('Analysis cache hit', { cacheKey });
           
           completeRequest(requestId);
           endOperation('analyze');
@@ -278,7 +278,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
       }));
 
       updateProgress(100, 'Analysis complete');
-      logger.info('Content analysis completed', {
+      llog.info('Content analysis completed', {
         contentLength: content.length,
         processingTimeMs: analysis.processingTimeMs,
         suggestionCount: analysis.suggestions.length,
@@ -291,7 +291,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown analysis error';
-      logger.error('Content analysis failed', error instanceof Error ? error : new Error(errorMessage), {
+      llog.error('Content analysis failed', error instanceof Error ? error : new Error(errorMessage), {
         contentLength: content.length,
       });
 
@@ -343,7 +343,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
             cacheHits: prev.cacheHits + 1,
           }));
           updateProgress(100, 'Cache hit');
-          logger.debug('Classification cache hit', { cacheKey });
+          llog.debug('Classification cache hit', { cacheKey });
           
           completeRequest(requestId);
           endOperation('classify');
@@ -386,7 +386,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
       }));
 
       updateProgress(100, 'Classification complete');
-      logger.info('Content classification completed', {
+      llog.info('Content classification completed', {
         contentLength: content.length,
         primaryType: classification.primaryType,
         confidence: classification.confidence,
@@ -399,7 +399,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown classification error';
-      logger.error('Content classification failed', error instanceof Error ? error : new Error(errorMessage), {
+      llog.error('Content classification failed', error instanceof Error ? error : new Error(errorMessage), {
         contentLength: content.length,
       });
 
@@ -457,7 +457,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
             cacheHits: prev.cacheHits + 1,
           }));
           updateProgress(100, 'Cache hit');
-          logger.debug('Enhancement cache hit', { cacheKey });
+          llog.debug('Enhancement cache hit', { cacheKey });
           
           completeRequest(requestId);
           endOperation('enhance');
@@ -514,7 +514,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
       }
 
       updateProgress(100, 'Enhancement complete');
-      logger.info('Content enhancement completed', {
+      llog.info('Content enhancement completed', {
         originalLength: content.length,
         enhancedLength: enhanced.enhanced.length,
         confidence: enhanced.confidence,
@@ -528,7 +528,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown enhancement error';
-      logger.error('Content enhancement failed', error instanceof Error ? error : new Error(errorMessage), {
+      llog.error('Content enhancement failed', error instanceof Error ? error : new Error(errorMessage), {
         contentLength: content.length,
         options,
       });
@@ -569,7 +569,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
       return suggestionsResult || [];
 
     } catch (error) {
-      logger.error('Failed to generate enhancement suggestions', error as Error);
+      llog.error('Failed to generate enhancement suggestions', error as Error);
       return [];
     }
   }, []);
@@ -600,7 +600,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
       }
 
       updateProgress(100, 'Summarization complete');
-      logger.info('Text summarization completed', {
+      llog.info('Text summarization completed', {
         originalLength: text.length,
         summaryLength: summaryResult.summary.length,
         reduction: ((text.length - summaryResult.summary.length) / text.length * 100).toFixed(1) + '%',
@@ -612,7 +612,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown summarization error';
-      logger.error('Text summarization failed', error instanceof Error ? error : new Error(errorMessage), {
+      llog.error('Text summarization failed', error instanceof Error ? error : new Error(errorMessage), {
         textLength: text.length,
       });
 
@@ -641,7 +641,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown sensitive check error';
-      logger.error('Sensitive content check failed', error instanceof Error ? error : new Error(errorMessage));
+      llog.error('Sensitive content check failed', error instanceof Error ? error : new Error(errorMessage));
 
       return {
         success: false,
@@ -670,7 +670,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown suggestions error';
-      logger.error('Failed to get suggestions', error instanceof Error ? error : new Error(errorMessage));
+      llog.error('Failed to get suggestions', error instanceof Error ? error : new Error(errorMessage));
 
       return {
         success: false,
@@ -712,7 +712,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
           case 'execute':
             if (suggestion.action.command) {
               // Execute command through IPC
-              logger.debug('Executing suggestion command', { command: suggestion.action.command });
+              llog.debug('Executing suggestion command', { command: suggestion.action.command });
             }
             break;
         }
@@ -724,7 +724,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
         suggestions: prev.suggestions.filter(s => s.id !== suggestion.id),
       }));
 
-      logger.info('Suggestion applied', {
+      llog.info('Suggestion applied', {
         suggestionId: suggestion.id,
         suggestionType: suggestion.type,
         originalLength: currentContent.length,
@@ -735,7 +735,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
 
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to apply suggestion';
-      logger.error('Failed to apply suggestion', error instanceof Error ? error : new Error(errorMessage), {
+      llog.error('Failed to apply suggestion', error instanceof Error ? error : new Error(errorMessage), {
         suggestionId: suggestion.id,
       });
 
@@ -760,7 +760,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
       cacheMisses: 0,
     }));
     
-    logger.debug('AI caches cleared');
+    llog.debug('AI caches cleared');
   }, []);
 
   /**
@@ -779,7 +779,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
         break;
     }
     
-    logger.debug('Cache cleared', { cacheType });
+    llog.debug('Cache cleared', { cacheType });
   }, []);
 
   /**
@@ -814,7 +814,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
       currentOperation: undefined,
     }));
     
-    logger.debug('AI operations cancelled');
+    llog.debug('AI operations cancelled');
   }, []);
 
   /**
@@ -834,7 +834,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
       cacheMisses: 0,
     });
     
-    logger.debug('AI hook state reset');
+    llog.debug('AI hook state reset');
   }, [cancelOperations, clearCache]);
 
   /**
@@ -861,7 +861,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
       keysToDelete.forEach(key => cache.delete(key));
       
       if (keysToDelete.length > 0) {
-        logger.debug('Cleaned up old cache entries', { 
+        llog.debug('Cleaned up old cache entries', { 
           cache: cache.constructor.name,
           count: keysToDelete.length 
         });
@@ -887,7 +887,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
         capabilities: ['analysis', 'enhancement', 'classification', 'summarization'],
       };
     } catch (error) {
-      logger.error('Failed to get AI model info', error as Error);
+      llog.error('Failed to get AI model info', error as Error);
       throw error;
     }
   }, []);
@@ -946,3 +946,4 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
 };
 
 export default useAI;
+

@@ -37,7 +37,7 @@ import {
   AlertTriangle,
   RefreshCw
 } from 'lucide-react';
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { 
   UserPreferences,
   AppStatistics,
@@ -257,7 +257,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
         setSystemInfo(response.data);
       }
     } catch (error) {
-      logger.error('Failed to load system info', error as Error);
+      llog.error('Failed to load system info', error as Error);
     }
   };
   
@@ -269,7 +269,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
         setStats(response.data);
       }
     } catch (error) {
-      logger.error('Failed to load statistics', error as Error);
+      llog.error('Failed to load statistics', error as Error);
     }
   };
   
@@ -292,7 +292,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     setIsSaving(true);
     
     try {
-      logger.info('Saving settings', settings);
+      llog.info('Saving settings', settings);
       
       // In production, this would save to storage via IPC
       await new Promise(resolve => setTimeout(resolve, 500)); // Simulated delay
@@ -303,9 +303,9 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
         onSave(settings);
       }
       
-      logger.info('Settings saved successfully');
+      llog.info('Settings saved successfully');
     } catch (error) {
-      logger.error('Failed to save settings', error as Error);
+      llog.error('Failed to save settings', error as Error);
     } finally {
       setIsSaving(false);
     }
@@ -354,10 +354,10 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             ...imported.settings
           });
           setHasUnsavedChanges(true);
-          logger.info('Settings imported successfully');
+          llog.info('Settings imported successfully');
         }
       } catch (error) {
-        logger.error('Failed to import settings', error as Error);
+        llog.error('Failed to import settings', error as Error);
       }
     };
     reader.readAsText(file);
@@ -381,10 +381,10 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     try {
       const response = await window.knoux.createBackup();
       if (response.success) {
-        logger.info('Backup created successfully');
+        llog.info('Backup created successfully');
       }
     } catch (error) {
-      logger.error('Failed to create backup', error as Error);
+      llog.error('Failed to create backup', error as Error);
     } finally {
       setTimeout(() => setBackupProgress(0), 1000);
     }
@@ -408,10 +408,10 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     try {
       const response = await window.knoux.restoreBackup();
       if (response.success) {
-        logger.info('Backup restored successfully');
+        llog.info('Backup restored successfully');
       }
     } catch (error) {
-      logger.error('Failed to restore backup', error as Error);
+      llog.error('Failed to restore backup', error as Error);
     } finally {
       setTimeout(() => setRestoreProgress(0), 1000);
     }
@@ -422,9 +422,9 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     if (window.confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
       try {
         await window.knoux.clearAllData();
-        logger.info('All data cleared');
+        llog.info('All data cleared');
       } catch (error) {
-        logger.error('Failed to clear data', error as Error);
+        llog.error('Failed to clear data', error as Error);
       }
     }
   };
@@ -1707,3 +1707,4 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     </div>
   );
 };
+

@@ -5,7 +5,7 @@
  * Clipboard Intelligence • Desktop Precision • Premium Engineering
  */
 
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { CONTENT_TYPES, AI, ERROR_CODES } from '../../shared/constants';
 import { AISuggestion, ContentClassification, ProgrammingLanguage } from '../../shared/types';
 import { AIModelType, SuggestionCategory } from '../../shared/enums';
@@ -76,7 +76,7 @@ export class ContentEnhancer {
       return;
     }
 
-    this.logger.info('Initializing content enhancer');
+    this.llog.info('Initializing content enhancer');
     
     try {
       // Verify AI engine is ready
@@ -86,9 +86,9 @@ export class ContentEnhancer {
       await this.promptLibrary.initialize();
       
       this.isInitialized = true;
-      this.logger.info('Content enhancer initialized successfully');
+      this.llog.info('Content enhancer initialized successfully');
     } catch (error) {
-      this.logger.error('Failed to initialize content enhancer', error as Error);
+      this.llog.error('Failed to initialize content enhancer', error as Error);
       throw error;
     }
   }
@@ -111,11 +111,11 @@ export class ContentEnhancer {
     const cacheKey = this.generateCacheKey(content, contentType, options);
     const cachedResult = this.enhancementCache.get(cacheKey);
     if (cachedResult && this.isCacheValid(cachedResult)) {
-      this.logger.debug('Enhancement cache hit', { cacheKey });
+      this.llog.debug('Enhancement cache hit', { cacheKey });
       return cachedResult;
     }
 
-    this.logger.debug('Enhancing content', {
+    this.llog.debug('Enhancing content', {
       contentLength: content.length,
       contentType,
       options,
@@ -182,7 +182,7 @@ export class ContentEnhancer {
       this.enhancementCache.set(cacheKey, result);
       this.cleanupCache();
 
-      this.logger.info('Content enhanced successfully', {
+      this.llog.info('Content enhanced successfully', {
         originalLength: content.length,
         enhancedLength: enhancedContent.length,
         processingTimeMs,
@@ -193,7 +193,7 @@ export class ContentEnhancer {
       return result;
 
     } catch (error) {
-      this.logger.error('Failed to enhance content', error as Error, {
+      this.llog.error('Failed to enhance content', error as Error, {
         contentLength: content.length,
         contentType,
       });
@@ -210,7 +210,7 @@ export class ContentEnhancer {
     classification: ContentClassification,
     options: EnhancementOptions
   ): Promise<string> {
-    this.logger.debug('Enhancing code content', {
+    this.llog.debug('Enhancing code content', {
       language: classification.language,
       length: content.length,
     });
@@ -229,14 +229,14 @@ export class ContentEnhancer {
       // Validate enhanced code
       const isValid = await this.validateCode(enhanced, language);
       if (!isValid) {
-        this.logger.warn('Enhanced code validation failed, returning original');
+        this.llog.warn('Enhanced code validation failed, returning original');
         return content;
       }
 
       return enhanced.trim();
 
     } catch (error) {
-      this.logger.error('Code enhancement failed', error as Error);
+      this.llog.error('Code enhancement failed', error as Error);
       return content; // Fallback to original
     }
   }
@@ -249,7 +249,7 @@ export class ContentEnhancer {
     classification: ContentClassification,
     options: EnhancementOptions
   ): Promise<string> {
-    this.logger.debug('Enhancing prompt content', { length: content.length });
+    this.llog.debug('Enhancing prompt content', { length: content.length });
 
     const prompt = this.promptLibrary.getPromptEnhancementPrompt(options);
 
@@ -266,7 +266,7 @@ export class ContentEnhancer {
       return extracted;
 
     } catch (error) {
-      this.logger.error('Prompt enhancement failed', error as Error);
+      this.llog.error('Prompt enhancement failed', error as Error);
       return content; // Fallback to original
     }
   }
@@ -279,7 +279,7 @@ export class ContentEnhancer {
     classification: ContentClassification,
     options: EnhancementOptions
   ): Promise<string> {
-    this.logger.debug('Enhancing text content', { length: content.length });
+    this.llog.debug('Enhancing text content', { length: content.length });
 
     const textType = classification.secondaryTypes.includes('EMAIL') ? 'email' :
                     classification.secondaryTypes.includes('DOCUMENT') ? 'document' : 'general';
@@ -297,7 +297,7 @@ export class ContentEnhancer {
       return enhanced.trim();
 
     } catch (error) {
-      this.logger.error('Text enhancement failed', error as Error);
+      this.llog.error('Text enhancement failed', error as Error);
       return content; // Fallback to original
     }
   }
@@ -534,7 +534,7 @@ export class ContentEnhancer {
       keysToDelete.forEach(key => this.enhancementCache.delete(key));
       
       if (keysToDelete.length > 0) {
-        this.logger.debug('Cleaned up cache entries', { count: keysToDelete.length });
+        this.llog.debug('Cleaned up cache entries', { count: keysToDelete.length });
       }
     }
   }
@@ -819,7 +819,7 @@ export class ContentEnhancer {
    */
   public clearCache(): void {
     this.enhancementCache.clear();
-    this.logger.debug('Enhancement cache cleared');
+    this.llog.debug('Enhancement cache cleared');
   }
 
   /**
@@ -840,3 +840,4 @@ export class ContentEnhancer {
     return this.isInitialized;
   }
 }
+

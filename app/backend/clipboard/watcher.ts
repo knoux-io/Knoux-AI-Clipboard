@@ -6,7 +6,7 @@
  */
 
 import { clipboard, nativeImage } from 'electron';
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { CLIPBOARD, CONTENT_TYPES } from '../../shared/constants';
 import { ClipboardItem, ClipboardMetadata, ClipboardEvent } from '../../shared/types';
 import { ClipboardFormat, ClipboardState, DetectionMode } from '../../shared/enums';
@@ -127,7 +127,7 @@ export class ClipboardWatcher {
       return;
     }
 
-    this.logger.info('Initializing clipboard watcher');
+    this.llog.info('Initializing clipboard watcher');
 
     try {
       // Initialize dependencies
@@ -140,7 +140,7 @@ export class ClipboardWatcher {
       this.lastImageHash = this.getCurrentImageHash();
 
       this.isInitialized = true;
-      this.logger.info('Clipboard watcher initialized successfully');
+      this.llog.info('Clipboard watcher initialized successfully');
 
       // Start watching if enabled
       if (this.config.enabled) {
@@ -148,7 +148,7 @@ export class ClipboardWatcher {
       }
 
     } catch (error) {
-      this.logger.error('Failed to initialize clipboard watcher', error as Error);
+      this.llog.error('Failed to initialize clipboard watcher', error as Error);
       throw error;
     }
   }
@@ -162,7 +162,7 @@ export class ClipboardWatcher {
 
     const configChanged = JSON.stringify(oldConfig) !== JSON.stringify(this.config);
     if (configChanged) {
-      this.logger.info('Clipboard watcher configuration updated', {
+      this.llog.info('Clipboard watcher configuration updated', {
         oldConfig,
         newConfig: this.config,
       });
@@ -191,7 +191,7 @@ export class ClipboardWatcher {
       return;
     }
 
-    this.logger.info('Starting clipboard watcher');
+    this.llog.info('Starting clipboard watcher');
 
     try {
       // Stop any existing monitoring
@@ -217,13 +217,13 @@ export class ClipboardWatcher {
       }
 
       this.setState(ClipboardState.ACTIVE);
-      this.logger.info('Clipboard watcher started successfully', {
+      this.llog.info('Clipboard watcher started successfully', {
         mode: this.config.detectionMode,
         interval: this.config.pollIntervalMs,
       });
 
     } catch (error) {
-      this.logger.error('Failed to start clipboard watcher', error as Error);
+      this.llog.error('Failed to start clipboard watcher', error as Error);
       this.setState(ClipboardState.ERROR);
       throw error;
     }
@@ -233,7 +233,7 @@ export class ClipboardWatcher {
    * Stop watching clipboard
    */
   public stopWatching(): void {
-    this.logger.info('Stopping clipboard watcher');
+    this.llog.info('Stopping clipboard watcher');
 
     // Clear polling interval
     if (this.pollingInterval) {
@@ -251,7 +251,7 @@ export class ClipboardWatcher {
     this.eventListeners = [];
 
     this.setState(ClipboardState.DISABLED);
-    this.logger.info('Clipboard watcher stopped');
+    this.llog.info('Clipboard watcher stopped');
   }
 
   /**
@@ -266,7 +266,7 @@ export class ClipboardWatcher {
       this.checkClipboardChanges();
     }, this.config.pollIntervalMs);
 
-    this.logger.debug('Started polling mode', { interval: this.config.pollIntervalMs });
+    this.llog.debug('Started polling mode', { interval: this.config.pollIntervalMs });
   }
 
   /**
@@ -275,7 +275,7 @@ export class ClipboardWatcher {
   private startEventDriven(): void {
     // Electron doesn't have native clipboard change events on Windows
     // We'll use polling with a shorter interval as fallback
-    this.logger.warn('Event-driven mode not fully supported, using polling fallback');
+    this.llog.warn('Event-driven mode not fully supported, using polling fallback');
     this.startPolling();
   }
 
@@ -285,7 +285,7 @@ export class ClipboardWatcher {
   private startHybrid(): void {
     // Combine polling with other detection methods
     this.startPolling();
-    this.logger.debug('Started hybrid detection mode');
+    this.llog.debug('Started hybrid detection mode');
   }
 
   /**
@@ -324,7 +324,7 @@ export class ClipboardWatcher {
       }
 
     } catch (error) {
-      this.logger.error('Error checking clipboard changes', error as Error);
+      this.llog.error('Error checking clipboard changes', error as Error);
       this.stats.errorCount++;
     }
   }
@@ -336,7 +336,7 @@ export class ClipboardWatcher {
     try {
       return clipboard.readText() || '';
     } catch (error) {
-      this.logger.warn('Failed to read clipboard text', error as Error);
+      this.llog.warn('Failed to read clipboard text', error as Error);
       return '';
     }
   }
@@ -360,7 +360,7 @@ export class ClipboardWatcher {
       return `${size.width}x${size.height}`;
 
     } catch (error) {
-      this.logger.warn('Failed to read clipboard image', error as Error);
+      this.llog.warn('Failed to read clipboard image', error as Error);
       return '';
     }
   }
@@ -460,14 +460,14 @@ export class ClipboardWatcher {
         
         // Check if app is excluded
         if (this.isAppExcluded(sourceApp)) {
-          this.logger.debug('Ignoring clipboard change from excluded app', { app: sourceApp });
+          this.llog.debug('Ignoring clipboard change from excluded app', { app: sourceApp });
           this.stats.ignoredChanges++;
           return;
         }
 
         // Check content size
         if (this.isContentTooLarge(currentText)) {
-          this.logger.warn('Clipboard content too large, ignoring', {
+          this.llog.warn('Clipboard content too large, ignoring', {
             size: currentText.length,
             limit: this.config.maxItemSizeKB * 1024,
           });
@@ -489,7 +489,7 @@ export class ClipboardWatcher {
           try {
             change.htmlContent = clipboard.readHTML();
           } catch (error) {
-            this.logger.debug('Failed to read HTML from clipboard', error as Error);
+            this.llog.debug('Failed to read HTML from clipboard', error as Error);
           }
         }
 
@@ -497,7 +497,7 @@ export class ClipboardWatcher {
           try {
             change.rtfContent = clipboard.readRTF();
           } catch (error) {
-            this.logger.debug('Failed to read RTF from clipboard', error as Error);
+            this.llog.debug('Failed to read RTF from clipboard', error as Error);
           }
         }
 
@@ -509,14 +509,14 @@ export class ClipboardWatcher {
         this.stats.capturedChanges++;
         this.stats.lastChangeTime = timestamp;
 
-        this.logger.debug('Clipboard text change processed', {
+        this.llog.debug('Clipboard text change processed', {
           length: currentText.length,
           sourceApp,
           timestamp,
         });
 
       } catch (error) {
-        this.logger.error('Failed to process clipboard text change', error as Error, {
+        this.llog.error('Failed to process clipboard text change', error as Error, {
           changeId,
           contentLength: currentText.length,
         });
@@ -549,7 +549,7 @@ export class ClipboardWatcher {
       // Get image from clipboard
       const image = clipboard.readImage();
       if (image.isEmpty()) {
-        this.logger.debug('Clipboard image is empty');
+        this.llog.debug('Clipboard image is empty');
         return;
       }
 
@@ -558,7 +558,7 @@ export class ClipboardWatcher {
       
       // Check if app is excluded
       if (this.isAppExcluded(sourceApp)) {
-        this.logger.debug('Ignoring clipboard image from excluded app', { app: sourceApp });
+        this.llog.debug('Ignoring clipboard image from excluded app', { app: sourceApp });
         this.stats.ignoredChanges++;
         return;
       }
@@ -568,7 +568,7 @@ export class ClipboardWatcher {
       
       // Check image size
       if (this.isImageTooLarge(pngBuffer)) {
-        this.logger.warn('Clipboard image too large, ignoring', {
+        this.llog.warn('Clipboard image too large, ignoring', {
           size: pngBuffer.length,
           limit: this.config.maxItemSizeKB * 1024,
         });
@@ -594,7 +594,7 @@ export class ClipboardWatcher {
       this.stats.capturedChanges++;
       this.stats.lastChangeTime = timestamp;
 
-      this.logger.debug('Clipboard image change processed', {
+      this.llog.debug('Clipboard image change processed', {
         size: pngBuffer.length,
         dimensions: image.getSize(),
         sourceApp,
@@ -602,7 +602,7 @@ export class ClipboardWatcher {
       });
 
     } catch (error) {
-      this.logger.error('Failed to process clipboard image change', error as Error, {
+      this.llog.error('Failed to process clipboard image change', error as Error, {
         changeId,
       });
       this.stats.errorCount++;
@@ -674,14 +674,14 @@ export class ClipboardWatcher {
         timestamp: change.timestamp,
       });
 
-      this.logger.info('Clipboard change processed successfully', {
+      this.llog.info('Clipboard change processed successfully', {
         itemId: item.id,
         contentType: item.contentType,
         processingTime,
       });
 
     } catch (error) {
-      this.logger.error('Failed to process clipboard change', error as Error, {
+      this.llog.error('Failed to process clipboard change', error as Error, {
         format: change.format,
         timestamp: change.timestamp,
       });
@@ -731,7 +731,7 @@ export class ClipboardWatcher {
       return 'unknown';
       
     } catch (error) {
-      this.logger.debug('Failed to get source application', error as Error);
+      this.llog.debug('Failed to get source application', error as Error);
       return 'unknown';
     }
   }
@@ -851,7 +851,7 @@ export class ClipboardWatcher {
     this.stats.state = newState;
 
     if (oldState !== newState) {
-      this.logger.debug('Watcher state changed', { oldState, newState });
+      this.llog.debug('Watcher state changed', { oldState, newState });
     }
   }
 
@@ -878,7 +878,7 @@ export class ClipboardWatcher {
       try {
         listener(event);
       } catch (error) {
-        this.logger.error('Error in clipboard event listener', error as Error);
+        this.llog.error('Error in clipboard event listener', error as Error);
       }
     });
   }
@@ -891,7 +891,7 @@ export class ClipboardWatcher {
       throw new Error('Watcher is not active');
     }
 
-    this.logger.debug('Manual clipboard check triggered');
+    this.llog.debug('Manual clipboard check triggered');
     await this.checkClipboardChanges();
   }
 
@@ -901,7 +901,7 @@ export class ClipboardWatcher {
   public pause(): void {
     if (this.state === ClipboardState.ACTIVE) {
       this.setState(ClipboardState.PAUSED);
-      this.logger.info('Clipboard watcher paused');
+      this.llog.info('Clipboard watcher paused');
     }
   }
 
@@ -911,7 +911,7 @@ export class ClipboardWatcher {
   public resume(): void {
     if (this.state === ClipboardState.PAUSED) {
       this.setState(ClipboardState.ACTIVE);
-      this.logger.info('Clipboard watcher resumed');
+      this.llog.info('Clipboard watcher resumed');
     }
   }
 
@@ -927,7 +927,7 @@ export class ClipboardWatcher {
    */
   public clearStats(): void {
     this.stats = this.createInitialStats();
-    this.logger.debug('Watcher statistics cleared');
+    this.llog.debug('Watcher statistics cleared');
   }
 
   /**
@@ -973,7 +973,7 @@ export class ClipboardWatcher {
       return currentText;
 
     } catch (error) {
-      this.logger.error('Failed to capture clipboard content', error as Error);
+      this.llog.error('Failed to capture clipboard content', error as Error);
       return null;
     }
   }
@@ -982,7 +982,7 @@ export class ClipboardWatcher {
    * Cleanup resources
    */
   public async cleanup(): Promise<void> {
-    this.logger.info('Cleaning up clipboard watcher');
+    this.llog.info('Cleaning up clipboard watcher');
     
     this.stopWatching();
     this.eventListeners = [];
@@ -994,7 +994,7 @@ export class ClipboardWatcher {
     }
     
     this.isInitialized = false;
-    this.logger.info('Clipboard watcher cleanup completed');
+    this.llog.info('Clipboard watcher cleanup completed');
   }
 
   /**
@@ -1004,3 +1004,4 @@ export class ClipboardWatcher {
     return this.isInitialized;
   }
 }
+

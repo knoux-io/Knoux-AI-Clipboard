@@ -5,7 +5,7 @@
  * Clipboard Intelligence • Desktop Precision • Premium Engineering
  */
 
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { CLIPBOARD, CONTENT_TYPES } from '../../shared/constants';
 import { ClipboardItem, ClipboardMetadata } from '../../shared/types';
 import { ProgrammingLanguage, ClipboardFormat } from '../../shared/enums';
@@ -73,9 +73,9 @@ export class ClipboardFormatter {
       return;
     }
 
-    this.logger.info('Initializing clipboard formatter');
+    this.llog.info('Initializing clipboard formatter');
     this.isInitialized = true;
-    this.logger.info('Clipboard formatter initialized successfully');
+    this.llog.info('Clipboard formatter initialized successfully');
   }
 
   /**
@@ -164,7 +164,7 @@ export class ClipboardFormatter {
       { pattern: /^\s*\d+\.\s+.+$/gm, type: 'keyword', className: 'list' },
     ]);
 
-    this.logger.debug(`Initialized syntax rules for ${this.syntaxRules.size} languages`);
+    this.llog.debug(`Initialized syntax rules for ${this.syntaxRules.size} languages`);
   }
 
   /**
@@ -192,7 +192,7 @@ export class ClipboardFormatter {
       ...options,
     };
 
-    this.logger.debug('Formatting content', {
+    this.llog.debug('Formatting content', {
       contentLength: content.length,
       options: fullOptions,
     });
@@ -233,7 +233,7 @@ export class ClipboardFormatter {
       const formattingTimeMs = Date.now() - startTime;
       const metadata = this.createFormatMetadata(content, formatted, language, formattingTimeMs);
       
-      this.logger.info('Content formatted successfully', {
+      this.llog.info('Content formatted successfully', {
         originalLength: content.length,
         formattedLength: formatted.length,
         language,
@@ -249,7 +249,7 @@ export class ClipboardFormatter {
       };
       
     } catch (error) {
-      this.logger.error('Failed to format content', error as Error, {
+      this.llog.error('Failed to format content', error as Error, {
         contentLength: content.length,
       });
       
@@ -711,7 +711,7 @@ export class ClipboardFormatter {
         const formatted = await this.formatClipboardItem(item, options);
         formattedItems.push(formatted);
       } catch (error) {
-        this.logger.error('Failed to format collection item', error as Error, {
+        this.llog.error('Failed to format collection item', error as Error, {
           itemId: item.id,
         });
       }
@@ -845,7 +845,7 @@ export class ClipboardFormatter {
    * Clear formatter cache
    */
   public clearCache(): void {
-    this.logger.debug('Formatter cache cleared');
+    this.llog.debug('Formatter cache cleared');
     // This implementation doesn't use caching
   }
 
@@ -867,3 +867,4 @@ export class ClipboardFormatter {
     };
   }
 }
+

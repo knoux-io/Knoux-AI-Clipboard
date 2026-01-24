@@ -5,7 +5,7 @@
  * Clipboard Intelligence • Desktop Precision • Premium Engineering
  */
 
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { CONTENT_TYPES, SECURITY, AI } from '../../shared/constants';
 import { ContentClassification, ClassificationPattern, TextLocation } from '../../shared/types';
 import { ProgrammingLanguage, TextType, DataFormat, ContentCategory } from '../../shared/enums';
@@ -70,7 +70,7 @@ export class ContentClassifier {
    * Initialize classification patterns and rules
    */
   private initializePatterns(): void {
-    this.logger.info('Initializing classification patterns');
+    this.llog.info('Initializing classification patterns');
 
     // ==================== CODE PATTERNS ====================
     
@@ -303,7 +303,7 @@ export class ContentClassifier {
 
     this.initializeLanguagePatterns();
 
-    this.logger.info(`Initialized ${this.patternRules.length} pattern rules and ${this.languagePatterns.length} language patterns`);
+    this.llog.info(`Initialized ${this.patternRules.length} pattern rules and ${this.languagePatterns.length} language patterns`);
   }
 
   /**
@@ -453,7 +453,7 @@ export class ContentClassifier {
       return;
     }
 
-    this.logger.info('Initializing content classifier');
+    this.llog.info('Initializing content classifier');
 
     try {
       // Load any custom patterns from storage
@@ -463,12 +463,12 @@ export class ContentClassifier {
       await this.warmUp();
       
       this.isInitialized = true;
-      this.logger.info('Content classifier initialized successfully', {
+      this.llog.info('Content classifier initialized successfully', {
         patternCount: this.patternRules.length,
         languagePatternCount: this.languagePatterns.length,
       });
     } catch (error) {
-      this.logger.error('Failed to initialize classifier', error as Error);
+      this.llog.error('Failed to initialize classifier', error as Error);
       throw error;
     }
   }
@@ -478,7 +478,7 @@ export class ContentClassifier {
    */
   private async loadCustomPatterns(): Promise<void> {
     // In production, this would load user-defined patterns
-    this.logger.debug('Would load custom patterns from storage');
+    this.llog.debug('Would load custom patterns from storage');
   }
 
   /**
@@ -497,7 +497,7 @@ export class ContentClassifier {
       await this.classify(sample, { detailedAnalysis: false });
     }
 
-    this.logger.debug('Classifier warmed up with sample data');
+    this.llog.debug('Classifier warmed up with sample data');
   }
 
   /**
@@ -517,11 +517,11 @@ export class ContentClassifier {
     const cacheKey = this.generateCacheKey(content, options);
     const cachedResult = this.classificationCache.get(cacheKey);
     if (cachedResult && this.isCacheValid(cachedResult)) {
-      this.logger.debug('Classification cache hit', { cacheKey });
+      this.llog.debug('Classification cache hit', { cacheKey });
       return cachedResult;
     }
 
-    this.logger.debug('Classifying content', {
+    this.llog.debug('Classifying content', {
       contentLength: content.length,
       options,
     });
@@ -563,7 +563,7 @@ export class ContentClassifier {
       this.cleanupCache();
 
       const processingTime = Date.now() - startTime;
-      this.logger.info('Content classification completed', {
+      this.llog.info('Content classification completed', {
         contentLength: content.length,
         primaryType,
         confidence: classification.confidence,
@@ -574,7 +574,7 @@ export class ContentClassifier {
       return classification;
 
     } catch (error) {
-      this.logger.error('Content classification failed', error as Error, {
+      this.llog.error('Content classification failed', error as Error, {
         contentLength: content.length,
       });
       
@@ -969,7 +969,7 @@ export class ContentClassifier {
       keysToDelete.forEach(key => this.classificationCache.delete(key));
       
       if (keysToDelete.length > 0) {
-        this.logger.debug('Cleaned up classification cache', { count: keysToDelete.length });
+        this.llog.debug('Cleaned up classification cache', { count: keysToDelete.length });
       }
     }
   }
@@ -979,7 +979,7 @@ export class ContentClassifier {
    */
   public clearCache(): void {
     this.classificationCache.clear();
-    this.logger.debug('Classification cache cleared');
+    this.llog.debug('Classification cache cleared');
   }
 
   /**
@@ -1008,7 +1008,7 @@ export class ContentClassifier {
     };
     
     this.patternRules.push(fullRule);
-    this.logger.info('Custom pattern added', { type: rule.type, pattern: rule.pattern });
+    this.llog.info('Custom pattern added', { type: rule.type, pattern: rule.pattern });
   }
 
   /**
@@ -1069,3 +1069,4 @@ export class ContentClassifier {
     });
   }
 }
+

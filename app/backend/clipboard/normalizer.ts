@@ -5,7 +5,7 @@
  * Clipboard Intelligence • Desktop Precision • Premium Engineering
  */
 
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { CLIPBOARD, CONTENT_TYPES } from '../../shared/constants';
 import { ClipboardFormat } from '../../shared/enums';
 
@@ -83,9 +83,9 @@ export class ClipboardNormalizer {
       return;
     }
 
-    this.logger.info('Initializing clipboard normalizer');
+    this.llog.info('Initializing clipboard normalizer');
     this.isInitialized = true;
-    this.logger.info('Clipboard normalizer initialized successfully');
+    this.llog.info('Clipboard normalizer initialized successfully');
   }
 
   /**
@@ -122,7 +122,7 @@ export class ClipboardNormalizer {
       ...options,
     };
 
-    this.logger.debug('Normalizing content', {
+    this.llog.debug('Normalizing content', {
       originalLength: content.length,
       format,
       options: fullOptions,
@@ -168,7 +168,7 @@ export class ClipboardNormalizer {
     // Extract metadata
     const metadata = this.extractMetadata(normalized, format);
 
-    this.logger.info('Content normalized successfully', {
+    this.llog.info('Content normalized successfully', {
       originalLength: content.length,
       normalizedLength: normalized.length,
       reduction: ((content.length - normalized.length) / content.length * 100).toFixed(1) + '%',
@@ -225,7 +225,7 @@ export class ClipboardNormalizer {
       
       return cleaned;
     } catch (error) {
-      this.logger.warn('HTML normalization failed, returning as plain text', error as Error);
+      this.llog.warn('HTML normalization failed, returning as plain text', error as Error);
       return html;
     }
   }
@@ -261,7 +261,7 @@ export class ClipboardNormalizer {
       
       return text;
     } catch (error) {
-      this.logger.warn('RTF normalization failed', error as Error);
+      this.llog.warn('RTF normalization failed', error as Error);
       return '[RTF Content]';
     }
   }
@@ -678,7 +678,7 @@ export class ClipboardNormalizer {
     }
     
     if (redactionCount > 0) {
-      this.logger.info('Sensitive data cleaned from content', { redactionCount });
+      this.llog.info('Sensitive data cleaned from content', { redactionCount });
     }
     
     return cleaned;
@@ -808,7 +808,8 @@ export class ClipboardNormalizer {
    * Reset normalizer state
    */
   public reset(): void {
-    this.logger.debug('Normalizer reset');
+    this.llog.debug('Normalizer reset');
     // No state to reset in this implementation
   }
 }
+

@@ -6,7 +6,7 @@
  */
 
 import { ipcMain, IpcMainEvent } from 'electron';
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { IPC_CHANNELS, ERROR_CODES } from '../../shared/constants';
 import { 
   ApiResponse, 
@@ -65,7 +65,7 @@ export class IPCHandlers {
    * Initialize all IPC handlers
    */
   private initializeHandlers(): void {
-    this.logger.info('Initializing IPC handlers');
+    this.llog.info('Initializing IPC handlers');
 
     // Clipboard handlers
     this.registerHandler(IPC_CHANNELS.CLIPBOARD_GET, this.handleGetClipboard.bind(this));
@@ -117,7 +117,7 @@ export class IPCHandlers {
     this.registerHandler(IPC_CHANNELS.ERROR_LOG, this.handleErrorLog.bind(this));
     this.registerHandler(IPC_CHANNELS.ERROR_CLEAR, this.handleErrorClear.bind(this));
 
-    this.logger.info(`Registered ${this.handlers.size} IPC handlers`);
+    this.llog.info(`Registered ${this.handlers.size} IPC handlers`);
   }
 
   /**
@@ -130,7 +130,7 @@ export class IPCHandlers {
       try {
         return await handler(event, ...args);
       } catch (error) {
-        this.logger.error(`IPC handler error for channel ${channel}`, error as Error);
+        this.llog.error(`IPC handler error for channel ${channel}`, error as Error);
         return this.createErrorResponse(error as Error, channel);
       }
     });
@@ -154,7 +154,7 @@ export class IPCHandlers {
       return;
     }
 
-    this.logger.info('Initializing IPC services');
+    this.llog.info('Initializing IPC services');
 
     this.watcher = services.watcher;
     this.historyStore = services.historyStore;
@@ -174,7 +174,7 @@ export class IPCHandlers {
     ]);
 
     this.initialized = true;
-    this.logger.info('IPC handlers initialized successfully');
+    this.llog.info('IPC handlers initialized successfully');
   }
 
   /**
@@ -208,7 +208,7 @@ export class IPCHandlers {
    * Handle: Get current clipboard content
    */
   private async handleGetClipboard(event: IpcMainEvent, format?: ClipboardFormat): Promise<ApiResponse<string>> {
-    this.logger.debug('Getting clipboard content', { format });
+    this.llog.debug('Getting clipboard content', { format });
     
     try {
       // In production, this would read from Electron clipboard
@@ -216,7 +216,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(content);
     } catch (error) {
-      this.logger.error('Failed to get clipboard content', error as Error);
+      this.llog.error('Failed to get clipboard content', error as Error);
       throw error;
     }
   }
@@ -225,7 +225,7 @@ export class IPCHandlers {
    * Handle: Set clipboard content
    */
   private async handleSetClipboard(event: IpcMainEvent, content: string, format?: ClipboardFormat): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Setting clipboard content', { 
+    this.llog.debug('Setting clipboard content', { 
       contentLength: content.length,
       format,
     });
@@ -235,7 +235,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to set clipboard content', error as Error);
+      this.llog.error('Failed to set clipboard content', error as Error);
       throw error;
     }
   }
@@ -244,14 +244,14 @@ export class IPCHandlers {
    * Handle: Clear clipboard
    */
   private async handleClearClipboard(event: IpcMainEvent): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Clearing clipboard');
+    this.llog.debug('Clearing clipboard');
     
     try {
       // In production, this would clear Electron clipboard
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to clear clipboard', error as Error);
+      this.llog.error('Failed to clear clipboard', error as Error);
       throw error;
     }
   }
@@ -260,7 +260,7 @@ export class IPCHandlers {
    * Handle: Clipboard change event
    */
   private async handleClipboardChange(event: IpcMainEvent, content: string): Promise<ApiResponse<ClipboardItem>> {
-    this.logger.debug('Handling clipboard change', { 
+    this.llog.debug('Handling clipboard change', { 
       contentLength: content.length,
     });
     
@@ -276,7 +276,7 @@ export class IPCHandlers {
 
       return this.createSuccessResponse(item);
     } catch (error) {
-      this.logger.error('Failed to handle clipboard change', error as Error);
+      this.llog.error('Failed to handle clipboard change', error as Error);
       throw error;
     }
   }
@@ -289,7 +289,7 @@ export class IPCHandlers {
     limit?: number, 
     filters?: SearchFilter[]
   ): Promise<ApiResponse<ClipboardItem[]>> {
-    this.logger.debug('Getting clipboard history', { limit, filterCount: filters?.length || 0 });
+    this.llog.debug('Getting clipboard history', { limit, filterCount: filters?.length || 0 });
     
     try {
       if (!this.historyStore) {
@@ -309,7 +309,7 @@ export class IPCHandlers {
 
       return this.createSuccessResponse(items);
     } catch (error) {
-      this.logger.error('Failed to get clipboard history', error as Error);
+      this.llog.error('Failed to get clipboard history', error as Error);
       throw error;
     }
   }
@@ -322,7 +322,7 @@ export class IPCHandlers {
     content: string, 
     metadata?: any
   ): Promise<ApiResponse<ClipboardItem>> {
-    this.logger.debug('Adding item to history', { 
+    this.llog.debug('Adding item to history', { 
       contentLength: content.length,
       metadata: metadata ? 'provided' : 'none',
     });
@@ -336,7 +336,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(item);
     } catch (error) {
-      this.logger.error('Failed to add item to history', error as Error);
+      this.llog.error('Failed to add item to history', error as Error);
       throw error;
     }
   }
@@ -345,7 +345,7 @@ export class IPCHandlers {
    * Handle: Delete item from history
    */
   private async handleDeleteFromHistory(event: IpcMainEvent, itemId: string): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Deleting item from history', { itemId });
+    this.llog.debug('Deleting item from history', { itemId });
     
     try {
       if (!this.historyStore) {
@@ -356,7 +356,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(success);
     } catch (error) {
-      this.logger.error('Failed to delete item from history', error as Error);
+      this.llog.error('Failed to delete item from history', error as Error);
       throw error;
     }
   }
@@ -365,7 +365,7 @@ export class IPCHandlers {
    * Handle: Clear clipboard history
    */
   private async handleClearHistory(event: IpcMainEvent, includePinned?: boolean): Promise<ApiResponse<number>> {
-    this.logger.debug('Clearing clipboard history', { includePinned });
+    this.llog.debug('Clearing clipboard history', { includePinned });
     
     try {
       if (!this.historyStore) {
@@ -376,7 +376,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(deletedCount);
     } catch (error) {
-      this.logger.error('Failed to clear clipboard history', error as Error);
+      this.llog.error('Failed to clear clipboard history', error as Error);
       throw error;
     }
   }
@@ -391,7 +391,7 @@ export class IPCHandlers {
     content: string, 
     options?: any
   ): Promise<ApiResponse<AIAnalysis>> {
-    this.logger.debug('Analyzing content with AI', { 
+    this.llog.debug('Analyzing content with AI', { 
       contentLength: content.length,
       options: options ? 'provided' : 'default',
     });
@@ -425,7 +425,7 @@ export class IPCHandlers {
 
       return this.createSuccessResponse(analysis);
     } catch (error) {
-      this.logger.error('Failed to analyze content', error as Error);
+      this.llog.error('Failed to analyze content', error as Error);
       throw error;
     }
   }
@@ -438,7 +438,7 @@ export class IPCHandlers {
     content: string, 
     options?: any
   ): Promise<ApiResponse<{ enhanced: string; improvements: string[]; confidence: number }>> {
-    this.logger.debug('Enhancing content with AI', { 
+    this.llog.debug('Enhancing content with AI', { 
       contentLength: content.length,
       options: options ? 'provided' : 'default',
     });
@@ -461,7 +461,7 @@ export class IPCHandlers {
         confidence: result.confidence,
       });
     } catch (error) {
-      this.logger.error('Failed to enhance content', error as Error);
+      this.llog.error('Failed to enhance content', error as Error);
       throw error;
     }
   }
@@ -474,7 +474,7 @@ export class IPCHandlers {
     content: string, 
     options?: any
   ): Promise<ApiResponse<ContentClassification>> {
-    this.logger.debug('Classifying content', { 
+    this.llog.debug('Classifying content', { 
       contentLength: content.length,
       options: options ? 'provided' : 'default',
     });
@@ -491,7 +491,7 @@ export class IPCHandlers {
 
       return this.createSuccessResponse(classification);
     } catch (error) {
-      this.logger.error('Failed to classify content', error as Error);
+      this.llog.error('Failed to classify content', error as Error);
       throw error;
     }
   }
@@ -504,7 +504,7 @@ export class IPCHandlers {
     content: string, 
     options?: any
   ): Promise<ApiResponse<{ summary: string; keyPoints: string[] }>> {
-    this.logger.debug('Summarizing content', { 
+    this.llog.debug('Summarizing content', { 
       contentLength: content.length,
       options: options ? 'provided' : 'default',
     });
@@ -525,7 +525,7 @@ export class IPCHandlers {
         keyPoints: result.keyPoints,
       });
     } catch (error) {
-      this.logger.error('Failed to summarize content', error as Error);
+      this.llog.error('Failed to summarize content', error as Error);
       throw error;
     }
   }
@@ -538,7 +538,7 @@ export class IPCHandlers {
     content: string, 
     context?: any
   ): Promise<ApiResponse<AISuggestion[]>> {
-    this.logger.debug('Getting AI suggestions', { 
+    this.llog.debug('Getting AI suggestions', { 
       contentLength: content.length,
       context: context ? 'provided' : 'none',
     });
@@ -568,7 +568,7 @@ export class IPCHandlers {
 
       return this.createSuccessResponse(suggestions);
     } catch (error) {
-      this.logger.error('Failed to get suggestions', error as Error);
+      this.llog.error('Failed to get suggestions', error as Error);
       throw error;
     }
   }
@@ -577,7 +577,7 @@ export class IPCHandlers {
    * Handle: Get AI status
    */
   private async handleAIStatus(event: IpcMainEvent): Promise<ApiResponse<any>> {
-    this.logger.debug('Getting AI status');
+    this.llog.debug('Getting AI status');
     
     try {
       if (!this.aiEngine) {
@@ -593,7 +593,7 @@ export class IPCHandlers {
 
       return this.createSuccessResponse(status);
     } catch (error) {
-      this.logger.error('Failed to get AI status', error as Error);
+      this.llog.error('Failed to get AI status', error as Error);
       throw error;
     }
   }
@@ -602,7 +602,7 @@ export class IPCHandlers {
    * Handle: Get available AI models
    */
   private async handleGetModels(event: IpcMainEvent): Promise<ApiResponse<any[]>> {
-    this.logger.debug('Getting available AI models');
+    this.llog.debug('Getting available AI models');
     
     try {
       if (!this.aiEngine) {
@@ -613,7 +613,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(models);
     } catch (error) {
-      this.logger.error('Failed to get AI models', error as Error);
+      this.llog.error('Failed to get AI models', error as Error);
       throw error;
     }
   }
@@ -622,7 +622,7 @@ export class IPCHandlers {
    * Handle: Switch AI model
    */
   private async handleSwitchModel(event: IpcMainEvent, modelType: string): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Switching AI model', { modelType });
+    this.llog.debug('Switching AI model', { modelType });
     
     try {
       if (!this.aiEngine) {
@@ -634,7 +634,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to switch AI model', error as Error);
+      this.llog.error('Failed to switch AI model', error as Error);
       throw error;
     }
   }
@@ -645,7 +645,7 @@ export class IPCHandlers {
    * Handle: Get storage value
    */
   private async handleStorageGet(event: IpcMainEvent, key: string): Promise<ApiResponse<any>> {
-    this.logger.debug('Getting storage value', { key });
+    this.llog.debug('Getting storage value', { key });
     
     try {
       // In production, this would read from Electron store
@@ -653,7 +653,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(value);
     } catch (error) {
-      this.logger.error('Failed to get storage value', error as Error);
+      this.llog.error('Failed to get storage value', error as Error);
       throw error;
     }
   }
@@ -662,7 +662,7 @@ export class IPCHandlers {
    * Handle: Set storage value
    */
   private async handleStorageSet(event: IpcMainEvent, key: string, value: any): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Setting storage value', { 
+    this.llog.debug('Setting storage value', { 
       key,
       valueType: typeof value,
     });
@@ -672,7 +672,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to set storage value', error as Error);
+      this.llog.error('Failed to set storage value', error as Error);
       throw error;
     }
   }
@@ -681,14 +681,14 @@ export class IPCHandlers {
    * Handle: Delete storage value
    */
   private async handleStorageDelete(event: IpcMainEvent, key: string): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Deleting storage value', { key });
+    this.llog.debug('Deleting storage value', { key });
     
     try {
       // In production, this would delete from Electron store
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to delete storage value', error as Error);
+      this.llog.error('Failed to delete storage value', error as Error);
       throw error;
     }
   }
@@ -697,14 +697,14 @@ export class IPCHandlers {
    * Handle: Clear storage
    */
   private async handleStorageClear(event: IpcMainEvent): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Clearing storage');
+    this.llog.debug('Clearing storage');
     
     try {
       // In production, this would clear Electron store
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to clear storage', error as Error);
+      this.llog.error('Failed to clear storage', error as Error);
       throw error;
     }
   }
@@ -716,7 +716,7 @@ export class IPCHandlers {
     event: IpcMainEvent, 
     options: ExportOptions
   ): Promise<ApiResponse<string>> {
-    this.logger.debug('Exporting data', { 
+    this.llog.debug('Exporting data', { 
       format: options.format,
       includeSensitive: options.includeSensitive,
     });
@@ -730,7 +730,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(exportData);
     } catch (error) {
-      this.logger.error('Failed to export data', error as Error);
+      this.llog.error('Failed to export data', error as Error);
       throw error;
     }
   }
@@ -743,7 +743,7 @@ export class IPCHandlers {
     data: string, 
     options: ImportOptions
   ): Promise<ApiResponse<number>> {
-    this.logger.debug('Importing data', { 
+    this.llog.debug('Importing data', { 
       dataLength: data.length,
       format: options.format,
       merge: options.merge,
@@ -758,7 +758,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(importedCount);
     } catch (error) {
-      this.logger.error('Failed to import data', error as Error);
+      this.llog.error('Failed to import data', error as Error);
       throw error;
     }
   }
@@ -767,7 +767,7 @@ export class IPCHandlers {
    * Handle: Get storage statistics
    */
   private async handleStorageStats(event: IpcMainEvent): Promise<ApiResponse<any>> {
-    this.logger.debug('Getting storage statistics');
+    this.llog.debug('Getting storage statistics');
     
     try {
       if (!this.historyStore) {
@@ -778,7 +778,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(stats);
     } catch (error) {
-      this.logger.error('Failed to get storage statistics', error as Error);
+      this.llog.error('Failed to get storage statistics', error as Error);
       throw error;
     }
   }
@@ -789,14 +789,14 @@ export class IPCHandlers {
    * Handle: Change theme
    */
   private async handleThemeChange(event: IpcMainEvent, theme: string): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Changing theme', { theme });
+    this.llog.debug('Changing theme', { theme });
     
     try {
       // In production, this would update the theme
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to change theme', error as Error);
+      this.llog.error('Failed to change theme', error as Error);
       throw error;
     }
   }
@@ -805,14 +805,14 @@ export class IPCHandlers {
    * Handle: Change language
    */
   private async handleLanguageChange(event: IpcMainEvent, language: string): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Changing language', { language });
+    this.llog.debug('Changing language', { language });
     
     try {
       // In production, this would update the language
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to change language', error as Error);
+      this.llog.error('Failed to change language', error as Error);
       throw error;
     }
   }
@@ -826,14 +826,14 @@ export class IPCHandlers {
     title: string, 
     message: string
   ): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Showing notification', { type, title });
+    this.llog.debug('Showing notification', { type, title });
     
     try {
       // In production, this would show a system notification
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to show notification', error as Error);
+      this.llog.error('Failed to show notification', error as Error);
       throw error;
     }
   }
@@ -848,7 +848,7 @@ export class IPCHandlers {
     message: string,
     buttons?: string[]
   ): Promise<ApiResponse<number>> {
-    this.logger.debug('Showing dialog', { type, title });
+    this.llog.debug('Showing dialog', { type, title });
     
     try {
       // In production, this would show an Electron dialog
@@ -856,7 +856,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(result);
     } catch (error) {
-      this.logger.error('Failed to show dialog', error as Error);
+      this.llog.error('Failed to show dialog', error as Error);
       throw error;
     }
   }
@@ -865,7 +865,7 @@ export class IPCHandlers {
    * Handle: Minimize window
    */
   private async handleWindowMinimize(event: IpcMainEvent): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Minimizing window');
+    this.llog.debug('Minimizing window');
     
     try {
       const window = event.sender.getOwnerBrowserWindow();
@@ -875,7 +875,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to minimize window', error as Error);
+      this.llog.error('Failed to minimize window', error as Error);
       throw error;
     }
   }
@@ -884,7 +884,7 @@ export class IPCHandlers {
    * Handle: Maximize window
    */
   private async handleWindowMaximize(event: IpcMainEvent): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Maximizing window');
+    this.llog.debug('Maximizing window');
     
     try {
       const window = event.sender.getOwnerBrowserWindow();
@@ -898,7 +898,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to maximize window', error as Error);
+      this.llog.error('Failed to maximize window', error as Error);
       throw error;
     }
   }
@@ -907,7 +907,7 @@ export class IPCHandlers {
    * Handle: Close window
    */
   private async handleWindowClose(event: IpcMainEvent): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Closing window');
+    this.llog.debug('Closing window');
     
     try {
       const window = event.sender.getOwnerBrowserWindow();
@@ -917,7 +917,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to close window', error as Error);
+      this.llog.error('Failed to close window', error as Error);
       throw error;
     }
   }
@@ -928,7 +928,7 @@ export class IPCHandlers {
    * Handle: Get system information
    */
   private async handleSystemInfo(event: IpcMainEvent): Promise<ApiResponse<SystemInfo>> {
-    this.logger.debug('Getting system information');
+    this.llog.debug('Getting system information');
     
     try {
       const systemInfo: SystemInfo = {
@@ -964,7 +964,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(systemInfo);
     } catch (error) {
-      this.logger.error('Failed to get system information', error as Error);
+      this.llog.error('Failed to get system information', error as Error);
       throw error;
     }
   }
@@ -973,7 +973,7 @@ export class IPCHandlers {
    * Handle: Get system statistics
    */
   private async handleSystemStats(event: IpcMainEvent): Promise<ApiResponse<AppStatistics>> {
-    this.logger.debug('Getting system statistics');
+    this.llog.debug('Getting system statistics');
     
     try {
       const stats: AppStatistics = {
@@ -1006,7 +1006,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(stats);
     } catch (error) {
-      this.logger.error('Failed to get system statistics', error as Error);
+      this.llog.error('Failed to get system statistics', error as Error);
       throw error;
     }
   }
@@ -1015,7 +1015,7 @@ export class IPCHandlers {
    * Handle: System update
    */
   private async handleSystemUpdate(event: IpcMainEvent): Promise<ApiResponse<UpdateInfo>> {
-    this.logger.debug('Checking for system update');
+    this.llog.debug('Checking for system update');
     
     try {
       const updateInfo: UpdateInfo = {
@@ -1025,7 +1025,7 @@ export class IPCHandlers {
       
       return this.createSuccessResponse(updateInfo);
     } catch (error) {
-      this.logger.error('Failed to check for update', error as Error);
+      this.llog.error('Failed to check for update', error as Error);
       throw error;
     }
   }
@@ -1034,14 +1034,14 @@ export class IPCHandlers {
    * Handle: System restart
    */
   private async handleSystemRestart(event: IpcMainEvent): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Restarting system');
+    this.llog.debug('Restarting system');
     
     try {
       // In production, this would restart the app
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to restart system', error as Error);
+      this.llog.error('Failed to restart system', error as Error);
       throw error;
     }
   }
@@ -1050,14 +1050,14 @@ export class IPCHandlers {
    * Handle: System quit
    */
   private async handleSystemQuit(event: IpcMainEvent): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Quitting system');
+    this.llog.debug('Quitting system');
     
     try {
       // In production, this would quit the app
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to quit system', error as Error);
+      this.llog.error('Failed to quit system', error as Error);
       throw error;
     }
   }
@@ -1072,14 +1072,14 @@ export class IPCHandlers {
     error: Error, 
     context?: any
   ): Promise<ApiResponse<string>> {
-    this.logger.error('Error reported from renderer', error, context);
+    this.llog.error('Error reported from renderer', error, context);
     
     try {
       const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
       return this.createSuccessResponse(errorId);
     } catch (reportError) {
-      this.logger.error('Failed to report error', reportError as Error);
+      this.llog.error('Failed to report error', reportError as Error);
       throw reportError;
     }
   }
@@ -1092,12 +1092,12 @@ export class IPCHandlers {
     message: string, 
     data?: any
   ): Promise<ApiResponse<boolean>> {
-    this.logger.error('Error logged from renderer', new Error(message), data);
+    this.llog.error('Error logged from renderer', new Error(message), data);
     
     try {
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to log error', error as Error);
+      this.llog.error('Failed to log error', error as Error);
       throw error;
     }
   }
@@ -1106,14 +1106,14 @@ export class IPCHandlers {
    * Handle: Clear errors
    */
   private async handleErrorClear(event: IpcMainEvent): Promise<ApiResponse<boolean>> {
-    this.logger.debug('Clearing errors');
+    this.llog.debug('Clearing errors');
     
     try {
       // In production, this would clear error logs
       
       return this.createSuccessResponse(true);
     } catch (error) {
-      this.logger.error('Failed to clear errors', error as Error);
+      this.llog.error('Failed to clear errors', error as Error);
       throw error;
     }
   }
@@ -1122,7 +1122,7 @@ export class IPCHandlers {
    * Cleanup IPC handlers
    */
   public cleanup(): void {
-    this.logger.info('Cleaning up IPC handlers');
+    this.llog.info('Cleaning up IPC handlers');
     
     // Remove all handlers
     for (const channel of this.handlers.keys()) {
@@ -1132,7 +1132,7 @@ export class IPCHandlers {
     this.handlers.clear();
     this.initialized = false;
     
-    this.logger.info('IPC handlers cleanup completed');
+    this.llog.info('IPC handlers cleanup completed');
   }
 
   /**
@@ -1146,3 +1146,4 @@ export class IPCHandlers {
 // Create and export default instance
 const ipcHandlers = new IPCHandlers();
 export default ipcHandlers;
+

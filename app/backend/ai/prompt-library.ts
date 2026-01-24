@@ -5,7 +5,7 @@
  * Clipboard Intelligence • Desktop Precision • Premium Engineering
  */
 
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { CONTENT_TYPES } from '../../shared/constants';
 import { ProgrammingLanguage, TextType } from '../../shared/enums';
 import { EnhancementOptions } from './enhancer';
@@ -90,7 +90,7 @@ export class PromptLibrary {
    * Initialize prompt library with default templates
    */
   private initializeDefaultTemplates(): void {
-    this.logger.info('Initializing prompt library with default templates');
+    this.llog.info('Initializing prompt library with default templates');
     
     // Code enhancement templates
     this.addTemplate({
@@ -504,7 +504,7 @@ Provide a comprehensive explanation and actionable fixes.`,
       usageCount: 0,
     });
 
-    this.logger.info(`Loaded ${this.templates.size} default templates`);
+    this.llog.info(`Loaded ${this.templates.size} default templates`);
   }
 
   /**
@@ -515,19 +515,19 @@ Provide a comprehensive explanation and actionable fixes.`,
       return;
     }
 
-    this.logger.info('Initializing prompt library');
+    this.llog.info('Initializing prompt library');
     
     try {
       // Load custom templates from storage if available
       await this.loadCustomTemplates();
       
       this.isInitialized = true;
-      this.logger.info('Prompt library initialized successfully', {
+      this.llog.info('Prompt library initialized successfully', {
         templateCount: this.templates.size,
         categories: this.getTemplateCategories(),
       });
     } catch (error) {
-      this.logger.error('Failed to initialize prompt library', error as Error);
+      this.llog.error('Failed to initialize prompt library', error as Error);
       throw error;
     }
   }
@@ -538,7 +538,7 @@ Provide a comprehensive explanation and actionable fixes.`,
   private async loadCustomTemplates(): Promise<void> {
     // In a real implementation, this would load from a database or file
     // For now, we'll just log that we would load custom templates
-    this.logger.debug('Would load custom templates from storage');
+    this.llog.debug('Would load custom templates from storage');
   }
 
   /**
@@ -546,11 +546,11 @@ Provide a comprehensive explanation and actionable fixes.`,
    */
   public addTemplate(template: PromptTemplate): void {
     if (this.templates.has(template.id)) {
-      this.logger.warn('Template already exists, updating', { id: template.id });
+      this.llog.warn('Template already exists, updating', { id: template.id });
     }
     
     this.templates.set(template.id, template);
-    this.logger.debug('Template added/updated', { id: template.id, name: template.name });
+    this.llog.debug('Template added/updated', { id: template.id, name: template.name });
   }
 
   /**
@@ -559,7 +559,7 @@ Provide a comprehensive explanation and actionable fixes.`,
   public removeTemplate(templateId: string): boolean {
     const existed = this.templates.delete(templateId);
     if (existed) {
-      this.logger.debug('Template removed', { id: templateId });
+      this.llog.debug('Template removed', { id: templateId });
     }
     return existed;
   }
@@ -841,7 +841,7 @@ Provide a comprehensive explanation and actionable fixes.`,
    */
   public clearExecutionHistory(): void {
     this.executionHistory = [];
-    this.logger.debug('Execution history cleared');
+    this.llog.debug('Execution history cleared');
   }
 
   /**
@@ -877,11 +877,11 @@ Provide a comprehensive explanation and actionable fixes.`,
         }
       });
       
-      this.logger.info('Templates imported successfully', { count: importedCount });
+      this.llog.info('Templates imported successfully', { count: importedCount });
       return importedCount;
       
     } catch (error) {
-      this.logger.error('Failed to import templates', error as Error);
+      this.llog.error('Failed to import templates', error as Error);
       throw error;
     }
   }
@@ -927,6 +927,7 @@ Provide a comprehensive explanation and actionable fixes.`,
     this.templates.clear();
     this.executionHistory = [];
     this.initializeDefaultTemplates();
-    this.logger.info('Prompt library reset to defaults');
+    this.llog.info('Prompt library reset to defaults');
   }
 }
+

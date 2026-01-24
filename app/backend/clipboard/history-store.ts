@@ -5,7 +5,7 @@
  * Clipboard Intelligence • Desktop Precision • Premium Engineering
  */
 
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { CLIPBOARD, SECURITY, AI } from '../../shared/constants';
 import { 
   ClipboardItem, 
@@ -118,7 +118,7 @@ export class HistoryStore {
       return;
     }
 
-    this.logger.info('Initializing history store');
+    this.llog.info('Initializing history store');
 
     try {
       // Initialize dependencies
@@ -144,13 +144,13 @@ export class HistoryStore {
       }
 
       this.isInitialized = true;
-      this.logger.info('History store initialized successfully', {
+      this.llog.info('History store initialized successfully', {
         itemCount: this.stats.totalItems,
         totalSize: this.formatBytes(this.stats.totalSizeBytes),
       });
 
     } catch (error) {
-      this.logger.error('Failed to initialize history store', error as Error);
+      this.llog.error('Failed to initialize history store', error as Error);
       throw error;
     }
   }
@@ -161,15 +161,15 @@ export class HistoryStore {
   private async loadFromStorage(): Promise<void> {
     try {
       // In production, this would load from SQLite/JSON file
-      this.logger.debug('Loading items from storage', { path: this.storagePath });
+      this.llog.debug('Loading items from storage', { path: this.storagePath });
       
       // Simulate loading
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      this.logger.debug('Storage loading completed (simulated)');
+      this.llog.debug('Storage loading completed (simulated)');
 
     } catch (error) {
-      this.logger.warn('Failed to load from storage, starting fresh', error as Error);
+      this.llog.warn('Failed to load from storage, starting fresh', error as Error);
       this.items.clear();
     }
   }
@@ -180,15 +180,15 @@ export class HistoryStore {
   private async setupEncryption(): Promise<void> {
     try {
       // In production, this would load or generate encryption keys
-      this.logger.debug('Setting up encryption system');
+      this.llog.debug('Setting up encryption system');
       
       // For now, create a mock key
       this.encryptionKey = Buffer.from('mock-encryption-key-32-bytes-length', 'utf8');
       
-      this.logger.info('Encryption system ready');
+      this.llog.info('Encryption system ready');
 
     } catch (error) {
-      this.logger.error('Failed to setup encryption', error as Error);
+      this.llog.error('Failed to setup encryption', error as Error);
       this.config.encryptionEnabled = false;
     }
   }
@@ -203,7 +203,7 @@ export class HistoryStore {
       this.createBackup();
     }, intervalMs);
 
-    this.logger.debug('Backup schedule started', { intervalHours: this.config.backupIntervalHours });
+    this.llog.debug('Backup schedule started', { intervalHours: this.config.backupIntervalHours });
   }
 
   /**
@@ -212,15 +212,15 @@ export class HistoryStore {
   private async createBackup(): Promise<void> {
     try {
       const backupPath = `${this.storagePath}.backup.${Date.now()}.json`;
-      this.logger.info('Creating backup', { path: backupPath });
+      this.llog.info('Creating backup', { path: backupPath });
       
       // In production, this would copy the database/file
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      this.logger.debug('Backup created successfully');
+      this.llog.debug('Backup created successfully');
 
     } catch (error) {
-      this.logger.error('Failed to create backup', error as Error);
+      this.llog.error('Failed to create backup', error as Error);
     }
   }
 
@@ -229,7 +229,7 @@ export class HistoryStore {
    */
   private async saveToStorage(): Promise<void> {
     try {
-      this.logger.debug('Saving items to storage', { 
+      this.llog.debug('Saving items to storage', { 
         itemCount: this.items.size,
         path: this.storagePath,
       });
@@ -237,10 +237,10 @@ export class HistoryStore {
       // In production, this would save to SQLite/JSON file
       await new Promise(resolve => setTimeout(resolve, 200));
       
-      this.logger.debug('Storage save completed');
+      this.llog.debug('Storage save completed');
 
     } catch (error) {
-      this.logger.error('Failed to save to storage', error as Error);
+      this.llog.error('Failed to save to storage', error as Error);
     }
   }
 
@@ -259,7 +259,7 @@ export class HistoryStore {
     const startTime = Date.now();
     const itemId = `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
-    this.logger.debug('Adding item to history', {
+    this.llog.debug('Adding item to history', {
       itemId,
       contentLength: content.length,
       format,
@@ -339,7 +339,7 @@ export class HistoryStore {
       await this.saveToStorage();
 
       const processingTime = Date.now() - startTime;
-      this.logger.info('Item added to history', {
+      this.llog.info('Item added to history', {
         itemId,
         contentType: classification.primaryType,
         isSensitive: classification.isSensitive,
@@ -349,7 +349,7 @@ export class HistoryStore {
       return item;
 
     } catch (error) {
-      this.logger.error('Failed to add item to history', error as Error, {
+      this.llog.error('Failed to add item to history', error as Error, {
         itemId,
         contentLength: content.length,
       });
@@ -363,7 +363,7 @@ export class HistoryStore {
   private async encryptItemContent(item: ClipboardItem): Promise<void> {
     try {
       // In production, use actual encryption
-      this.logger.debug('Encrypting item content', { itemId: item.id });
+      this.llog.debug('Encrypting item content', { itemId: item.id });
       
       // Mark as encrypted
       (item.metadata as any).encrypted = true;
@@ -372,7 +372,7 @@ export class HistoryStore {
       this.stats.encryptedCount++;
 
     } catch (error) {
-      this.logger.error('Failed to encrypt item', error as Error, { itemId: item.id });
+      this.llog.error('Failed to encrypt item', error as Error, { itemId: item.id });
       throw error;
     }
   }
@@ -394,7 +394,7 @@ export class HistoryStore {
   private async compressItem(item: ClipboardItem): Promise<void> {
     try {
       // In production, use actual compression
-      this.logger.debug('Compressing item', { 
+      this.llog.debug('Compressing item', { 
         itemId: item.id,
         originalSize: item.metadata.sizeBytes,
       });
@@ -407,7 +407,7 @@ export class HistoryStore {
       this.stats.compressionRatio = 0.7; // Simulated 30% compression
 
     } catch (error) {
-      this.logger.warn('Failed to compress item', error as Error, { itemId: item.id });
+      this.llog.warn('Failed to compress item', error as Error, { itemId: item.id });
     }
   }
 
@@ -457,7 +457,7 @@ export class HistoryStore {
       return;
     }
 
-    this.logger.info('Auto-pruning history store', {
+    this.llog.info('Auto-pruning history store', {
       currentItems: this.stats.totalItems,
       maxItems: this.config.maxItems,
       currentSize: this.formatBytes(this.stats.totalSizeBytes),
@@ -493,7 +493,7 @@ export class HistoryStore {
 
     if (removedCount > 0) {
       await this.saveToStorage();
-      this.logger.info('Auto-prune completed', {
+      this.llog.info('Auto-prune completed', {
         removedCount,
         removedSize: this.formatBytes(removedSize),
         remainingItems: this.stats.totalItems,
@@ -511,7 +511,7 @@ export class HistoryStore {
     if (item) {
       item.accessCount++;
       item.lastAccessed = new Date();
-      this.logger.debug('Item accessed', { itemId: id, accessCount: item.accessCount });
+      this.llog.debug('Item accessed', { itemId: id, accessCount: item.accessCount });
     }
     
     return item;
@@ -645,7 +645,7 @@ export class HistoryStore {
     
     const searchTimeMs = Date.now() - startTime;
     
-    this.logger.debug('Search completed', {
+    this.llog.debug('Search completed', {
       query,
       filterCount: filters.length,
       resultCount: results.length,
@@ -674,7 +674,7 @@ export class HistoryStore {
     Object.assign(item, updates);
     item.version = (item.version || 0) + 1;
     
-    this.logger.debug('Item updated', { itemId: id, updates: Object.keys(updates) });
+    this.llog.debug('Item updated', { itemId: id, updates: Object.keys(updates) });
     this.saveToStorage(); // Async, no await
     
     return true;
@@ -693,7 +693,7 @@ export class HistoryStore {
     item.favorites = !item.favorites;
     item.version = (item.version || 0) + 1;
     
-    this.logger.debug('Favorite toggled', { 
+    this.llog.debug('Favorite toggled', { 
       itemId: id, 
       isFavorite: item.favorites 
     });
@@ -715,7 +715,7 @@ export class HistoryStore {
     item.pinned = !item.pinned;
     item.version = (item.version || 0) + 1;
     
-    this.logger.debug('Pinned toggled', { 
+    this.llog.debug('Pinned toggled', { 
       itemId: id, 
       isPinned: item.pinned 
     });
@@ -738,7 +738,7 @@ export class HistoryStore {
       item.metadata.tags.push(tag);
       item.version = (item.version || 0) + 1;
       
-      this.logger.debug('Tag added', { itemId: id, tag });
+      this.llog.debug('Tag added', { itemId: id, tag });
       this.saveToStorage(); // Async, no await
     }
     
@@ -760,7 +760,7 @@ export class HistoryStore {
       item.metadata.tags.splice(index, 1);
       item.version = (item.version || 0) + 1;
       
-      this.logger.debug('Tag removed', { itemId: id, tag });
+      this.llog.debug('Tag removed', { itemId: id, tag });
       this.saveToStorage(); // Async, no await
     }
     
@@ -779,14 +779,14 @@ export class HistoryStore {
     
     // Don't delete pinned items without force
     if (item.pinned) {
-      this.logger.warn('Attempted to delete pinned item', { itemId: id });
+      this.llog.warn('Attempted to delete pinned item', { itemId: id });
       return false;
     }
     
     this.items.delete(id);
     this.updateStats(item, 'remove');
     
-    this.logger.info('Item deleted', { 
+    this.llog.info('Item deleted', { 
       itemId: id, 
       contentType: item.classification.primaryType,
       age: this.formatAge(Date.now() - item.metadata.timestamp.getTime()),
@@ -816,7 +816,7 @@ export class HistoryStore {
       this.updateStats(item, 'remove');
     }
     
-    this.logger.info('All items cleared', { 
+    this.llog.info('All items cleared', { 
       deletedCount: deleteCount,
       remainingCount: this.items.size,
       includePinned,
@@ -853,7 +853,7 @@ export class HistoryStore {
       items: itemsToExport,
     };
     
-    this.logger.info('Items exported', { 
+    this.llog.info('Items exported', { 
       itemCount: itemsToExport.length,
       includeSensitive,
     });
@@ -896,13 +896,13 @@ export class HistoryStore {
           importedCount++;
           
         } catch (error) {
-          this.logger.warn('Failed to import item', error as Error, { itemId: itemData.id });
+          this.llog.warn('Failed to import item', error as Error, { itemId: itemData.id });
         }
       }
       
       await this.saveToStorage();
       
-      this.logger.info('Items imported', { 
+      this.llog.info('Items imported', { 
         importedCount,
         totalItems: this.stats.totalItems,
       });
@@ -910,7 +910,7 @@ export class HistoryStore {
       return importedCount;
       
     } catch (error) {
-      this.logger.error('Failed to import items', error as Error);
+      this.llog.error('Failed to import items', error as Error);
       throw error;
     }
   }
@@ -954,7 +954,7 @@ export class HistoryStore {
    * Cleanup resources
    */
   public async cleanup(): Promise<void> {
-    this.logger.info('Cleaning up history store');
+    this.llog.info('Cleaning up history store');
     
     // Clear backup interval
     if (this.backupInterval) {
@@ -965,6 +965,7 @@ export class HistoryStore {
     // Save final state
     await this.saveToStorage();
     
-    this.logger.info('History store cleanup completed');
+    this.llog.info('History store cleanup completed');
   }
 }
+

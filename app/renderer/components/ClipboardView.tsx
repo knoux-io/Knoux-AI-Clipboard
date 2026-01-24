@@ -32,7 +32,7 @@ import {
   Lock,
   AlertCircle
 } from 'lucide-react';
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { useAI } from '../hooks/useAI';
 import { 
   ClipboardItem, 
@@ -116,20 +116,20 @@ export const ClipboardView: React.FC<ClipboardViewProps> = ({
     setError(null);
     
     try {
-      logger.debug('Fetching clipboard items');
+      llog.debug('Fetching clipboard items');
       
       // In production, this would call IPC to get clipboard history
       const response = await window.knoux.getClipboardHistory(maxItems, filters);
       
       if (response.success && response.data) {
         setItems(response.data);
-        logger.info('Clipboard items fetched', { count: response.data.length });
+        llog.info('Clipboard items fetched', { count: response.data.length });
       } else {
         throw new Error(response.error || 'Failed to fetch clipboard items');
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error('Failed to fetch clipboard items', error as Error);
+      llog.error('Failed to fetch clipboard items', error as Error);
       setError(errorMessage);
       
       // Load sample data for development
@@ -249,7 +249,7 @@ export const ClipboardView: React.FC<ClipboardViewProps> = ({
     ];
     
     setItems(sampleItems);
-    logger.info('Loaded sample data', { count: sampleItems.length });
+    llog.info('Loaded sample data', { count: sampleItems.length });
   };
 
   // Filter and sort items
@@ -362,7 +362,7 @@ export const ClipboardView: React.FC<ClipboardViewProps> = ({
   };
 
   const handleItemAction = (action: string, item: ClipboardItem) => {
-    logger.debug('Item action', { action, itemId: item.id });
+    llog.debug('Item action', { action, itemId: item.id });
     
     switch (action) {
       case 'copy':
@@ -399,7 +399,7 @@ export const ClipboardView: React.FC<ClipboardViewProps> = ({
         ));
       }
     } catch (error) {
-      logger.error('Failed to toggle favorite', error as Error);
+      llog.error('Failed to toggle favorite', error as Error);
     }
   };
 
@@ -412,7 +412,7 @@ export const ClipboardView: React.FC<ClipboardViewProps> = ({
         ));
       }
     } catch (error) {
-      logger.error('Failed to toggle pin', error as Error);
+      llog.error('Failed to toggle pin', error as Error);
     }
   };
 
@@ -428,7 +428,7 @@ export const ClipboardView: React.FC<ClipboardViewProps> = ({
         });
       }
     } catch (error) {
-      logger.error('Failed to delete item', error as Error);
+      llog.error('Failed to delete item', error as Error);
     }
   };
 
@@ -436,10 +436,10 @@ export const ClipboardView: React.FC<ClipboardViewProps> = ({
     try {
       const result = await analyzeContent(item.content);
       if (result.success) {
-        logger.info('Item analyzed', { itemId: item.id });
+        llog.info('Item analyzed', { itemId: item.id });
       }
     } catch (error) {
-      logger.error('Failed to analyze item', error as Error);
+      llog.error('Failed to analyze item', error as Error);
     }
   };
 
@@ -1091,3 +1091,4 @@ export const ClipboardView: React.FC<ClipboardViewProps> = ({
 };
 
 export default ClipboardView;
+
