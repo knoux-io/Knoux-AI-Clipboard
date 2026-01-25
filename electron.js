@@ -66,12 +66,14 @@ function createWindow() {
     });
 
     let startURL;
+    // allow override from runner
+    const devOverride = process.env.DEV_SERVER_URL;
 
     switch (projectType) {
         case 'react':
             // React app (localhost:3000 or build/index.html)
             if (process.env.NODE_ENV === 'development') {
-                startURL = 'http://localhost:3000';
+                startURL = devOverride || 'http://localhost:3000';
             } else {
                 startURL = `file://${path.join(__dirname, 'build', 'index.html')}`;
             }
@@ -81,7 +83,7 @@ function createWindow() {
         case 'typescript':
             // Vite/TypeScript app (localhost:5173)
             if (process.env.NODE_ENV === 'development') {
-                startURL = 'http://localhost:5173';
+                startURL = devOverride || 'http://localhost:5173';
             } else {
                 startURL = `file://${path.join(__dirname, 'dist', 'index.html')}`;
             }
