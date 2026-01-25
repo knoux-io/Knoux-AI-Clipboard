@@ -1,0 +1,34 @@
+{
+  "name": "knoux-clipboard-ai",
+  "version": "1.0.0",
+  "private": true,
+  "main": "bridge.js",
+  "scripts": {
+    "electron": "electron .",
+    "start": "react-scripts start",
+    "electron:build": "npm run build && electron-builder",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "electron:dev": "electron .",
+    "dev": "start npm run start && npm run electron",
+    "build": "react-scripts build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "electron": "^25.9.8",
+    "electron-builder": "^26.4.0",
+    "react-scripts": "^5.0.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

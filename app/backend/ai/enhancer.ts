@@ -198,7 +198,7 @@ export class ContentEnhancer {
         contentType,
       });
       
-      throw new Error(`Enhancement failed: ${(error as Error).message}`);
+      throw new Error(Enhancement failed: );
     }
   }
 
@@ -317,10 +317,10 @@ export class ContentEnhancer {
     // Compare lengths
     if (enhanced.length < original.length * 0.8) {
       suggestions.push({
-        id: `suggestion_${now}_1`,
+        id: suggestion__1,
         type: 'optimization',
         title: 'Content Optimized',
-        description: `Content reduced by ${Math.round((1 - enhanced.length / original.length) * 100)}%`,
+        description: Content reduced by %,
         priority: 'medium',
         confidence: 0.8,
         applyAutomatically: true,
@@ -334,10 +334,10 @@ export class ContentEnhancer {
       
       if (enhancedComplexity < originalComplexity * 0.7) {
         suggestions.push({
-          id: `suggestion_${now}_2`,
+          id: suggestion__2,
           type: 'code_improvement',
           title: 'Complexity Reduced',
-          description: `Code complexity reduced by ${Math.round((1 - enhancedComplexity / originalComplexity) * 100)}%`,
+          description: Code complexity reduced by %,
           priority: 'high',
           confidence: 0.75,
           applyAutomatically: true,
@@ -352,10 +352,10 @@ export class ContentEnhancer {
       
       if (securityIssues.length > fixedIssues.length) {
         suggestions.push({
-          id: `suggestion_${now}_3`,
+          id: suggestion__3,
           type: 'security_fix',
           title: 'Security Improvements',
-          description: `Fixed ${securityIssues.length - fixedIssues.length} security issues`,
+          description: Fixed  security issues,
           priority: 'critical',
           confidence: 0.9,
           applyAutomatically: true,
@@ -381,7 +381,7 @@ export class ContentEnhancer {
     const enhancedErrors = await this.detectSyntaxErrors(enhanced, classification.language);
     
     if (enhancedErrors.length < originalErrors.length) {
-      improvements.push(`Fixed ${originalErrors.length - enhancedErrors.length} syntax errors`);
+      improvements.push(Fixed  syntax errors);
     }
 
     // Check for best practices
@@ -389,13 +389,13 @@ export class ContentEnhancer {
     const enhancedBestPractices = this.checkCodeBestPractices(enhanced, classification.language);
     
     if (enhancedBestPractices.score > originalBestPractices.score) {
-      improvements.push(`Improved code quality score from ${originalBestPractices.score}/10 to ${enhancedBestPractices.score}/10`);
+      improvements.push(Improved code quality score from /10 to /10);
     }
 
     // Performance improvements
     const performanceDiff = this.estimatePerformanceImprovement(original, enhanced);
     if (performanceDiff > 0.1) {
-      improvements.push(`Estimated ${Math.round(performanceDiff * 100)}% performance improvement`);
+      improvements.push(Estimated % performance improvement);
     }
 
     return improvements;
@@ -412,7 +412,7 @@ export class ContentEnhancer {
     const enhancedClarity = this.assessClarity(enhanced);
     
     if (enhancedClarity > originalClarity) {
-      improvements.push(`Improved clarity from ${originalClarity}/10 to ${enhancedClarity}/10`);
+      improvements.push(Improved clarity from /10 to /10);
     }
 
     // Specificity improvement
@@ -420,7 +420,7 @@ export class ContentEnhancer {
     const enhancedSpecificity = this.assessSpecificity(enhanced);
     
     if (enhancedSpecificity > originalSpecificity) {
-      improvements.push(`Improved specificity from ${originalSpecificity}/10 to ${enhancedSpecificity}/10`);
+      improvements.push(Improved specificity from /10 to /10);
     }
 
     // Structure improvement
@@ -428,7 +428,7 @@ export class ContentEnhancer {
     const enhancedStructure = this.assessStructure(enhanced);
     
     if (enhancedStructure > originalStructure) {
-      improvements.push(`Improved structure from ${originalStructure}/10 to ${enhancedStructure}/10`);
+      improvements.push(Improved structure from /10 to /10);
     }
 
     return improvements;
@@ -449,18 +449,18 @@ export class ContentEnhancer {
     const enhancedReadability = this.calculateReadability(enhanced);
     
     if (enhancedReadability.score > originalReadability.score) {
-      improvements.push(`Improved readability from ${originalReadability.grade} to ${enhancedReadability.grade}`);
+      improvements.push(Improved readability from  to );
     }
 
     // Grammar improvement
     const grammarIssues = await this.checkGrammar(original);
     if (grammarIssues.length > 0) {
-      improvements.push(`Fixed ${grammarIssues.length} grammar issues`);
+      improvements.push(Fixed  grammar issues);
     }
 
     // Conciseness improvement
     if (enhanced.length < original.length * 0.9) {
-      improvements.push(`Made text ${Math.round((1 - enhanced.length / original.length) * 100)}% more concise`);
+      improvements.push(Made text % more concise);
     }
 
     return improvements;
@@ -506,7 +506,7 @@ export class ContentEnhancer {
    */
   private generateCacheKey(content: string, contentType?: string, options?: EnhancementOptions): string {
     const optionsHash = options ? JSON.stringify(options) : '';
-    return `${content.substring(0, 100)}_${contentType}_${optionsHash}`.replace(/[^a-zA-Z0-9_]/g, '_');
+    return __.replace(/[^a-zA-Z0-9_]/g, '_');
   }
 
   /**
@@ -654,7 +654,7 @@ export class ContentEnhancer {
     const lines = code.split('\n');
     lines.forEach((line, index) => {
       if (line.includes('===') && line.includes('==')) {
-        errors.push(`Line ${index + 1}: Mixed equality operators`);
+        errors.push(Line : Mixed equality operators);
       }
     });
     
@@ -673,14 +673,14 @@ export class ContentEnhancer {
     const longLines = lines.filter(line => line.length > 120);
     if (longLines.length > 0) {
       score -= longLines.length * 0.5;
-      issues.push(`${longLines.length} lines exceed 120 characters`);
+      issues.push( lines exceed 120 characters);
     }
     
     // Check for TODO comments
     const todoCount = (code.match(/TODO:/gi) || []).length;
     if (todoCount > 0) {
       score -= todoCount;
-      issues.push(`${todoCount} TODO comments found`);
+      issues.push( TODO comments found);
     }
     
     // Check for console.log in production code
@@ -840,4 +840,7 @@ export class ContentEnhancer {
     return this.isInitialized;
   }
 }
+
+
+
 

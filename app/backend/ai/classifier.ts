@@ -127,7 +127,7 @@ export class ContentClassifier {
 
     // Bash/Shell patterns
     this.addPatternRule({
-      pattern: /(?:#!/bin/|#!/usr/bin/|echo\s+|cd\s+|ls\s+|grep\s+|awk\s+|sed\s+)/,
+      pattern: /(?:#!\\/bin\\/|#!\\/usr\\/bin\\/|echo\s+|cd\s+|ls\s+|grep\s+|awk\s+|sed\s+)/,
       type: CONTENT_TYPES.CODE.BASH,
       confidence: 0.8,
       category: ContentCategory.CODE,
@@ -303,7 +303,7 @@ export class ContentClassifier {
 
     this.initializeLanguagePatterns();
 
-    this.llog.info(`Initialized ${this.patternRules.length} pattern rules and ${this.languagePatterns.length} language patterns`);
+    this.llog.info(Initialized  pattern rules and  language patterns);
   }
 
   /**
@@ -430,7 +430,7 @@ export class ContentClassifier {
         /^#+\s+.+$/,
         /^\*\*\s*.+\*\*\s*$/,
         /^-\s+\[[ x]\]\s*.+$/,
-        /^```[a-zA-Z]*$/,
+        /^[a-zA-Z]*$/,
       ],
       extensions: ['.md', '.markdown', '.mdown'],
       mimeTypes: ['text/markdown'],
@@ -936,7 +936,7 @@ export class ContentClassifier {
   private generateCacheKey(content: string, options: ClassificationOptions): string {
     const optionsHash = JSON.stringify(options);
     const contentHash = btoa(content.substring(0, 100)).replace(/[^a-zA-Z0-9]/g, '_');
-    return `classify_${contentHash}_${optionsHash}`;
+    return classify__;
   }
 
   /**
@@ -1069,4 +1069,10 @@ export class ContentClassifier {
     });
   }
 }
+
+
+
+
+
+
 

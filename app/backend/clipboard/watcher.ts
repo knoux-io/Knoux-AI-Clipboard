@@ -357,7 +357,7 @@ export class ClipboardWatcher {
 
       // Create simple hash from image dimensions
       const size = image.getSize();
-      return `${size.width}x${size.height}`;
+      return x;
 
     } catch (error) {
       this.llog.warn('Failed to read clipboard image', error as Error);
@@ -439,7 +439,7 @@ export class ClipboardWatcher {
    */
   private async handleTextChange(currentText: string): Promise<void> {
     const timestamp = Date.now();
-    const changeId = `change_${timestamp}_${Math.random().toString(36).substr(2, 9)}`;
+    const changeId = change__;
 
     // Debounce rapid changes
     if (this.changeDebounceTimer) {
@@ -536,7 +536,7 @@ export class ClipboardWatcher {
     }
 
     const timestamp = Date.now();
-    const changeId = `image_${timestamp}_${Math.random().toString(36).substr(2, 9)}`;
+    const changeId = image__;
 
     if (this.processingQueue.has(changeId)) {
       return;
@@ -645,7 +645,7 @@ export class ClipboardWatcher {
 
       // Create clipboard item
       const item: ClipboardItem = {
-        id: `item_${change.timestamp}_${Math.random().toString(36).substr(2, 9)}`,
+        id: item__,
         content: normalizedContent,
         contentType: this.mapFormatToContentType(change.format),
         sourceApp: change.sourceApp,
@@ -1004,4 +1004,7 @@ export class ClipboardWatcher {
     return this.isInitialized;
   }
 }
+
+
+
 

@@ -321,30 +321,30 @@ export class ContentSummarizer {
     });
 
     // Build summary
-    let summary = `Code summary (${language}):\n`;
-    summary += `- Lines: ${lines.length}\n`;
+    let summary = Code summary ():\n;
+    summary += - Lines: \n;
     
     if (functions.length > 0) {
-      summary += `- Functions: ${functions.slice(0, 5).join(', ')}`;
-      if (functions.length > 5) summary += ` and ${functions.length - 5} more`;
+      summary += - Functions: ;
+      if (functions.length > 5) summary +=  and  more;
       summary += '\n';
     }
     
     if (imports.length > 0) {
-      summary += `- Imports: ${imports.length} module${imports.length !== 1 ? 's' : ''}\n`;
+      summary += - Imports:  module\n;
     }
     
     if (variables.length > 0) {
-      summary += `- Variables: ${variables.slice(0, 3).join(', ')}`;
-      if (variables.length > 3) summary += ` and ${variables.length - 3} more`;
+      summary += - Variables: ;
+      if (variables.length > 3) summary +=  and  more;
       summary += '\n';
     }
 
     // Extract key points
     const keyPoints = [
-      `${lines.length} lines of ${language} code`,
-      functions.length > 0 ? `${functions.length} function${functions.length !== 1 ? 's' : ''} defined` : 'No functions defined',
-      imports.length > 0 ? `Uses ${imports.length} import${imports.length !== 1 ? 's' : ''}` : 'No imports',
+       lines of  code,
+      functions.length > 0 ?  function defined : 'No functions defined',
+      imports.length > 0 ? Uses  import : 'No imports',
     ];
 
     // Create metadata
@@ -371,7 +371,7 @@ export class ContentSummarizer {
       length: content.length,
     });
 
-    let summary = `Data structure summary (${classification.primaryType}):\n`;
+    let summary = Data structure summary ():\n;
     let keyPoints: string[] = [];
     let structureInfo = '';
 
@@ -440,12 +440,12 @@ export class ContentSummarizer {
     }
 
     // Build summary
-    let summary = `Email summary:\n`;
-    summary += `- From: ${from}\n`;
-    summary += `- To: ${to}\n`;
-    summary += `- Subject: ${subject}\n`;
-    summary += `- Date: ${date}\n`;
-    summary += `- Body length: ${body.length} characters\n`;
+    let summary = Email summary:\n;
+    summary += - From: \n;
+    summary += - To: \n;
+    summary += - Subject: \n;
+    summary += - Date: \n;
+    summary += - Body length:  characters\n;
 
     // Extract key points from body
     const sentences = body.split(/[.!?]+/).filter(s => s.trim().length > 0);
@@ -480,12 +480,12 @@ export class ContentSummarizer {
     const hasFormatting = content.includes('\n') || content.includes('#') || content.includes('- ');
 
     // Build summary
-    let summary = `AI Prompt summary:\n`;
-    summary += `- Length: ${content.length} characters\n`;
-    summary += `- Context provided: ${hasContext ? 'Yes' : 'No'}\n`;
-    summary += `- Instructions: ${hasInstructions ? 'Clear' : 'Unclear'}\n`;
-    summary += `- Examples: ${hasExamples ? 'Included' : 'Not included'}\n`;
-    summary += `- Formatting: ${hasFormatting ? 'Structured' : 'Unstructured'}\n`;
+    let summary = AI Prompt summary:\n;
+    summary += - Length:  characters\n;
+    summary += - Context provided: \n;
+    summary += - Instructions: \n;
+    summary += - Examples: \n;
+    summary += - Formatting: \n;
 
     // Extract key instructions
     const lines = content.split('\n').filter(line => line.trim().length > 0);
@@ -617,14 +617,14 @@ export class ContentSummarizer {
       if (depth > 2) return '...'; // Limit depth
       
       if (Array.isArray(obj)) {
-        return `Array[${obj.length}]`;
+        return Array[];
       } else if (obj && typeof obj === 'object') {
         const keys = Object.keys(obj);
         if (keys.length === 0) return 'Empty object';
         
-        let result = `Object with ${keys.length} propert${keys.length === 1 ? 'y' : 'ies'}: `;
+        let result = Object with  propert: ;
         result += keys.slice(0, 3).join(', ');
-        if (keys.length > 3) result += `, ...`;
+        if (keys.length > 3) result += , ...;
         return result;
       } else {
         return typeof obj;
@@ -641,18 +641,18 @@ export class ContentSummarizer {
     const keyPoints: string[] = [];
     
     if (Array.isArray(data)) {
-      keyPoints.push(`Array with ${data.length} element${data.length !== 1 ? 's' : ''}`);
+      keyPoints.push(Array with  element);
       
       if (data.length > 0) {
         const sampleType = typeof data[0];
-        keyPoints.push(`Elements are of type: ${sampleType}`);
+        keyPoints.push(Elements are of type: );
       }
     } else if (data && typeof data === 'object') {
       const keys = Object.keys(data);
-      keyPoints.push(`Object with ${keys.length} propert${keys.length === 1 ? 'y' : 'ies'}`);
+      keyPoints.push(Object with  propert);
       
       if (keys.length > 0) {
-        keyPoints.push(`Properties: ${keys.slice(0, 3).join(', ')}`);
+        keyPoints.push(Properties: );
       }
     }
     
@@ -669,7 +669,7 @@ export class ContentSummarizer {
       .map(line => line.trim().split(':')[0] || line.trim().substring(2))
       .slice(0, 5);
     
-    return `YAML document with ${lines.length} lines, top-level: ${topLevelKeys.join(', ')}`;
+    return YAML document with  lines, top-level: ;
   }
 
   /**
@@ -679,7 +679,7 @@ export class ContentSummarizer {
     const lines = content.split('\n').filter(line => line.trim().length > 0);
     const keyPoints: string[] = [];
     
-    keyPoints.push(`${lines.length} lines of YAML`);
+    keyPoints.push( lines of YAML);
     
     const hasArrays = content.includes('- ');
     const hasNested = content.includes('  ') || content.includes('\t');
@@ -700,7 +700,7 @@ export class ContentSummarizer {
       return match ? match[1] : 'unknown';
     })));
     
-    return `XML with ${tags.length} tags, unique tags: ${uniqueTags.slice(0, 5).join(', ')}`;
+    return XML with  tags, unique tags: ;
   }
 
   /**
@@ -714,9 +714,9 @@ export class ContentSummarizer {
     })));
     
     return [
-      `${tags.length} XML tags`,
-      `${uniqueTags.length} unique element types`,
-      uniqueTags.length > 0 ? `Elements: ${uniqueTags.slice(0, 3).join(', ')}` : 'No elements',
+       XML tags,
+       unique element types,
+      uniqueTags.length > 0 ? Elements:  : 'No elements',
     ];
   }
 
@@ -847,14 +847,14 @@ export class ContentSummarizer {
     const keyPoints: string[] = [];
     
     // Add classification info
-    keyPoints.push(`Content type: ${classification.primaryType}`);
+    keyPoints.push(Content type: );
     
     if (classification.language) {
-      keyPoints.push(`Language: ${classification.language}`);
+      keyPoints.push(Language: );
     }
     
     if (classification.isSensitive && classification.sensitiveType) {
-      keyPoints.push(`Contains sensitive: ${classification.sensitiveType}`);
+      keyPoints.push(Contains sensitive: );
     }
     
     // Add important sentences
@@ -1086,7 +1086,7 @@ export class ContentSummarizer {
   private generateCacheKey(content: string, options: SummarizationOptions): string {
     const optionsHash = this.hashOptions(options);
     const contentHash = btoa(content.substring(0, 100)).replace(/[^a-zA-Z0-9]/g, '_');
-    return `summary_${contentHash}_${optionsHash}`;
+    return summary__;
   }
 
   /**
@@ -1152,4 +1152,8 @@ export class ContentSummarizer {
     return this.isInitialized;
   }
 }
+
+
+
+
 

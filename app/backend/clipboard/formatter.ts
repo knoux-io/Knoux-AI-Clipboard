@@ -85,7 +85,7 @@ export class ClipboardFormatter {
     // JavaScript/TypeScript syntax rules
     this.syntaxRules.set('javascript', [
       { pattern: /\b(function|const|let|var|if|else|for|while|return|class|import|export|from|default)\b/g, type: 'keyword', className: 'keyword' },
-      { pattern: /(["'`])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
+      { pattern: /(["'])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
       { pattern: /\/\/.*$/gm, type: 'comment', className: 'comment' },
       { pattern: /\/\*[\s\S]*?\*\//g, type: 'comment', className: 'comment' },
       { pattern: /\b(\d+)\b/g, type: 'number', className: 'number' },
@@ -95,7 +95,7 @@ export class ClipboardFormatter {
 
     this.syntaxRules.set('typescript', [
       { pattern: /\b(interface|type|implements|extends|public|private|protected|readonly)\b/g, type: 'keyword', className: 'keyword' },
-      { pattern: /(["'`])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
+      { pattern: /(["'])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
       { pattern: /\/\/.*$/gm, type: 'comment', className: 'comment' },
       { pattern: /\/\*[\s\S]*?\*\//g, type: 'comment', className: 'comment' },
       { pattern: /\b(\d+)\b/g, type: 'number', className: 'number' },
@@ -106,7 +106,7 @@ export class ClipboardFormatter {
     // Python syntax rules
     this.syntaxRules.set('python', [
       { pattern: /\b(def|class|if|elif|else|for|while|try|except|import|from|as|with|return|yield)\b/g, type: 'keyword', className: 'keyword' },
-      { pattern: /(["'`])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
+      { pattern: /(["'])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
       { pattern: /#.*$/gm, type: 'comment', className: 'comment' },
       { pattern: /"""[\s\S]*?"""/g, type: 'comment', className: 'comment' },
       { pattern: /'''[\s\S]*?'''/g, type: 'comment', className: 'comment' },
@@ -118,7 +118,7 @@ export class ClipboardFormatter {
     // PowerShell syntax rules
     this.syntaxRules.set('powershell', [
       { pattern: /\b(function|param|begin|process|end|if|else|foreach|while|try|catch|finally|return)\b/g, type: 'keyword', className: 'keyword' },
-      { pattern: /(["'`])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
+      { pattern: /(["'])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
       { pattern: /#.*$/gm, type: 'comment', className: 'comment' },
       { pattern: /\b(\d+)\b/g, type: 'number', className: 'number' },
       { pattern: /\b(Get-|Set-|Write-|Start-|Stop-|Test-|New-|Remove-)[A-Za-z]+\b/g, type: 'function', className: 'function' },
@@ -129,7 +129,7 @@ export class ClipboardFormatter {
     // HTML syntax rules
     this.syntaxRules.set('html', [
       { pattern: /&[a-z]+;/g, type: 'keyword', className: 'entity' },
-      { pattern: /(["'`])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
+      { pattern: /(["'])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
       { pattern: /<!--[\s\S]*?-->/g, type: 'comment', className: 'comment' },
       { pattern: /<\/?[a-zA-Z][^>]*>/g, type: 'keyword', className: 'tag' },
       { pattern: /\b([a-zA-Z-]+)=/g, type: 'keyword', className: 'attribute' },
@@ -138,7 +138,7 @@ export class ClipboardFormatter {
     // CSS syntax rules
     this.syntaxRules.set('css', [
       { pattern: /\b(@media|@import|@keyframes|@font-face)\b/g, type: 'keyword', className: 'keyword' },
-      { pattern: /(["'`])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
+      { pattern: /(["'])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
       { pattern: /\/\*[\s\S]*?\*\//g, type: 'comment', className: 'comment' },
       { pattern: /[a-zA-Z-]+\s*\{/g, type: 'function', className: 'selector' },
       { pattern: /[a-zA-Z-]+\s*:/g, type: 'keyword', className: 'property' },
@@ -148,7 +148,7 @@ export class ClipboardFormatter {
 
     // JSON syntax rules
     this.syntaxRules.set('json', [
-      { pattern: /(["'`])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
+      { pattern: /(["'])(?:(?=(\\?))\2.)*?\1/g, type: 'string', className: 'string' },
       { pattern: /\b(true|false|null)\b/g, type: 'keyword', className: 'keyword' },
       { pattern: /\b(\d+)\b/g, type: 'number', className: 'number' },
     ]);
@@ -158,13 +158,13 @@ export class ClipboardFormatter {
       { pattern: /^#+\s+.+$/gm, type: 'keyword', className: 'heading' },
       { pattern: /\*\*[^*]+\*\*/g, type: 'keyword', className: 'bold' },
       { pattern: /\*[^*]+\*/g, type: 'keyword', className: 'italic' },
-      { pattern: /`[^`]+`/g, type: 'string', className: 'code' },
+      { pattern: /[^]+/g, type: 'string', className: 'code' },
       { pattern: /\[[^\]]+\]\([^)]+\)/g, type: 'keyword', className: 'link' },
       { pattern: /^\s*[-*+]\s+.+$/gm, type: 'keyword', className: 'list' },
       { pattern: /^\s*\d+\.\s+.+$/gm, type: 'keyword', className: 'list' },
     ]);
 
-    this.llog.debug(`Initialized syntax rules for ${this.syntaxRules.size} languages`);
+    this.llog.debug("Initialized syntax rules for languages");
   }
 
   /**
@@ -356,7 +356,7 @@ export class ClipboardFormatter {
     }
     
     // Check for Markdown
-    if (content.includes('# ') || content.includes('## ') || content.includes('*') || content.includes('`')) {
+    if (content.includes('# ') || content.includes('## ') || content.includes('*') || content.includes('')) {
       return 'markdown';
     }
     
@@ -397,7 +397,7 @@ export class ClipboardFormatter {
     
     const numberedLines = lines.map((line, index) => {
       const lineNumber = (index + 1).toString().padStart(lineNumberWidth, ' ');
-      return `${lineNumber} │ ${line}`;
+      return "";
     });
     
     return numberedLines.join('\n');
@@ -421,7 +421,7 @@ export class ClipboardFormatter {
     // Apply rules in order
     for (const rule of rules) {
       highlighted = highlighted.replace(rule.pattern, (match) => {
-        return `{{${rule.className}:${match}}}`;
+        return "";
       });
     }
     
@@ -466,7 +466,7 @@ export class ClipboardFormatter {
     
     return content.replace(/\{\{([^}]+):([^}]+)\}\}/g, (match, className, text) => {
       const color = colorMap[className] || '\x1b[0m';
-      return `${color}${text}\x1b[0m`;
+      return \x1b[0m;
     });
   }
 
@@ -498,7 +498,7 @@ export class ClipboardFormatter {
     
     return content.replace(/\{\{([^}]+):([^}]+)\}\}/g, (match, className, text) => {
       const color = colorMap[className] || '\x1b[0m';
-      return `${color}${text}\x1b[0m`;
+      return \x1b[0m;
     });
   }
 
@@ -546,7 +546,7 @@ export class ClipboardFormatter {
       html += '<div class="line-numbers">';
       const lines = content.split('\n');
       for (let i = 1; i <= lines.length; i++) {
-        html += `<div class="line-number">${i}</div>`;
+        html += <div class="line-number"></div>;
       }
       html += '</div>';
     }
@@ -568,7 +568,7 @@ export class ClipboardFormatter {
       
       for (const rule of rules) {
         highlighted = highlighted.replace(rule.pattern, (match) => {
-          return `<span class="syntax-${rule.className}">${match}</span>`;
+          return <span class="syntax-"></span>;
         });
       }
       
@@ -684,13 +684,13 @@ export class ClipboardFormatter {
     }
     
     if (options.theme && !['dark', 'light', 'system'].includes(options.theme)) {
-      errors.push(`Invalid theme: ${options.theme}`);
+      errors.push(Invalid theme: );
     }
     
     if (options.language) {
       const languages = this.getAvailableLanguages();
       if (!languages.some(lang => lang.id === options.language)) {
-        errors.push(`Unsupported language: ${options.language}`);
+        errors.push(Unsupported language: );
       }
     }
     
@@ -741,11 +741,11 @@ export class ClipboardFormatter {
     const differences: string[] = [];
     
     if (original.metadata.lineCount !== modified.metadata.lineCount) {
-      differences.push(`Line count changed: ${original.metadata.lineCount} → ${modified.metadata.lineCount}`);
+      differences.push(Line count changed:  → );
     }
     
     if (original.metadata.charCount !== modified.metadata.charCount) {
-      differences.push(`Character count changed: ${original.metadata.charCount} → ${modified.metadata.charCount}`);
+      differences.push(Character count changed:  → );
     }
     
     // Simple content comparison
@@ -758,7 +758,7 @@ export class ClipboardFormatter {
         const line2 = lines2[i] || '';
         
         if (line1 !== line2) {
-          differences.push(`Line ${i + 1} changed`);
+          differences.push(Line  changed);
         }
       }
     }
@@ -792,7 +792,7 @@ export class ClipboardFormatter {
       const line = lines[i];
       
       // Check for code block start
-      const codeBlockMatch = line.match(/^```(\w*)/);
+      const codeBlockMatch = line.match(/^(\w*)/);
       if (codeBlockMatch && !inCodeBlock) {
         inCodeBlock = true;
         currentLanguage = codeBlockMatch[1] || 'plain';
@@ -801,7 +801,7 @@ export class ClipboardFormatter {
       }
       
       // Check for code block end
-      if (line.trim() === '```' && inCodeBlock) {
+      if (line.trim() === '' && inCodeBlock) {
         inCodeBlock = false;
         if (currentBlock.length > 0) {
           codeBlocks.push({
@@ -867,4 +867,8 @@ export class ClipboardFormatter {
     };
   }
 }
+
+
+
+
 

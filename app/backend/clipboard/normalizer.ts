@@ -104,7 +104,7 @@ export class ClipboardNormalizer {
 
     // Validate input
     if (typeof content !== 'string') {
-      throw new Error(`Invalid content type: ${typeof content}`);
+      throw new Error(Invalid content type: );
     }
 
     // Apply format-specific normalization first
@@ -461,7 +461,7 @@ export class ClipboardNormalizer {
     if (content !== after) {
       changes.push({
         type: 'indent',
-        description: `Normalized indentation to ${useSpaces ? `${indentSize} spaces` : 'tabs'}`,
+        description: Normalized indentation to  spaces : 'tabs'},
         count: Math.max(tabCount, spaceCount),
       });
     }
@@ -501,7 +501,7 @@ export class ClipboardNormalizer {
     if (charsRemoved > 0) {
       changes.push({
         type: 'truncate',
-        description: `Truncated to ${maxLength} characters`,
+        description: Truncated to  characters,
         count: charsRemoved,
       });
     }
@@ -751,7 +751,7 @@ export class ClipboardNormalizer {
     const lines = content.split('\n');
     const trailingWhitespaceLines = lines.filter(line => line.match(/\s+$/)).length;
     if (trailingWhitespaceLines > 0) {
-      recommendations.push(`${trailingWhitespaceLines} lines have trailing whitespace.`);
+      recommendations.push( lines have trailing whitespace.);
     }
     
     // Check for inconsistent indentation
@@ -765,7 +765,7 @@ export class ClipboardNormalizer {
     // Check for very long lines
     const longLines = lines.filter(line => line.length > 200).length;
     if (longLines > 0) {
-      recommendations.push(`${longLines} lines exceed 200 characters. Consider breaking them up.`);
+      recommendations.push( lines exceed 200 characters. Consider breaking them up.);
     }
     
     return recommendations;
@@ -812,4 +812,7 @@ export class ClipboardNormalizer {
     // No state to reset in this implementation
   }
 }
+
+
+
 

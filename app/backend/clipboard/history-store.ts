@@ -211,7 +211,7 @@ export class HistoryStore {
    */
   private async createBackup(): Promise<void> {
     try {
-      const backupPath = `${this.storagePath}.backup.${Date.now()}.json`;
+      const backupPath = ".backup.json";
       this.llog.info('Creating backup', { path: backupPath });
       
       // In production, this would copy the database/file
@@ -257,7 +257,7 @@ export class HistoryStore {
     }
 
     const startTime = Date.now();
-    const itemId = `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const itemId = item__;
     
     this.llog.debug('Adding item to history', {
       itemId,
@@ -461,7 +461,7 @@ export class HistoryStore {
       currentItems: this.stats.totalItems,
       maxItems: this.config.maxItems,
       currentSize: this.formatBytes(this.stats.totalSizeBytes),
-      maxSize: `${this.config.maxSizeMB}MB`,
+      maxSize: MB,
     });
 
     // Get all items sorted by oldest first
@@ -937,10 +937,10 @@ export class HistoryStore {
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
     
-    if (days > 0) return `${days}d ${hours % 24}h`;
-    if (hours > 0) return `${hours}h ${minutes % 60}m`;
-    if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
-    return `${seconds}s`;
+    if (days > 0) return d h;
+    if (hours > 0) return h m;
+    if (minutes > 0) return m s;
+    return s;
   }
 
   /**
@@ -968,4 +968,8 @@ export class HistoryStore {
     this.llog.info('History store cleanup completed');
   }
 }
+
+
+
+
 

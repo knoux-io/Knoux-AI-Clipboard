@@ -98,12 +98,12 @@ export class PromptLibrary {
       name: 'JavaScript Code Enhancer',
       description: 'Enhances JavaScript code for readability, performance, and best practices',
       category: 'code_enhancement',
-      template: `You are an expert JavaScript developer. Analyze and improve the following code:
+      template: You are an expert JavaScript developer. Analyze and improve the following code:
 
 ## Original Code:
-\`\`\`javascript
+\\\javascript
 {code}
-\`\`\`
+\\\
 
 ## Improvement Requirements:
 1. Fix any syntax errors or bugs
@@ -116,7 +116,7 @@ export class PromptLibrary {
 {complexity_instruction}
 
 ## Enhanced Code:
-Provide only the enhanced JavaScript code without explanations.`,
+Provide only the enhanced JavaScript code without explanations.,
       variables: ['code', 'tone_instruction', 'complexity_instruction'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -129,12 +129,12 @@ Provide only the enhanced JavaScript code without explanations.`,
       name: 'Python Code Enhancer',
       description: 'Enhances Python code for readability, performance, and PEP 8 compliance',
       category: 'code_enhancement',
-      template: `You are an expert Python developer. Analyze and improve the following code:
+      template: You are an expert Python developer. Analyze and improve the following code:
 
 ## Original Code:
-\`\`\`python
+\\\python
 {code}
-\`\`\`
+\\\
 
 ## Improvement Requirements:
 1. Fix syntax errors and bugs
@@ -147,7 +147,7 @@ Provide only the enhanced JavaScript code without explanations.`,
 {complexity_instruction}
 
 ## Enhanced Code:
-Provide only the enhanced Python code without explanations.`,
+Provide only the enhanced Python code without explanations.,
       variables: ['code', 'tone_instruction', 'complexity_instruction'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -160,12 +160,12 @@ Provide only the enhanced Python code without explanations.`,
       name: 'PowerShell Script Enhancer',
       description: 'Enhances PowerShell scripts for security, readability, and best practices',
       category: 'code_enhancement',
-      template: `You are an expert PowerShell developer. Analyze and improve the following script:
+      template: You are an expert PowerShell developer. Analyze and improve the following script:
 
 ## Original Script:
-\`\`\`powershell
+\\\powershell
 {code}
-\`\`\`
+\\\
 
 ## Improvement Requirements:
 1. Fix syntax errors and bugs
@@ -179,7 +179,7 @@ Provide only the enhanced Python code without explanations.`,
 {security_instruction}
 
 ## Enhanced Script:
-Provide only the enhanced PowerShell script without explanations.`,
+Provide only the enhanced PowerShell script without explanations.,
       variables: ['code', 'tone_instruction', 'complexity_instruction', 'security_instruction'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -193,7 +193,7 @@ Provide only the enhanced PowerShell script without explanations.`,
       name: 'General Text Enhancer',
       description: 'Enhances general text for clarity, conciseness, and professionalism',
       category: 'text_enhancement',
-      template: `You are an expert editor. Improve the following text:
+      template: You are an expert editor. Improve the following text:
 
 ## Original Text:
 {text}
@@ -209,7 +209,7 @@ Provide only the enhanced PowerShell script without explanations.`,
 {max_length_instruction}
 
 ## Enhanced Text:
-Provide only the enhanced text without explanations.`,
+Provide only the enhanced text without explanations.,
       variables: ['text', 'tone', 'include_examples_instruction', 'max_length_instruction'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -222,7 +222,7 @@ Provide only the enhanced text without explanations.`,
       name: 'Email Text Enhancer',
       description: 'Enhances email content for professionalism and effectiveness',
       category: 'text_enhancement',
-      template: `You are an expert email writer. Improve the following email:
+      template: You are an expert email writer. Improve the following email:
 
 ## Original Email:
 {text}
@@ -239,7 +239,7 @@ Provide only the enhanced text without explanations.`,
 {max_length_instruction}
 
 ## Enhanced Email:
-Provide only the enhanced email without explanations.`,
+Provide only the enhanced email without explanations.,
       variables: ['text', 'tone_instruction', 'max_length_instruction'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -253,7 +253,7 @@ Provide only the enhanced email without explanations.`,
       name: 'AI Prompt Enhancer',
       description: 'Enhances AI prompts for clarity, specificity, and effectiveness',
       category: 'prompt_enhancement',
-      template: `You are an expert prompt engineer. Improve the following AI prompt:
+      template: You are an expert prompt engineer. Improve the following AI prompt:
 
 ## Original Prompt:
 {prompt}
@@ -274,7 +274,7 @@ Provide only the enhanced email without explanations.`,
 - Ensure appropriate tone ({tone})
 
 ## Enhanced Prompt:
-Provide only the enhanced prompt without explanations.`,
+Provide only the enhanced prompt without explanations.,
       variables: ['prompt', 'tone'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -287,7 +287,7 @@ Provide only the enhanced prompt without explanations.`,
       name: 'Code Generation Prompt Enhancer',
       description: 'Enhances prompts for code generation tasks',
       category: 'prompt_enhancement',
-      template: `You are an expert in code generation prompts. Improve the following prompt:
+      template: You are an expert in code generation prompts. Improve the following prompt:
 
 ## Original Prompt:
 {prompt}
@@ -306,7 +306,7 @@ Provide only the enhanced prompt without explanations.`,
 {complexity_instruction}
 
 ## Enhanced Prompt:
-Provide only the enhanced prompt without explanations.`,
+Provide only the enhanced prompt without explanations.,
       variables: ['prompt', 'language', 'complexity_instruction'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -320,12 +320,12 @@ Provide only the enhanced prompt without explanations.`,
       name: 'Code Security Analyzer',
       description: 'Analyzes code for security vulnerabilities and best practices',
       category: 'security_analysis',
-      template: `You are a security expert. Analyze the following code for security issues:
+      template: You are a security expert. Analyze the following code for security issues:
 
 ## Code to Analyze:
-\`\`\`{language}
+\\\{language}
 {code}
-\`\`\`
+\\\
 
 ## Security Analysis Checklist:
 1. Input validation and sanitization
@@ -345,7 +345,7 @@ For each issue found, provide:
 - Recommendation: [How to fix]
 
 ## Security Report:
-Provide a comprehensive security analysis report.`,
+Provide a comprehensive security analysis report.,
       variables: ['code', 'language'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -358,12 +358,12 @@ Provide a comprehensive security analysis report.`,
       name: 'Code Performance Analyzer',
       description: 'Analyzes code for performance issues and optimization opportunities',
       category: 'code_analysis',
-      template: `You are a performance optimization expert. Analyze the following code:
+      template: You are a performance optimization expert. Analyze the following code:
 
 ## Code to Analyze:
-\`\`\`{language}
+\\\{language}
 {code}
-\`\`\`
+\\\
 
 ## Performance Analysis Areas:
 1. Time complexity analysis
@@ -381,7 +381,7 @@ Provide specific optimization recommendations with:
 - Solution: [Optimization approach]
 - Code Example: [Optimized code snippet]
 
-Focus on practical, actionable improvements.`,
+Focus on practical, actionable improvements.,
       variables: ['code', 'language'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -395,7 +395,7 @@ Focus on practical, actionable improvements.`,
       name: 'Text Summarizer',
       description: 'Summarizes long text into concise version',
       category: 'summarization',
-      template: `Summarize the following text:
+      template: Summarize the following text:
 
 ## Original Text:
 {text}
@@ -408,7 +408,7 @@ Focus on practical, actionable improvements.`,
 - Capture the overall tone and intent
 
 ## Summary:
-Provide only the summary without additional text.`,
+Provide only the summary without additional text.,
       variables: ['text', 'max_length'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -421,12 +421,12 @@ Provide only the summary without additional text.`,
       name: 'Code Documentation Generator',
       description: 'Generates documentation summaries for code',
       category: 'summarization',
-      template: `Generate comprehensive documentation for the following code:
+      template: Generate comprehensive documentation for the following code:
 
 ## Code:
-\`\`\`{language}
+\\\{language}
 {code}
-\`\`\`
+\\\
 
 ## Documentation Requirements:
 1. Overview: What does this code do?
@@ -438,7 +438,7 @@ Provide only the summary without additional text.`,
 7. Notes: Any important implementation details
 
 ## Documentation:
-Provide well-structured documentation in markdown format.`,
+Provide well-structured documentation in markdown format.,
       variables: ['code', 'language'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -452,12 +452,12 @@ Provide well-structured documentation in markdown format.`,
       name: 'Code Explainer',
       description: 'Explains code in simple terms for different audiences',
       category: 'explanation',
-      template: `Explain the following code for a {audience} audience:
+      template: Explain the following code for a {audience} audience:
 
 ## Code:
-\`\`\`{language}
+\\\{language}
 {code}
-\`\`\`
+\\\
 
 ## Explanation Requirements:
 - Audience Level: {audience}
@@ -467,7 +467,7 @@ Provide well-structured documentation in markdown format.`,
 - Include: Practical implications and use cases
 
 ## Explanation:
-Provide a clear, audience-appropriate explanation.`,
+Provide a clear, audience-appropriate explanation.,
       variables: ['code', 'language', 'audience'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -480,7 +480,7 @@ Provide a clear, audience-appropriate explanation.`,
       name: 'Error Message Explainer',
       description: 'Explains error messages and suggests fixes',
       category: 'explanation',
-      template: `Explain this error message and suggest fixes:
+      template: Explain this error message and suggest fixes:
 
 ## Error Message:
 {error}
@@ -496,7 +496,7 @@ Provide a clear, audience-appropriate explanation.`,
 5. Prevention tips for the future
 
 ## Explanation and Fixes:
-Provide a comprehensive explanation and actionable fixes.`,
+Provide a comprehensive explanation and actionable fixes.,
       variables: ['error', 'context'],
       version: '1.0.0',
       author: 'Knoux AI',
@@ -504,7 +504,7 @@ Provide a comprehensive explanation and actionable fixes.`,
       usageCount: 0,
     });
 
-    this.llog.info(`Loaded ${this.templates.size} default templates`);
+    this.llog.info(Loaded  default templates);
   }
 
   /**
@@ -633,7 +633,7 @@ Provide a comprehensive explanation and actionable fixes.`,
     
     const template = this.getTemplate(templateId);
     if (!template) {
-      throw new Error(`Template not found: ${templateId}`);
+      throw new Error(Template not found: );
     }
     
     const variables: PromptVariables = {
@@ -668,18 +668,18 @@ Provide a comprehensive explanation and actionable fixes.`,
     
     const template = this.getTemplate(templateId);
     if (!template) {
-      throw new Error(`Template not found: ${templateId}`);
+      throw new Error(Template not found: );
     }
     
     const variables: PromptVariables = {
       text: '{text}', // Will be replaced by caller
       tone: options.tone || 'professional',
       include_examples_instruction: options.includeExamples ? '7. Include relevant examples if helpful' : '',
-      max_length_instruction: options.maxLength ? `8. Keep within ${options.maxLength} characters` : '',
+      max_length_instruction: options.maxLength ? 8. Keep within  characters : '',
     };
     
     if (templateId === 'text_enhance_email_001') {
-      variables.tone_instruction = `Adjust tone to be ${options.tone || 'professional'}`;
+      variables.tone_instruction = Adjust tone to be ;
     }
     
     return this.renderTemplate(template.template, variables);
@@ -693,7 +693,7 @@ Provide a comprehensive explanation and actionable fixes.`,
     const template = this.getTemplate(templateId);
     
     if (!template) {
-      throw new Error(`Template not found: ${templateId}`);
+      throw new Error(Template not found: );
     }
     
     const variables: PromptVariables = {
@@ -704,7 +704,7 @@ Provide a comprehensive explanation and actionable fixes.`,
     if (templateId === 'prompt_enhance_codegen_001') {
       variables.language = options.targetLanguage || ProgrammingLanguage.JAVASCRIPT;
       variables.complexity_instruction = options.complexityLevel 
-        ? `Complexity Level: ${options.complexityLevel}`
+        ? Complexity Level: 
         : '';
     }
     
@@ -724,7 +724,7 @@ Provide a comprehensive explanation and actionable fixes.`,
       creative: 'Use creative, expressive language',
     };
     
-    return toneInstructions[tone] || `Use ${tone} tone`;
+    return toneInstructions[tone] || Use  tone;
   }
 
   /**
@@ -750,7 +750,7 @@ Provide a comprehensive explanation and actionable fixes.`,
     let rendered = template;
     
     for (const [key, value] of Object.entries(variables)) {
-      const placeholder = `{${key}}`;
+      const placeholder = {};
       rendered = rendered.replace(new RegExp(placeholder, 'g'), String(value));
     }
     
@@ -770,7 +770,7 @@ Provide a comprehensive explanation and actionable fixes.`,
   ): string {
     const template = this.getTemplate(templateId);
     if (!template) {
-      throw new Error(`Template not found: ${templateId}`);
+      throw new Error(Template not found: );
     }
     
     // Prepare variables
@@ -930,4 +930,7 @@ Provide a comprehensive explanation and actionable fixes.`,
     this.llog.info('Prompt library reset to defaults');
   }
 }
+
+
+
 
