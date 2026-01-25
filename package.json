@@ -2,22 +2,30 @@
   "name": "knoux-clipboard-ai",
   "version": "1.0.0",
   "private": true,
-  "main": "bridge.js",
+  "main": "electron.js",
   "scripts": {
-    "electron": "electron .",
-    "start": "react-scripts start",
-    "electron:build": "npm run build && electron-builder",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "electron:dev": "electron .",
-    "dev": "start npm run start && npm run electron",
-    "build": "react-scripts build"
+    "dev": "concurrently \"vite\" \"wait-on http://localhost:3000 && electron .\"",
+    "start": "electron .",
+    "start:renderer": "vite",
+    "build:renderer": "vite build",
+    "build:main": "echo \"No main build step configured\"",
+    "build": "npm run build:renderer && npm run build:main",
+    "dist": "electron-builder --publish never",
+    "test": "echo \"No tests configured\" && exit 0"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
+    "wait-on": "^8.1.0",
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
     "electron": "^25.9.8",
     "electron-builder": "^26.4.0",
-    "react-scripts": "^5.0.1"
+    "typescript": "^5.1.6",
+    "@types/node": "^20.5.7"
   },
   "browserslist": {
     "production": [
