@@ -200,7 +200,7 @@ const DashboardPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-knoux-background text-white p-6 font-sans">
       <div className="container mx-auto max-w-7xl">
-        {/* Header & Clock Section */}
+        {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 bg-knoux-background-surface/50 p-6 rounded-2xl backdrop-blur-md border border-knoux-primary/20 shadow-knoux-lg">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-knoux-primary via-knoux-secondary to-knoux-accent bg-clip-text text-transparent mb-2">
@@ -211,15 +211,6 @@ const DashboardPage: React.FC = () => {
                 ? "نظرة شاملة على أداء التطبيق"
                 : "Comprehensive overview of application performance"}
             </p>
-          </div>
-
-          <div className="mt-4 md:mt-0 flex flex-col items-center md:items-end bg-knoux-background/40 p-4 rounded-xl border border-knoux-primary/10">
-            <h3 className="text-sm font-medium text-knoux-accent mb-2 font-mono tracking-wider">
-              {i18n.isRTL()
-                ? "التوقيت الرسمي لمساكن حي الزهور 🦾"
-                : "Official Time"}
-            </h3>
-            <DigitalClock />
           </div>
         </div>
 
@@ -343,6 +334,33 @@ const DashboardPage: React.FC = () => {
                   ? "المراقبة متوقفة"
                   : "Monitoring paused"}
             </p>
+          </div>
+        </div>
+
+        {/* Status Bar */}
+        <div className="fixed bottom-0 left-0 right-0 h-8 bg-knoux-background-surface/90 backdrop-blur-md border-t border-white/5 flex items-center justify-between px-4 text-xs text-gray-400 z-50">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-2 h-2 rounded-full ${systemInfo ? "bg-green-500" : "bg-red-500"}`}
+              />
+              <span>{systemInfo ? "System Online" : "Connecting..."}</span>
+            </div>
+            <div className="h-3 w-px bg-white/10" />
+            <div className="flex items-center gap-2">
+              <Brain className="w-3 h-3" />
+              <span>AI: {aiStatus?.model || "Local"}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span>Knoux AI v1.0.0</span>
+            <div className="h-3 w-px bg-white/10" />
+            <span>
+              {i18n.isRTL()
+                ? "محمي بواسطة Knoux Security"
+                : "Protected by Knoux Security"}
+            </span>
           </div>
         </div>
       </div>
