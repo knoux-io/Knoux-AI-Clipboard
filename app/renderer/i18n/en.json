@@ -1,95 +1,112 @@
 {
   "app": {
     "name": "Knoux Clipboard AI",
+    "tagline": "Intelligent Clipboard Management with AI Power"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "clipboardHistory": "Clipboard History",
+    "aiAssistant": "AI Assistant",
+    "smartActions": "Smart Actions",
+    "settings": "Settings",
+    "about": "About Knoux",
+    "vip": "VIP"
+  },
+  "settings": {
+    "language": "Language",
+    "theme": "Theme",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "notifications": "Notifications",
+    "startWithSystem": "Start with System",
+    "runInBackground": "Run in Background",
+    "clipboardMonitoring": "Clipboard Monitoring",
+    "performanceMode": "Performance Mode",
+    "clipboardLimit": "Clipboard Limit",
+    "autoCleanup": "Auto Cleanup",
+    "cleanupDays": "Cleanup Days",
+    "aiEnabled": "Enable AI",
+    "aiModel": "AI Model",
+    "autoSummarize": "Auto Summarize",
+    "showTrayIcon": "Show Tray Icon",
+    "minimizeToTray": "Minimize to Tray",
+    "showInTaskbar": "Show in Taskbar",
+    "encryption": "Encryption",
+    "dataRetention": "Data Retention",
+    "anonymizeData": "Anonymize Data"
+  },
+  "dashboard": {
+    "officialTime": "Official Time for Al-Zuhour Residences 🦾",
+    "clipboardStatus": "Clipboard Status",
+    "aiStatus": "AI Engine Status",
+    "databaseStatus": "Database Status",
+    "active": "Active",
+    "idle": "Idle",
+    "error": "Error",
+    "clearClipboard": "Clear Clipboard",
+    "pauseMonitoring": "Pause Monitoring",
+    "resumeMonitoring": "Resume Monitoring",
+    "systemInfo": "System Information",
+    "quickActions": "Quick Actions",
+    "statusUpdateFailed": "Failed to update system status",
+    "clipboardCleared": "Clipboard cleared successfully",
+    "clearClipboardFailed": "Failed to clear clipboard",
+    "monitoringStopped": "Clipboard monitoring stopped",
+    "monitoringStarted": "Clipboard monitoring started",
+    "toggleMonitoringFailed": "Failed to toggle monitoring"
+  },
+  "ai": {
+    "askQuestion": "Ask a Question",
+    "summarize": "Summarize",
+    "rephrase": "Rephrase",
+    "translate": "Translate",
+    "processing": "Processing...",
+    "error": "An error occurred",
+    "chatHistory": "Chat History",
+    "clearHistory": "Clear History",
+    "quickActions": "Quick Actions",
+    "recentClipboard": "Recent Clipboard"
+  },
+  "about": {
+    "title": "Knoux Clipboard AI",
+    "developer": "Developer: Knoux – Abu Retaj",
+    "vision": "Vision",
     "version": "Version",
-    "description": "Intelligent Clipboard Manager"
+    "builtWith": "Built With",
+    "systemInfo": "System Information"
+  },
+  "vip": {
+    "title": "VIP Membership",
+    "currentStatus": "Current Status",
+    "free": "Free",
+    "premium": "Premium",
+    "features": "Features",
+    "upgrade": "Upgrade",
+    "unlimitedHistory": "Unlimited History",
+    "advancedAI": "Advanced AI",
+    "cloudSync": "Cloud Sync",
+    "premiumThemes": "Premium Themes",
+    "prioritySupport": "Priority Support",
+    "enhancedSecurity": "Enhanced Security"
   },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
+    "copy": "Copy",
+    "paste": "Paste",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
     "close": "Close",
     "back": "Back",
-    "refresh": "Refresh",
-    "search": "Search",
-    "clear": "Clear",
+    "next": "Next",
+    "previous": "Previous",
     "loading": "Loading...",
     "error": "Error",
     "success": "Success",
-    "confirm": "Confirm"
-  },
-  "sidebar": {
-    "dashboard": "Dashboard",
-    "clipboard": "Clipboard",
-    "aiTools": "AI Tools",
-    "history": "History",
-    "analytics": "Analytics",
-    "settings": "Settings",
-    "about": "About Knoux"
-  },
-  "dashboard": {
-    "title": "Dashboard",
-    "clipboardStatus": "Clipboard Status",
-    "aiSummary": "AI Summary",
-    "quickActions": "Quick Actions",
-    "storageUsage": "Storage Usage",
-    "securityStatus": "Security Status",
-    "analyticsSnapshot": "Analytics Snapshot",
-    "totalItems": "Total Items",
-    "todayItems": "Today Items",
-    "totalSize": "Total Size",
-    "monitoring": "Monitoring",
-    "idle": "Idle"
-  },
-  "header": {
-    "officialTime": "Official Time for Al-Zuhur Residential Complex 🦾"
-  },
-  "settings": {
-    "title": "Settings",
-    "general": {
-      "title": "General",
-      "theme": "Theme",
-      "themeDark": "Dark",
-      "themeLight": "Light",
-      "themeAuto": "Auto",
-      "language": "Language",
-      "languageAr": "Arabic",
-      "languageEn": "English",
-      "startupBehavior": "Startup Behavior",
-      "notifications": "Notifications",
-      "notificationsEnabled": "Enable Notifications"
-    },
-    "clipboard": {
-      "title": "Clipboard",
-      "maxHistorySize": "Max History Size",
-      "autoCleanRules": "Auto-clean Rules",
-      "formatPriority": "Format Priority"
-    },
-    "ai": {
-      "title": "AI",
-      "enableAI": "Enable AI",
-      "modelSelection": "Model Selection",
-      "localMode": "Local Mode",
-      "cloudMode": "Cloud Mode"
-    },
-    "security": {
-      "title": "Security",
-      "encryption": "Encryption",
-      "encryptionOn": "Enable Encryption",
-      "encryptionOff": "Disable Encryption",
-      "clearOnLock": "Clear on Lock",
-      "secureMemory": "Secure Memory"
-    }
-  },
-  "about": {
-    "title": "About Knoux",
-    "developer": "Developer & Founder",
-    "vision": "Vision",
-    "links": {
-      "github": "GitHub",
-      "twitter": "Twitter",
-      "website": "Website"
-    }
+    "warning": "Warning",
+    "info": "Info"
   }
 }
