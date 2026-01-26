@@ -48,3 +48,31 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // System
   getSystemInfo: () => ipcRenderer.invoke('system:get-platform-info'),
 });
+
+// Expose unified knoux API for modern components
+contextBridge.exposeInMainWorld('knoux', {
+  clipboard: {
+    read: async () => ipcRenderer.invoke('knoux.clipboard.read'),
+    write: async (item) => ipcRenderer.invoke('knoux.clipboard.write', item),
+    history: async () => ipcRenderer.invoke('knoux.clipboard.history'),
+    normalize: async (content) => ipcRenderer.invoke('knoux.clipboard.normalize', content),
+    format: async (content, format) => ipcRenderer.invoke('knoux.clipboard.format', { content, format }),
+  },
+  
+  ai: {
+    summarize: async (text) => ipcRenderer.invoke('knoux.ai.summarize', text),
+    enhance: async (text, options) => ipcRenderer.invoke('knoux.ai.enhance', text, options),
+    predict: async (context) => ipcRenderer.invoke('knoux.ai.predict', context),
+  },
+  
+  storage: {
+    get: async (key) => ipcRenderer.invoke('knoux.storage.get', key),
+    set: async (key, value) => ipcRenderer.invoke('knoux.storage.set', key, value),
+    export: async () => ipcRenderer.invoke('knoux.storage.export'),
+  },
+  
+  system: {
+    getInfo: async () => ipcRenderer.invoke('system:get-platform-info'),
+    getVersion: async () => ipcRenderer.invoke('system:get-version'),
+  }
+});
