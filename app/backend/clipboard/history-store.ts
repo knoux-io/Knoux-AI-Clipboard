@@ -380,7 +380,7 @@ export class HistoryStore {
 
       this.stats.encryptedCount++;
     } catch (error) {
-      this.llog.error("Failed to encrypt item", error as Error, {
+      this.logger.error("Failed to encrypt item", error as Error, {
         itemId: item.id,
       });
       throw error;
@@ -404,7 +404,7 @@ export class HistoryStore {
   private async compressItem(item: ClipboardItem): Promise<void> {
     try {
       // In production, use actual compression
-      this.llog.debug("Compressing item", {
+      this.logger.debug("Compressing item", {
         itemId: item.id,
         originalSize: item.metadata.sizeBytes,
       });
@@ -416,7 +416,7 @@ export class HistoryStore {
       // Update stats with compression ratio
       this.stats.compressionRatio = 0.7; // Simulated 30% compression
     } catch (error) {
-      this.llog.warn("Failed to compress item", error as Error, {
+      this.logger.warn("Failed to compress item", error as Error, {
         itemId: item.id,
       });
     }
@@ -482,7 +482,7 @@ export class HistoryStore {
       return;
     }
 
-    this.llog.info("Auto-pruning history store", {
+    this.logger.info("Auto-pruning history store", {
       currentItems: this.stats.totalItems,
       maxItems: this.config.maxItems,
       currentSize: this.formatBytes(this.stats.totalSizeBytes),
@@ -522,7 +522,7 @@ export class HistoryStore {
 
     if (removedCount > 0) {
       await this.saveToStorage();
-      this.llog.info("Auto-prune completed", {
+      this.logger.info("Auto-prune completed", {
         removedCount,
         removedSize: this.formatBytes(removedSize),
         remainingItems: this.stats.totalItems,
@@ -540,7 +540,7 @@ export class HistoryStore {
     if (item) {
       item.accessCount++;
       item.lastAccessed = new Date();
-      this.llog.debug("Item accessed", {
+      this.logger.debug("Item accessed", {
         itemId: id,
         accessCount: item.accessCount,
       });
@@ -697,7 +697,7 @@ export class HistoryStore {
 
     const searchTimeMs = Date.now() - startTime;
 
-    this.llog.debug("Search completed", {
+    this.logger.debug("Search completed", {
       query,
       filterCount: filters.length,
       resultCount: results.length,
@@ -726,7 +726,7 @@ export class HistoryStore {
     Object.assign(item, updates);
     item.version = (item.version || 0) + 1;
 
-    this.llog.debug("Item updated", {
+    this.logger.debug("Item updated", {
       itemId: id,
       updates: Object.keys(updates),
     });
