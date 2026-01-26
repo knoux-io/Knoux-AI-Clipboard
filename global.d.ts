@@ -1,5 +1,36 @@
 // Global TypeScript declarations for Electron
 interface Window {
+  electron: {
+    ipcRenderer: {
+      invoke: (channel: string, ...args: any[]) => Promise<any>;
+      send: (channel: string, ...args: any[]) => void;
+      on: (channel: string, func: (...args: any[]) => void) => void;
+      once: (channel: string, func: (...args: any[]) => void) => void;
+      removeListener: (channel: string, func: (...args: any[]) => void) => void;
+    };
+  };
+  
+  electronAPI: {
+    // Settings
+    getSettings: () => Promise<{ success: boolean; data?: any; error?: string }>;
+    updateSettings: (settings: any) => Promise<{ success: boolean; data?: any; error?: string }>;
+    
+    // Language
+    getLanguage: () => Promise<{ success: boolean; data?: 'en' | 'ar'; error?: string }>;
+    setLanguage: (lang: 'en' | 'ar') => Promise<{ success: boolean; data?: 'en' | 'ar'; error?: string }>;
+    
+    // Theme
+    getTheme: () => Promise<{ success: boolean; data?: any; error?: string }>;
+    setTheme: (theme: 'light' | 'dark') => Promise<{ success: boolean; data?: any; error?: string }>;
+    
+    // Clipboard
+    getClipboardItems: (limit?: number, offset?: number) => Promise<{ success: boolean; data?: any[]; error?: string }>;
+    searchClipboard: (query: string) => Promise<{ success: boolean; data?: any[]; error?: string }>;
+    
+    // System
+    getSystemInfo: () => Promise<{ success: boolean; data?: any; error?: string }>;
+  };
+  
   knoux: {
     // App lifecycle
     isAppReady: () => boolean;

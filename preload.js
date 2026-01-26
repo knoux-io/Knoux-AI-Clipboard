@@ -1,29 +1,50 @@
-// preload.js - Optional secure preload script for Electron
-// This file runs in a sandboxed context with access to both Node.js and DOM
-
 const { contextBridge, ipcRenderer } = require('electron');
-const { shell } = require('electron');
 
-// Optional: Expose safe APIs to renderer if needed
-// contextBridge.exposeInMainWorld('knoux', {
-//   invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
-//   send: (channel, ...args) => ipcRenderer.send(channel, ...args),
-//   on: (channel, listener) => ipcRenderer.on(channel, listener)
-// });
-
-// Expose the API shape expected by app/renderer hooks (window.electron.*)
+// Expose protected methods that allow the renderer process to use
+// the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld('electron', {
-    ipcRenderer: {
-        invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
-        sendSync: (channel, ...args) => ipcRenderer.sendSync(channel, ...args),
-        on: (channel, callback) => {
-            ipcRenderer.on(channel, (event, ...ipcArgs) => callback(...ipcArgs));
-        },
-        removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel)
+  ipcRenderer: {
+    invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
+    send: (channel, ...args) => ipcRenderer.send(channel, ...args),
+    on: (channel, func) => {
+      const validChannels = [
+        'settings-changed',
+        'language-changed', 
+        'theme-changed',
+        'clipboard-updated',
+        'ai-response'
+      ];
+      if (validChannels.includes(channel)) {
+        ipcRenderer.on(channel, (event, ...args) => func(...args));
+      }
     },
-    shell: {
-        openExternal: (url) => shell.openExternal(url)
-    }
+    once: (channel, func) => {
+      ipcRenderer.once(channel, (event, ...args) => func(...args));
+    },
+    removeListener: (channel, func) => {
+      ipcRenderer.removeListener(channel, func);
+    },
+  },
 });
 
-console.log('✓ Preload script loaded');
+// Also expose a simpler API for common operations
+contextBridge.exposeInMainWorld('electronAPI', {
+  // Settings
+  getSettings: () => ipcRenderer.invoke('settings:get-all'),
+  updateSettings: (settings) => ipcRenderer.invoke('settings:update', settings),
+  
+  // Language
+  getLanguage: () => ipcRenderer.invoke('language:get'),
+  setLanguage: (lang) => ipcRenderer.invoke('language:set', lang),
+  
+  // Theme
+  getTheme: () => ipcRenderer.invoke('theme:get'),
+  setTheme: (theme) => ipcRenderer.invoke('theme:set-mode', theme),
+  
+  // Clipboard
+  getClipboardItems: (limit, offset) => ipcRenderer.invoke('clipboard:get-items', limit, offset),
+  searchClipboard: (query) => ipcRenderer.invoke('clipboard:search', query),
+  
+  // System
+  getSystemInfo: () => ipcRenderer.invoke('system:get-platform-info'),
+});

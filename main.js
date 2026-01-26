@@ -1,40 +1,19 @@
-// main.js - Electron Main Process for Knoux Clipboard AI
-// Stable and secure configuration for Electron 25.x
-
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const isDev = process.env.NODE_ENV === 'development';
 
-// Fix ffmpeg.dll loading path
-const appPath = app.getAppPath();
-const ffmpegPaths = [
-  path.join(appPath, 'ffmpeg.dll'),
-  path.join(appPath, '..', 'ffmpeg.dll'),
-  path.join(__dirname, 'ffmpeg.dll'),
-  path.join(__dirname, 'dist', 'ffmpeg.dll'),
-];
-
-// Load ffmpeg.dll from available location
-for (const ffmpegPath of ffmpegPaths) {
-  if (fs.existsSync(ffmpegPath)) {
-    process.env.FFMPEG_PATH = ffmpegPath;
-    console.log('✅ FFmpeg DLL found at:', ffmpegPath);
-    break;
-  }
-}
+const isDev = process.env.NODE_ENV === 'development' || process.argv.includes('--dev');
 
 let mainWindow;
 
-// Create application window
-function createWindow() {
+async function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 800,
-    minHeight: 600,
+    width: 1400,
+    height: 900,
+    minWidth: 1024,
+    minHeight: 768,
     show: false,
-    icon: path.join(__dirname, 'dist', 'favicon.ico'),
+    icon: path.join(__dirname, 'assets', 'icons', 'icon.png'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -45,30 +24,51 @@ function createWindow() {
     }
   });
 
-  // Initialize IPC handlers (compiled output) if available
+  // Initialize backend services and IPC handlers
   try {
-    const handlersPath = path.join(__dirname, 'build', 'electron', 'app', 'backend', 'ipc', 'enhanced-handlers.js');
-    if (fs.existsSync(handlersPath)) {
-      const { initializeEnhancedHandlers } = require(handlersPath);
-      if (typeof initializeEnhancedHandlers === 'function') {
-        initializeEnhancedHandlers();
-        console.log('✅ Enhanced IPC handlers initialized (compiled)');
-      }
+    if (isDev) {
+      // Development: Load from TypeScript source
+      require('ts-node').register({
+        transpileOnly: true,
+        compilerOptions: { module: 'commonjs' }
+      });
+      
+      // Initialize backend services first
+      const { initBackendServices } = require('./app/backend/init.ts');
+      await initBackendServices();
+      console.log('✅ Backend services initialized');
+      
+      // Then initialize IPC handlers
+      const { initializeEnhancedHandlers } = require('./app/backend/ipc/enhanced-handlers.ts');
+      initializeEnhancedHandlers();
+      console.log('✅ IPC handlers initialized (dev mode)');
     } else {
-      console.warn('⚠️ Compiled IPC handlers not found. Run `npm run build:main`.');
+      // Production: Load from compiled build
+      const initPath = path.join(__dirname, 'build', 'app', 'backend', 'init.js');
+      const handlersPath = path.join(__dirname, 'build', 'app', 'backend', 'ipc', 'enhanced-handlers.js');
+      
+      if (fs.existsSync(initPath) && fs.existsSync(handlersPath)) {
+        const { initBackendServices } = require(initPath);
+        await initBackendServices();
+        
+        const { initializeEnhancedHandlers } = require(handlersPath);
+        initializeEnhancedHandlers();
+        console.log('✅ Services and handlers initialized (production)');
+      } else {
+        console.warn('⚠️ Compiled backend files not found');
+      }
     }
-  } catch (e) {
-    console.error('❌ Failed to initialize IPC handlers:', e);
+  } catch (error) {
+    console.error('❌ Failed to initialize backend:', error);
   }
 
-  // Load the app
   const startUrl = isDev
-    ? 'http://localhost:3000'
+    ? 'http://localhost:5173'
     : `file://${path.join(__dirname, 'dist', 'index.html')}`;
 
   mainWindow.loadURL(startUrl).catch(err => {
     console.error('Failed to load URL:', err);
-    showErrorPage();
+    mainWindow.loadFile(path.join(__dirname, 'public', 'dev-unavailable.html'));
   });
 
   mainWindow.once('ready-to-show', () => {
@@ -83,57 +83,9 @@ function createWindow() {
   });
 }
 
-// Show error fallback page
-function showErrorPage() {
-  if (!mainWindow) return;
-
-  const errorHTML = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Knoux - Error</title>
-      <style>
-        body {
-          margin: 0;
-          padding: 20px;
-          background: #0f0f23;
-          color: #fff;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-        .container {
-          max-width: 600px;
-          margin: 100px auto;
-          text-align: center;
-        }
-        h1 { color: #8a2be2; margin-bottom: 20px; }
-        p { line-height: 1.6; margin: 10px 0; }
-        code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <h1>⚠️ Application Error</h1>
-        <p>Failed to load the application.</p>
-        <p>Please ensure:</p>
-        <ul style="text-align: left; display: inline-block;">
-          <li>dist/index.html exists</li>
-          <li>All dependencies are installed</li>
-          <li>Build completed successfully</li>
-        </ul>
-        <p style="margin-top: 30px; font-size: 12px; opacity: 0.7;">
-          Knoux Clipboard AI v1.0.0
-        </p>
-      </div>
-    </body>
-    </html>
-  `;
-
-  mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(errorHTML)}`);
-}
-
-// App Events
-app.on('ready', createWindow);
+app.on('ready', () => {
+  createWindow().catch(console.error);
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -147,7 +99,6 @@ app.on('activate', () => {
   }
 });
 
-// Handle any uncaught exceptions
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
 });

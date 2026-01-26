@@ -8,6 +8,7 @@ import { settingsService } from '../services/settingsService';
 import { languageService } from '../services/languageService';
 import { themeService } from '../services/themeService';
 import { databaseService } from '../services/databaseService';
+import { featureManager } from '../services/featureManager';
 
 let clipboardMonitoringEnabled = true;
 

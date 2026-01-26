@@ -1,101 +1,208 @@
-import React, { useEffect, useState } from 'react';
-import { ClipboardCopy } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ClipboardCopy, Zap, Shield, Cpu, CheckCircle } from 'lucide-react';
 
 interface SplashScreenProps {
   onComplete: () => void;
 }
 
+interface LoadingStep {
+  id: string;
+  label: string;
+  labelAr: string;
+  icon: React.ComponentType<any>;
+  duration: number;
+}
+
 const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
+  const [currentStep, setCurrentStep] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [isComplete, setIsComplete] = useState(false);
+
+  const loadingSteps: LoadingStep[] = [
+    {
+      id: 'init',
+      label: 'Initializing Knoux...',
+      labelAr: 'تهيئة نوكس...',
+      icon: ClipboardCopy,
+      duration: 800
+    },
+    {
+      id: 'services',
+      label: 'Loading Services...',
+      labelAr: 'تحميل الخدمات...',
+      icon: Zap,
+      duration: 600
+    },
+    {
+      id: 'security',
+      label: 'Securing Data...',
+      labelAr: 'تأمين البيانات...',
+      icon: Shield,
+      duration: 500
+    },
+    {
+      id: 'ai',
+      label: 'Activating AI...',
+      labelAr: 'تفعيل الذكاء الاصطناعي...',
+      icon: Cpu,
+      duration: 700
+    },
+    {
+      id: 'complete',
+      label: 'Ready!',
+      labelAr: 'جاهز!',
+      icon: CheckCircle,
+      duration: 400
+    }
+  ];
 
   useEffect(() => {
-    // Simulate initial loading sequence
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => onComplete(), 500);
-          return 100;
-        }
-        // Random progress to simulate real loading
-        return prev + Math.random() * 10;
-      });
-    }, 150);
+    let progressInterval: NodeJS.Timeout;
+    let stepTimeout: NodeJS.Timeout;
 
-    return () => clearInterval(interval);
+    const startStep = (stepIndex: number) => {
+      if (stepIndex >= loadingSteps.length) {
+        setIsComplete(true);
+        setTimeout(onComplete, 500);
+        return;
+      }
+
+      const step = loadingSteps[stepIndex];
+      setCurrentStep(stepIndex);
+      
+      // Animate progress for this step
+      let stepProgress = 0;
+      const stepIncrement = 100 / (step.duration / 16); // 60fps
+      
+      progressInterval = setInterval(() => {
+        stepProgress += stepIncrement;
+        const totalProgress = (stepIndex * 100 + Math.min(stepProgress, 100)) / loadingSteps.length;
+        setProgress(totalProgress);
+        
+        if (stepProgress >= 100) {
+          clearInterval(progressInterval);
+        }
+      }, 16);
+
+      // Move to next step
+      stepTimeout = setTimeout(() => {
+        startStep(stepIndex + 1);
+      }, step.duration);
+    };
+
+    startStep(0);
+
+    return () => {
+      if (progressInterval) clearInterval(progressInterval);
+      if (stepTimeout) clearTimeout(stepTimeout);
+    };
   }, [onComplete]);
 
+  const currentStepData = loadingSteps[currentStep];
+  const Icon = currentStepData?.icon || ClipboardCopy;
+  const isArabic = document.documentElement.lang === 'ar';
+
   return (
-    <div className="fixed inset-0 bg-knoux-background flex items-center justify-center z-50 overflow-hidden">
-      {/* Animated background elements - Neural Network Vibe */}
-      <div className="absolute inset-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-knoux-primary/10 rounded-full blur-[100px] animate-pulse"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-knoux-secondary/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
-        
-        {/* Particle Effects (Simulated with CSS) */}
-        <div className="absolute inset-0 opacity-20">
-            <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-knoux-primary rounded-full animate-float"></div>
-            <div className="absolute top-3/4 left-1/3 w-1 h-1 bg-knoux-secondary rounded-full animate-float" style={{ animationDelay: '0.5s' }}></div>
-            <div className="absolute top-1/2 right-1/4 w-2 h-2 bg-knoux-accent rounded-full animate-float" style={{ animationDelay: '1.2s' }}></div>
-            <div className="absolute bottom-1/4 right-1/3 w-1.5 h-1.5 bg-knoux-primary rounded-full animate-float" style={{ animationDelay: '2s' }}></div>
-        </div>
+    <div className="fixed inset-0 bg-gradient-to-br from-gray-900 via-purple-900 to-blue-900 flex items-center justify-center z-50">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-4000"></div>
       </div>
 
-      {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center">
-        {/* Logo Reveal */}
-        <div className="mb-8 relative group">
-          <div className="absolute inset-0 bg-gradient-to-br from-knoux-primary to-knoux-secondary rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-500 animate-pulse"></div>
-          <div className="relative bg-gradient-to-br from-knoux-primary to-knoux-secondary p-8 rounded-2xl shadow-2xl transform transition-transform duration-500 hover:scale-105">
-            <ClipboardCopy className="w-20 h-20 text-white animate-bounce-slow" />
+      {/* Main Content */}
+      <div className="relative z-10 text-center">
+        {/* Logo Animation */}
+        <div className="mb-8">
+          <div className={`relative inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 shadow-2xl transform transition-all duration-500 ${
+            isComplete ? 'scale-110 rotate-12' : 'scale-100 rotate-0'
+          }`}>
+            <Icon className={`w-12 h-12 text-white transition-all duration-300 ${
+              isComplete ? 'scale-110' : 'scale-100'
+            }`} />
+            
+            {/* Pulse Ring */}
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 animate-ping opacity-20"></div>
+          </div>
+        </div>
+
+        {/* App Name */}
+        <h1 className="text-4xl font-black text-white mb-2 bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+          {isArabic ? 'نوكس' : 'Knoux'}
+        </h1>
+        <p className="text-lg text-gray-300 mb-8 font-medium">
+          {isArabic ? 'مساعد الحافظة الذكي' : 'Intelligent Clipboard Assistant'}
+        </p>
+
+        {/* Loading Step */}
+        <div className="mb-8">
+          <div className={`flex items-center justify-center gap-3 mb-4 transition-all duration-300 ${
+            isArabic ? 'flex-row-reverse' : 'flex-row'
+          }`}>
+            <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+            </div>
+            <span className="text-white font-medium">
+              {isArabic ? currentStepData?.labelAr : currentStepData?.label}
+            </span>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-80 h-2 bg-gray-700 rounded-full overflow-hidden mx-auto">
+            <div 
+              className="h-full bg-gradient-to-r from-purple-500 to-blue-500 rounded-full transition-all duration-300 ease-out"
+              style={{ width: `${progress}%` }}
+            >
+              <div className="h-full bg-white opacity-30 animate-pulse"></div>
+            </div>
           </div>
           
-          {/* Neural connections (decorative lines) */}
-          <div className="absolute -left-12 top-1/2 w-12 h-[1px] bg-gradient-to-r from-transparent to-knoux-primary/50"></div>
-          <div className="absolute -right-12 top-1/2 w-12 h-[1px] bg-gradient-to-l from-transparent to-knoux-secondary/50"></div>
+          {/* Progress Percentage */}
+          <div className="mt-2 text-sm text-gray-400">
+            {Math.round(progress)}%
+          </div>
         </div>
 
-        {/* Title */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-black mb-3 tracking-tight">
-            <span className="bg-gradient-to-r from-knoux-primary via-knoux-secondary to-knoux-accent bg-clip-text text-transparent animate-gradient-x">
-              Knoux
-            </span>
-          </h1>
-          <p className="text-xl font-medium text-knoux-text-secondary">
-            Your Clipboard... <span className="text-knoux-primary">Finally Thinks.</span>
-          </p>
+        {/* Feature Highlights */}
+        <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
+          <div className="flex items-center gap-2 text-gray-300 text-sm">
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+            {isArabic ? 'ذكاء اصطناعي' : 'AI Powered'}
+          </div>
+          <div className="flex items-center gap-2 text-gray-300 text-sm">
+            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+            {isArabic ? 'آمن ومشفر' : 'Secure & Encrypted'}
+          </div>
+          <div className="flex items-center gap-2 text-gray-300 text-sm">
+            <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+            {isArabic ? 'سريع وذكي' : 'Fast & Smart'}
+          </div>
+          <div className="flex items-center gap-2 text-gray-300 text-sm">
+            <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
+            {isArabic ? 'سهل الاستخدام' : 'Easy to Use'}
+          </div>
         </div>
 
-        {/* AI Progress Indicator */}
-        <div className="w-80 relative">
-            <div className="flex justify-between text-xs text-knoux-text-muted mb-2 font-mono">
-                <span>SYSTEM_INIT</span>
-                <span>{Math.min(100, Math.round(progress))}%</span>
-            </div>
-            <div className="h-1.5 bg-knoux-background-lighter rounded-full overflow-hidden">
-                <div
-                    className="h-full bg-gradient-to-r from-knoux-primary via-knoux-secondary to-knoux-accent transition-all duration-300 ease-out relative"
-                    style={{ width: `${progress}%` }}
-                >
-                    <div className="absolute inset-0 bg-white/20 animate-shimmer"></div>
-                </div>
-            </div>
-            <div className="mt-4 text-center h-6">
-                <p className="text-sm text-knoux-text-secondary animate-pulse">
-                    {progress < 30 && 'Initializing Neural Core...'}
-                    {progress >= 30 && progress < 60 && 'Connecting to Knowledge Base...'}
-                    {progress >= 60 && progress < 90 && 'Optimizing Workflow Patterns...'}
-                    {progress >= 90 && 'Ready to Serve.'}
-                </p>
-            </div>
+        {/* Version */}
+        <div className="mt-8 text-xs text-gray-500">
+          {isArabic ? 'الإصدار' : 'Version'} 1.0.0
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="absolute bottom-8 text-center">
-        <p className="text-xs text-knoux-text-muted font-mono">v1.0.0 • AI-Powered Productivity</p>
-      </div>
+      {/* Completion Animation */}
+      {isComplete && (
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-blue-500/20 animate-pulse"></div>
+      )}
+
+      <style jsx>{`
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
     </div>
   );
 };

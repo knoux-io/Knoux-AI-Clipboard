@@ -1,418 +1,524 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Settings,
-  Globe,
-  Clipboard,
-  Brain,
-  Shield,
-  ChevronRight,
-  Save,
-  RefreshCw,
-  X,
-  Moon,
-  Bell,
-  Lock,
-  Database,
-  Activity,
-  Zap,
-  Eye,
-  Trash2,
-  HardDrive,
-  Palette,
-  Layout,
-  Plus
-} from 'lucide-react';
-import { useSettingsContext } from '../contexts/SettingsContext';
-import { useTheme } from '../contexts/ThemeContext';
-import i18n from '../utils/i18n';
+import { X, Save, RotateCcw, Download, Upload, Monitor, Moon, Sun, Globe, Bell, Shield, Cpu, HardDrive, Zap } from 'lucide-react';
+
+interface SettingsData {
+  language: 'en' | 'ar';
+  theme: 'light' | 'dark';
+  startWithSystem: boolean;
+  runInBackground: boolean;
+  notifications: boolean;
+  clipboardMonitoring: boolean;
+  performanceMode: 'low' | 'balanced' | 'high';
+  clipboardLimit: number;
+  autoCleanup: boolean;
+  cleanupDays: number;
+  aiEnabled: boolean;
+  aiModel: 'local' | 'cloud';
+  autoSummarize: boolean;
+  showTrayIcon: boolean;
+  minimizeToTray: boolean;
+  showInTaskbar: boolean;
+  encryption: boolean;
+  dataRetention: number;
+  anonymizeData: boolean;
+}
 
 interface SettingsPanelProps {
   onClose: () => void;
 }
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({ onClose }) => {
-  const settings = useSettingsContext();
-  const { theme, setTheme, availableThemes } = useTheme();
-  const [activeTab, setActiveTab] = useState<'general' | 'appearance' | 'clipboard' | 'ai' | 'security'>('general');
-  const [localSettings, setLocalSettings] = useState(settings.settings);
+  const [settings, setSettings] = useState<SettingsData | null>(null);
+  const [activeTab, setActiveTab] = useState('general');
+  const [hasChanges, setHasChanges] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  // Sync local state with context when context updates
   useEffect(() => {
-    if (settings.settings) {
-      setLocalSettings(settings.settings);
-    }
-  }, [settings.settings]);
+    loadSettings();
+  }, []);
 
-  const tabs = [
-    { id: 'general', label: i18n.t('settings.general.title'), labelAr: 'عام', icon: <Globe className="w-5 h-5" /> },
-    { id: 'appearance', label: i18n.isRTL() ? 'المظهر' : 'Appearance', labelAr: 'المظهر', icon: <Palette className="w-5 h-5" /> },
-    { id: 'clipboard', label: i18n.t('settings.clipboard.title'), labelAr: 'الحافظة', icon: <Clipboard className="w-5 h-5" /> },
-    { id: 'ai', label: i18n.t('settings.ai.title'), labelAr: 'الذكاء الاصطناعي', icon: <Brain className="w-5 h-5" /> },
-    { id: 'security', label: i18n.t('settings.security.title'), labelAr: 'الأمان', icon: <Shield className="w-5 h-5" /> },
-  ];
-
-  const handleSettingChange = <K extends keyof typeof localSettings>(
-    key: K,
-    value: any
-  ) => {
-    if (!localSettings) return;
-    
-    const updated = { ...localSettings, [key]: value };
-    setLocalSettings(updated);
-    settings.updateSetting(key, value);
-    
-    // Handle immediate side effects
-    if (key === 'language') {
-      i18n.setLanguage(value as 'ar' | 'en');
+  const loadSettings = async () => {
+    try {
+      const result = await window.electron?.ipcRenderer.invoke('settings:get-all');
+      if (result?.success) {
+        setSettings(result.data);
+      }
+    } catch (error) {
+      console.error('Failed to load settings:', error);
     }
   };
 
-  if (!localSettings) {
+  const updateSetting = (key: keyof SettingsData, value: any) => {
+    if (!settings) return;
+    
+    setSettings(prev => ({ ...prev!, [key]: value }));
+    setHasChanges(true);
+  };
+
+  const saveSettings = async () => {
+    if (!settings || !hasChanges) return;
+    
+    setSaving(true);
+    try {
+      const result = await window.electron?.ipcRenderer.invoke('settings:update', settings);
+      if (result?.success) {
+        setHasChanges(false);
+        
+        // Apply theme immediately
+        if (settings.theme === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+        } else {
+          document.documentElement.classList.add('light');
+          document.documentElement.classList.remove('dark');
+        }
+        
+        // Apply language immediately
+        if (settings.language === 'ar') {
+          document.documentElement.dir = 'rtl';
+          document.documentElement.lang = 'ar';
+        } else {
+          document.documentElement.dir = 'ltr';
+          document.documentElement.lang = 'en';
+        }
+      }
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const resetSettings = async () => {
+    if (!confirm('Are you sure you want to reset all settings to defaults?')) return;
+    
+    try {
+      const result = await window.electron?.ipcRenderer.invoke('settings:reset');
+      if (result?.success) {
+        setSettings(result.data);
+        setHasChanges(false);
+      }
+    } catch (error) {
+      console.error('Failed to reset settings:', error);
+    }
+  };
+
+  const exportSettings = async () => {
+    try {
+      const result = await window.electron?.ipcRenderer.invoke('settings:export');
+      if (result?.success) {
+        const blob = new Blob([result.data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'knoux-settings.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Failed to export settings:', error);
+    }
+  };
+
+  const importSettings = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    try {
+      const text = await file.text();
+      const result = await window.electron?.ipcRenderer.invoke('settings:import', text);
+      if (result?.success) {
+        await loadSettings();
+        setHasChanges(false);
+      }
+    } catch (error) {
+      console.error('Failed to import settings:', error);
+    }
+  };
+
+  if (!settings) {
     return (
-      <div className="flex items-center justify-center h-full text-knoux-primary">
-        <RefreshCw className="w-8 h-8 animate-spin" />
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="bg-gray-900 rounded-xl p-8">
+          <div className="animate-spin w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full mx-auto"></div>
+          <p className="text-white mt-4">Loading settings...</p>
+        </div>
       </div>
     );
   }
 
-  const renderToggle = (
-    label: string,
-    description: string,
-    key: keyof typeof localSettings,
-    icon: React.ReactNode
-  ) => (
-    <div className="flex items-center justify-between p-4 bg-knoux-background-surface/50 rounded-xl border border-white/5 hover:border-knoux-primary/30 transition-colors group">
-      <div className="flex items-center gap-4">
-        <div className="p-2 rounded-lg bg-knoux-primary/10 text-knoux-primary group-hover:bg-knoux-primary/20 transition-colors">
-          {icon}
-        </div>
-        <div>
-          <div className="font-medium text-white">{label}</div>
-          <div className="text-sm text-gray-400">{description}</div>
-        </div>
-      </div>
-      <button
-        onClick={() => handleSettingChange(key, !localSettings[key])}
-        className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-knoux-primary/50 ${
-          localSettings[key] ? 'bg-knoux-primary' : 'bg-gray-700'
-        }`}
-      >
-        <span
-          className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition duration-300 ${
-            localSettings[key] 
-              ? (i18n.isRTL() ? '-translate-x-6' : 'translate-x-6') 
-              : (i18n.isRTL() ? '-translate-x-1' : 'translate-x-1')
-          }`}
-        />
-      </button>
-    </div>
-  );
-
-  const renderSelect = (
-    label: string,
-    key: keyof typeof localSettings,
-    options: { value: string; label: string }[],
-    icon: React.ReactNode
-  ) => (
-    <div className="space-y-2">
-      <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-        {icon}
-        {label}
-      </label>
-      <div className="relative">
-        <select
-          value={String(localSettings[key])}
-          onChange={(e) => handleSettingChange(key, e.target.value)}
-          className="w-full px-4 py-3 bg-knoux-background-surface/50 text-white rounded-xl border border-white/10 focus:border-knoux-primary focus:ring-1 focus:ring-knoux-primary appearance-none transition-colors cursor-pointer hover:bg-knoux-background-surface/80"
-        >
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value} className="bg-knoux-background-surface text-white">
-              {opt.label}
-            </option>
-          ))}
-        </select>
-        <div className={`absolute top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400 ${i18n.isRTL() ? 'left-4' : 'right-4'}`}>
-          <ChevronRight className="w-4 h-4 rotate-90" />
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'general':
-        return (
-          <div className="space-y-6 animate-fadeIn">
-            <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-knoux-primary-light to-knoux-secondary-light mb-6 flex items-center gap-2">
-              <Globe className="w-6 h-6 text-knoux-primary" />
-              {i18n.isRTL() ? 'الإعدادات العامة' : 'General Settings'}
-            </h3>
-
-            <div className="grid gap-6">
-              {renderSelect(
-                i18n.t('settings.general.language') || (i18n.isRTL() ? 'اللغة' : 'Language'),
-                'language',
-                [
-                  { value: 'ar', label: 'العربية' },
-                  { value: 'en', label: 'English' }
-                ],
-                <Globe className="w-4 h-4 text-knoux-primary" />
-              )}
-
-              {renderToggle(
-                i18n.isRTL() ? 'التشغيل مع النظام' : 'Start with System',
-                i18n.isRTL() ? 'تشغيل التطبيق تلقائياً عند بدء تشغيل الجهاز' : 'Launch application automatically on system startup',
-                'startWithSystem',
-                <Zap className="w-5 h-5" />
-              )}
-
-              {renderToggle(
-                i18n.isRTL() ? 'الإشعارات' : 'Notifications',
-                i18n.isRTL() ? 'تفعيل إشعارات سطح المكتب' : 'Enable desktop notifications',
-                'notifications',
-                <Bell className="w-5 h-5" />
-              )}
-            </div>
-          </div>
-        );
-
-      case 'appearance':
-        return (
-          <div className="space-y-6 animate-fadeIn">
-            <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-knoux-primary-light to-knoux-secondary-light mb-6 flex items-center gap-2">
-              <Palette className="w-6 h-6 text-knoux-primary" />
-              {i18n.isRTL() ? 'المظهر والسمات' : 'Appearance & Themes'}
-            </h3>
-
-            <div className="space-y-4">
-              <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
-                <Layout className="w-4 h-4" />
-                {i18n.isRTL() ? 'السمة الحالية' : 'Current Theme'}
-              </label>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {availableThemes.map((t) => (
-                  <button
-                    key={t.id}
-                    onClick={() => setTheme(t.id)}
-                    className={`relative p-4 rounded-xl border transition-all duration-300 flex items-center gap-4 group overflow-hidden ${
-                      theme === t.id
-                        ? 'bg-knoux-primary/10 border-knoux-primary shadow-lg shadow-knoux-primary/10'
-                        : 'bg-knoux-background-surface/50 border-white/5 hover:border-white/20'
-                    }`}
-                  >
-                    <div 
-                      className="w-12 h-12 rounded-lg shadow-inner border border-white/10 flex items-center justify-center text-xl"
-                      style={{ backgroundColor: t.color }}
-                    >
-                      {theme === t.id && <div className="w-2 h-2 bg-white rounded-full animate-pulse" />}
-                    </div>
-                    <div className="text-left">
-                      <div className={`font-medium ${theme === t.id ? 'text-knoux-primary' : 'text-white'}`}>
-                        {t.label}
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        {theme === t.id ? (i18n.isRTL() ? 'نشط' : 'Active') : (i18n.isRTL() ? 'تطبيق' : 'Apply')}
-                      </div>
-                    </div>
-                    {theme === t.id && (
-                      <div className="absolute top-2 right-2 w-2 h-2 bg-knoux-primary rounded-full shadow-[0_0_10px_rgba(var(--knoux-primary),0.5)]" />
-                    )}
-                  </button>
-                ))}
-
-                {/* Custom Theme Builder Entry */}
-                <button
-                  className="relative p-4 rounded-xl border border-dashed border-white/20 bg-transparent hover:bg-white/5 transition-all duration-300 flex items-center gap-4 group"
-                  onClick={() => alert(i18n.isRTL() ? 'سيتم إطلاق منشئ السمات قريباً!' : 'Theme Builder coming soon!')}
-                >
-                  <div className="w-12 h-12 rounded-lg border-2 border-white/20 flex items-center justify-center">
-                    <Plus className="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-medium text-gray-300 group-hover:text-white transition-colors">
-                      {i18n.isRTL() ? 'تخصيص سمة' : 'Custom Theme'}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {i18n.isRTL() ? 'أنشئ مظهرك الخاص' : 'Create your own look'}
-                    </div>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'clipboard':
-        return (
-          <div className="space-y-6 animate-fadeIn">
-            <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-knoux-primary-light to-knoux-secondary-light mb-6 flex items-center gap-2">
-              <Clipboard className="w-6 h-6 text-knoux-primary" />
-              {i18n.isRTL() ? 'إعدادات الحافظة' : 'Clipboard Settings'}
-            </h3>
-
-            <div className="grid gap-6">
-              {renderToggle(
-                i18n.isRTL() ? 'مراقبة الحافظة' : 'Clipboard Monitoring',
-                i18n.isRTL() ? 'حفظ النصوص المنسوخة تلقائياً' : 'Automatically save copied text',
-                'clipboardMonitoring',
-                <Eye className="w-5 h-5" />
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-2">
-                  <Database className="w-4 h-4 text-knoux-accent" />
-                  {i18n.isRTL() ? 'حد السجل' : 'History Limit'}
-                </label>
-                <input
-                  type="number"
-                  min="10"
-                  max="1000"
-                  value={localSettings.clipboardLimit || 100}
-                  onChange={(e) => handleSettingChange('clipboardLimit', parseInt(e.target.value) || 100)}
-                  className="w-full px-4 py-3 bg-knoux-background-surface/50 text-white rounded-xl border border-white/10 focus:border-knoux-primary focus:ring-1 focus:ring-knoux-primary"
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  {i18n.isRTL() ? 'عدد العناصر المحفوظة في السجل (10-1000)' : 'Number of items to keep in history (10-1000)'}
-                </p>
-              </div>
-
-              {renderToggle(
-                i18n.isRTL() ? 'التنظيف التلقائي' : 'Auto Cleanup',
-                i18n.isRTL() ? 'حذف العناصر القديمة تلقائياً' : 'Automatically remove old items',
-                'autoCleanup',
-                <Trash2 className="w-5 h-5" />
-              )}
-            </div>
-          </div>
-        );
-
-      case 'ai':
-        return (
-          <div className="space-y-6 animate-fadeIn">
-            <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-knoux-primary-light to-knoux-secondary-light mb-6 flex items-center gap-2">
-              <Brain className="w-6 h-6 text-knoux-primary" />
-              {i18n.isRTL() ? 'إعدادات الذكاء الاصطناعي' : 'AI Settings'}
-            </h3>
-
-            <div className="grid gap-6">
-              {renderToggle(
-                i18n.isRTL() ? 'تفعيل الذكاء الاصطناعي' : 'Enable AI',
-                i18n.isRTL() ? 'تمكين تحليل وتصنيف النصوص الذكي' : 'Enable smart text analysis and classification',
-                'aiEnabled',
-                <Activity className="w-5 h-5" />
-              )}
-
-              {localSettings.aiEnabled && (
-                <>
-                  {renderSelect(
-                    i18n.isRTL() ? 'نموذج المعالجة' : 'Processing Model',
-                    'aiModel',
-                    [
-                      { value: 'local', label: i18n.isRTL() ? 'محلي (أسرع / خصوصية أعلى)' : 'Local (Faster / More Privacy)' },
-                      { value: 'cloud', label: i18n.isRTL() ? 'سحابي (أكثر دقة)' : 'Cloud (More Accurate)' }
-                    ],
-                    <HardDrive className="w-4 h-4 text-knoux-secondary" />
-                  )}
-
-                  {renderToggle(
-                    i18n.isRTL() ? 'التلخيص التلقائي' : 'Auto Summarize',
-                    i18n.isRTL() ? 'إنشاء ملخصات للنصوص الطويلة تلقائياً' : 'Automatically generate summaries for long text',
-                    'autoSummarize',
-                    <Clipboard className="w-5 h-5" />
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-        );
-
-      case 'security':
-        return (
-          <div className="space-y-6 animate-fadeIn">
-            <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-knoux-primary-light to-knoux-secondary-light mb-6 flex items-center gap-2">
-              <Shield className="w-6 h-6 text-knoux-primary" />
-              {i18n.isRTL() ? 'إعدادات الأمان' : 'Security Settings'}
-            </h3>
-
-            <div className="grid gap-6">
-              {renderToggle(
-                i18n.isRTL() ? 'تشفير البيانات' : 'Data Encryption',
-                i18n.isRTL() ? 'تشفير جميع البيانات المحفوظة محلياً' : 'Encrypt all locally stored data',
-                'encryption',
-                <Lock className="w-5 h-5" />
-              )}
-
-              {renderToggle(
-                i18n.isRTL() ? 'إخفاء البيانات' : 'Anonymize Data',
-                i18n.isRTL() ? 'إزالة المعلومات الحساسة قبل المعالجة' : 'Remove sensitive info before processing',
-                'anonymizeData',
-                <Eye className="w-5 h-5" />
-              )}
-            </div>
-          </div>
-        );
-    }
-  };
+  const tabs = [
+    { id: 'general', label: 'General', icon: Monitor },
+    { id: 'clipboard', label: 'Clipboard', icon: HardDrive },
+    { id: 'ai', label: 'AI', icon: Cpu },
+    { id: 'security', label: 'Security', icon: Shield },
+  ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div 
-        className="relative w-full max-w-4xl h-[85vh] bg-knoux-background/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 overflow-hidden flex flex-col md:flex-row"
-        dir={i18n.isRTL() ? 'rtl' : 'ltr'}
-      >
-        {/* Close Button */}
-        <button 
-          onClick={onClose}
-          className="absolute top-4 z-10 p-2 text-gray-400 hover:text-white bg-black/20 hover:bg-red-500/20 rounded-full transition-all duration-300 backdrop-blur-md border border-white/5 ltr:right-4 rtl:left-4"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Sidebar */}
-        <div className="w-full md:w-64 bg-knoux-background-surface/50 border-b md:border-b-0 md:border-r border-white/5 p-6 flex flex-col">
-          <div className="mb-8 flex items-center gap-3 px-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-knoux-primary to-knoux-secondary flex items-center justify-center shadow-lg shadow-knoux-primary/20">
-              <Settings className="w-5 h-5 text-white" />
-            </div>
-            <h2 className="text-xl font-bold text-white tracking-wide">
-              {i18n.isRTL() ? 'الإعدادات' : 'Settings'}
-            </h2>
-          </div>
-          
-          <nav className="space-y-2 flex-1">
-            {tabs.map((tab) => (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-gray-900 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+          <h2 className="text-2xl font-bold text-white">Settings</h2>
+          <div className="flex items-center gap-2">
+            {hasChanges && (
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group ${
-                  activeTab === tab.id
-                    ? 'bg-knoux-primary text-white shadow-lg shadow-knoux-primary/25'
-                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                }`}
+                onClick={saveSettings}
+                disabled={saving}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg flex items-center gap-2 transition-colors"
               >
-                <div className={`transition-transform duration-300 ${activeTab === tab.id ? 'scale-110' : 'group-hover:scale-110'}`}>
-                  {tab.icon}
-                </div>
-                <span className="font-medium">
-                  {i18n.isRTL() ? tab.labelAr : tab.label}
-                </span>
-                {activeTab === tab.id && (
-                  <ChevronRight className={`w-4 h-4 ml-auto opacity-50 ${i18n.isRTL() ? 'rotate-180' : ''}`} />
-                )}
+                <Save className="w-4 h-4" />
+                {saving ? 'Saving...' : 'Save'}
               </button>
-            ))}
-          </nav>
-
-          <div className="mt-auto pt-6 border-t border-white/5 text-center">
-            <p className="text-xs text-gray-500 font-mono">Knoux v1.0.0</p>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
-          <div className="max-w-2xl mx-auto">
-            {renderContent()}
+        <div className="flex h-[calc(90vh-120px)]">
+          {/* Sidebar */}
+          <div className="w-64 bg-gray-800 p-4 border-r border-gray-700">
+            <nav className="space-y-2">
+              {tabs.map(tab => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      activeTab === tab.id
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </nav>
+
+            <div className="mt-8 pt-4 border-t border-gray-700 space-y-2">
+              <button
+                onClick={exportSettings}
+                className="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Export
+              </button>
+              <label className="w-full flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded-lg transition-colors cursor-pointer">
+                <Upload className="w-4 h-4" />
+                Import
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={importSettings}
+                  className="hidden"
+                />
+              </label>
+              <button
+                onClick={resetSettings}
+                className="w-full flex items-center gap-3 px-4 py-2 text-red-400 hover:bg-red-900/20 hover:text-red-300 rounded-lg transition-colors"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Reset
+              </button>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 p-6 overflow-y-auto">
+            {activeTab === 'general' && (
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-white mb-4">General Settings</h3>
+                
+                {/* Theme */}
+                <div className="space-y-3">
+                  <label className="text-white font-medium">Theme</label>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => updateSetting('theme', 'light')}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                        settings.theme === 'light'
+                          ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                          : 'border-gray-600 text-gray-300 hover:border-gray-500'
+                      }`}
+                    >
+                      <Sun className="w-4 h-4" />
+                      Light
+                    </button>
+                    <button
+                      onClick={() => updateSetting('theme', 'dark')}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                        settings.theme === 'dark'
+                          ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                          : 'border-gray-600 text-gray-300 hover:border-gray-500'
+                      }`}
+                    >
+                      <Moon className="w-4 h-4" />
+                      Dark
+                    </button>
+                  </div>
+                </div>
+
+                {/* Language */}
+                <div className="space-y-3">
+                  <label className="text-white font-medium">Language</label>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => updateSetting('language', 'en')}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                        settings.language === 'en'
+                          ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                          : 'border-gray-600 text-gray-300 hover:border-gray-500'
+                      }`}
+                    >
+                      <Globe className="w-4 h-4" />
+                      English
+                    </button>
+                    <button
+                      onClick={() => updateSetting('language', 'ar')}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                        settings.language === 'ar'
+                          ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                          : 'border-gray-600 text-gray-300 hover:border-gray-500'
+                      }`}
+                    >
+                      <Globe className="w-4 h-4" />
+                      العربية
+                    </button>
+                  </div>
+                </div>
+
+                {/* Startup Behavior */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-medium text-white">Startup Behavior</h4>
+                  
+                  <label className="flex items-center justify-between">
+                    <span className="text-gray-300">Start with system</span>
+                    <input
+                      type="checkbox"
+                      checked={settings.startWithSystem}
+                      onChange={(e) => updateSetting('startWithSystem', e.target.checked)}
+                      className="w-5 h-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+                    />
+                  </label>
+                  
+                  <label className="flex items-center justify-between">
+                    <span className="text-gray-300">Run in background</span>
+                    <input
+                      type="checkbox"
+                      checked={settings.runInBackground}
+                      onChange={(e) => updateSetting('runInBackground', e.target.checked)}
+                      className="w-5 h-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+                    />
+                  </label>
+                  
+                  <label className="flex items-center justify-between">
+                    <span className="text-gray-300">Show tray icon</span>
+                    <input
+                      type="checkbox"
+                      checked={settings.showTrayIcon}
+                      onChange={(e) => updateSetting('showTrayIcon', e.target.checked)}
+                      className="w-5 h-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+                    />
+                  </label>
+                </div>
+
+                {/* Notifications */}
+                <div className="space-y-3">
+                  <label className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Bell className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-300">Enable notifications</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={settings.notifications}
+                      onChange={(e) => updateSetting('notifications', e.target.checked)}
+                      className="w-5 h-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'clipboard' && (
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-white mb-4">Clipboard Settings</h3>
+                
+                {/* Monitoring */}
+                <label className="flex items-center justify-between">
+                  <span className="text-gray-300">Enable clipboard monitoring</span>
+                  <input
+                    type="checkbox"
+                    checked={settings.clipboardMonitoring}
+                    onChange={(e) => updateSetting('clipboardMonitoring', e.target.checked)}
+                    className="w-5 h-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+                  />
+                </label>
+
+                {/* History Size */}
+                <div className="space-y-3">
+                  <label className="text-white font-medium">Max history size</label>
+                  <input
+                    type="number"
+                    min="100"
+                    max="10000"
+                    step="100"
+                    value={settings.clipboardLimit}
+                    onChange={(e) => updateSetting('clipboardLimit', parseInt(e.target.value))}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                  <p className="text-sm text-gray-400">Number of clipboard items to keep in history</p>
+                </div>
+
+                {/* Auto-clean */}
+                <div className="space-y-4">
+                  <label className="flex items-center justify-between">
+                    <span className="text-gray-300">Auto-clean old items</span>
+                    <input
+                      type="checkbox"
+                      checked={settings.autoCleanup}
+                      onChange={(e) => updateSetting('autoCleanup', e.target.checked)}
+                      className="w-5 h-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+                    />
+                  </label>
+                  
+                  {settings.autoCleanup && (
+                    <div className="space-y-3">
+                      <label className="text-white font-medium">Clean items older than (days)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="365"
+                        value={settings.cleanupDays}
+                        onChange={(e) => updateSetting('cleanupDays', parseInt(e.target.value))}
+                        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'ai' && (
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-white mb-4">AI Settings</h3>
+                
+                {/* Enable AI */}
+                <label className="flex items-center justify-between">
+                  <span className="text-gray-300">Enable AI features</span>
+                  <input
+                    type="checkbox"
+                    checked={settings.aiEnabled}
+                    onChange={(e) => updateSetting('aiEnabled', e.target.checked)}
+                    className="w-5 h-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+                  />
+                </label>
+
+                {settings.aiEnabled && (
+                  <>
+                    {/* Model Selection */}
+                    <div className="space-y-3">
+                      <label className="text-white font-medium">AI Model</label>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => updateSetting('aiModel', 'local')}
+                          className={`flex-1 px-4 py-3 rounded-lg border transition-colors ${
+                            settings.aiModel === 'local'
+                              ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                              : 'border-gray-600 text-gray-300 hover:border-gray-500'
+                          }`}
+                        >
+                          <div className="text-center">
+                            <div className="font-medium">Local</div>
+                            <div className="text-sm opacity-75">Runs on your device</div>
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => updateSetting('aiModel', 'cloud')}
+                          className={`flex-1 px-4 py-3 rounded-lg border transition-colors ${
+                            settings.aiModel === 'cloud'
+                              ? 'border-purple-500 bg-purple-500/20 text-purple-300'
+                              : 'border-gray-600 text-gray-300 hover:border-gray-500'
+                          }`}
+                        >
+                          <div className="text-center">
+                            <div className="font-medium">Cloud</div>
+                            <div className="text-sm opacity-75">Better accuracy</div>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Auto Summarize */}
+                    <label className="flex items-center justify-between">
+                      <span className="text-gray-300">Auto-summarize long text</span>
+                      <input
+                        type="checkbox"
+                        checked={settings.autoSummarize}
+                        onChange={(e) => updateSetting('autoSummarize', e.target.checked)}
+                        className="w-5 h-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+                      />
+                    </label>
+                  </>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'security' && (
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-white mb-4">Security & Privacy</h3>
+                
+                {/* Encryption */}
+                <label className="flex items-center justify-between">
+                  <div>
+                    <div className="text-gray-300">Enable encryption</div>
+                    <div className="text-sm text-gray-500">Encrypt clipboard data at rest</div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.encryption}
+                    onChange={(e) => updateSetting('encryption', e.target.checked)}
+                    className="w-5 h-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+                  />
+                </label>
+
+                {/* Data Retention */}
+                <div className="space-y-3">
+                  <label className="text-white font-medium">Data retention (days)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="365"
+                    value={settings.dataRetention}
+                    onChange={(e) => updateSetting('dataRetention', parseInt(e.target.value))}
+                    className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                  <p className="text-sm text-gray-400">Automatically delete data older than this</p>
+                </div>
+
+                {/* Anonymize Data */}
+                <label className="flex items-center justify-between">
+                  <div>
+                    <div className="text-gray-300">Anonymize data</div>
+                    <div className="text-sm text-gray-500">Remove personal information from analytics</div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settings.anonymizeData}
+                    onChange={(e) => updateSetting('anonymizeData', e.target.checked)}
+                    className="w-5 h-5 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500"
+                  />
+                </label>
+              </div>
+            )}
           </div>
         </div>
       </div>
