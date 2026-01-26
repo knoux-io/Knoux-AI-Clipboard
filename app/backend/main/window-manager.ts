@@ -7,9 +7,9 @@
 
 import { BrowserWindow, screen, Rectangle } from 'electron';
 import { join } from 'path';
-import { llog } from '../shared/localized-logger';
-import { AppConfig } from '../shared/config-schema';
-import { UI } from '../shared/constants';
+import { llog } from '../../shared/localized-logger';
+import { AppConfig } from '../../shared/config-schema';
+import { UI } from '../../shared/constants';
 
 // ==================== TYPES ====================
 
@@ -75,7 +75,7 @@ export class WindowManager {
     this.window = window;
     this.config = this.mapConfig(config);
     this.stateFilePath = join(this.getAppDataPath(), WINDOW_STATE_FILE);
-    
+
     this.initialize();
   }
 
@@ -423,7 +423,7 @@ export class WindowManager {
     // Set maximum size (0 means unlimited in Electron)
     const maxWidth = this.config.maxWidth > 0 ? this.config.maxWidth : undefined;
     const maxHeight = this.config.maxHeight > 0 ? this.config.maxHeight : undefined;
-    
+
     if (maxWidth !== undefined || maxHeight !== undefined) {
       this.window.setMaximumSize(
         maxWidth || 0,
@@ -536,7 +536,7 @@ export class WindowManager {
   public updateConfig(config: AppConfig): void {
     const newConfig = this.mapConfig(config);
     const configChanged = JSON.stringify(this.config) !== JSON.stringify(newConfig);
-    
+
     this.config = newConfig;
 
     if (configChanged) {
@@ -578,9 +578,9 @@ export class WindowManager {
   public toggleAlwaysOnTop(): void {
     const newState = !this.window.isAlwaysOnTop();
     this.window.setAlwaysOnTop(newState);
-    
+
     this.config.alwaysOnTop = newState;
-    
+
     this.llog.debug('Always on top toggled', {
       alwaysOnTop: newState,
     });
@@ -607,10 +607,10 @@ export class WindowManager {
     if (this.window.isMinimized()) {
       this.window.restore();
     }
-    
+
     this.window.show();
     this.window.focus();
-    
+
     this.llog.debug('Window shown and focused');
   }
 

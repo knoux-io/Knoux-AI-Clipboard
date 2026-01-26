@@ -6,8 +6,8 @@
  */
 
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-import { IPC_CHANNELS } from '../shared/constants';
-import { createLogger } from '../shared/logger';
+import { IPC_CHANNELS } from '../../shared/constants';
+import { createLogger } from '../../shared/logger';
 
 // ==================== TYPES ====================
 

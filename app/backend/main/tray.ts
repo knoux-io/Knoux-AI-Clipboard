@@ -7,10 +7,10 @@
 
 import { Tray, Menu, BrowserWindow, nativeImage, app } from 'electron';
 import { join } from 'path';
-import { llog } from '../shared/localized-logger';
-import { AppConfig } from '../shared/config-schema';
-import { APP_NAME, UI } from '../shared/constants';
-import { AppEventType } from '../shared/enums';
+import { llog } from '../../shared/localized-logger';
+import { AppConfig } from '../../shared/config-schema';
+import { APP_NAME, UI } from '../../shared/constants';
+import { AppEventType } from '../../shared/enums';
 
 // ==================== TYPES ====================
 
@@ -73,7 +73,7 @@ export class TrayManager {
     this.window = window;
     this.config = this.mapConfig(config);
     this.iconPath = join(__dirname, '../../assets', TRAY_ICONS.NORMAL);
-    
+
     this.initialize();
   }
 
@@ -121,7 +121,7 @@ export class TrayManager {
     try {
       // Load tray icon
       const icon = nativeImage.createFromPath(this.iconPath);
-      
+
       if (icon.isEmpty()) {
         throw new Error('Failed to load tray icon');
       }
@@ -158,7 +158,7 @@ export class TrayManager {
     try {
       const newIconPath = join(__dirname, '../../assets', TRAY_ICONS[state]);
       const icon = nativeImage.createFromPath(newIconPath);
-      
+
       if (!icon.isEmpty()) {
         this.tray.setImage(icon);
         this.currentIconState = state;
@@ -178,15 +178,15 @@ export class TrayManager {
     }
 
     let tooltip = TRAY_TOOLTIP;
-    
+
     if (this.clipboardCount > 0) {
       tooltip += `\n\nClipboard Items: ${this.clipboardCount}`;
     }
-    
+
     if (this.unreadNotifications > 0) {
       tooltip += `\nUnread Notifications: ${this.unreadNotifications}`;
     }
-    
+
     this.tray.setToolTip(tooltip);
   }
 
@@ -395,12 +395,12 @@ export class TrayManager {
     if (this.window.isMinimized()) {
       this.window.restore();
     }
-    
+
     this.window.show();
     this.window.focus();
-    
+
     this.llog.debug('Window shown and focused');
-    
+
     // Send event to renderer
     this.sendToRenderer(AppEventType.TRAY_ICON_CLICKED, { action: 'show-window' });
   }
@@ -410,10 +410,10 @@ export class TrayManager {
    */
   private focusSearch(): void {
     this.showAndFocusWindow();
-    
+
     // Send event to renderer to focus search
     this.sendToRenderer('focus-search', {});
-    
+
     this.llog.debug('Search focus requested');
   }
 
@@ -460,9 +460,9 @@ export class TrayManager {
     const newState = !this.window.isAlwaysOnTop();
     this.window.setAlwaysOnTop(newState);
     this.config.alwaysOnTop = newState;
-    
+
     this.llog.debug('Always on top toggled', { alwaysOnTop: newState });
-    
+
     // Update context menu
     this.updateContextMenu();
   }
@@ -472,11 +472,11 @@ export class TrayManager {
    */
   private toggleMinimizeToTray(): void {
     this.config.minimizeToTray = !this.config.minimizeToTray;
-    
-    this.llog.debug('Minimize to tray toggled', { 
-      minimizeToTray: this.config.minimizeToTray 
+
+    this.llog.debug('Minimize to tray toggled', {
+      minimizeToTray: this.config.minimizeToTray
     });
-    
+
     // Update context menu
     this.updateContextMenu();
   }
@@ -503,11 +503,11 @@ export class TrayManager {
    */
   private quitApplication(): void {
     this.llog.info('Quit requested from tray menu');
-    
+
     // Send quit event to main process
     const { ipcMain } = require('electron');
     ipcMain.emit('app-quit-requested');
-    
+
     app.quit();
   }
 
@@ -519,14 +519,14 @@ export class TrayManager {
   public updateClipboardCount(count: number): void {
     this.clipboardCount = count;
     this.updateTooltip();
-    
+
     // Update icon state based on count
     if (count > 50) {
       this.updateTrayIcon('WARNING');
     } else {
       this.updateTrayIcon('NORMAL');
     }
-    
+
     this.llog.debug('Clipboard count updated', { count });
   }
 
@@ -536,14 +536,14 @@ export class TrayManager {
   public updateNotificationCount(count: number): void {
     this.unreadNotifications = count;
     this.updateTooltip();
-    
+
     // Update icon state based on notifications
     if (count > 0) {
       this.updateTrayIcon('ACTIVE');
     } else {
       this.updateTrayIcon('NORMAL');
     }
-    
+
     this.llog.debug('Notification count updated', { count });
   }
 
@@ -557,14 +557,14 @@ export class TrayManager {
 
     try {
       // Map icon type to tray icon state
-      const iconState: keyof typeof TRAY_ICONS = 
+      const iconState: keyof typeof TRAY_ICONS =
         iconType === 'error' ? 'ERROR' :
         iconType === 'warning' ? 'WARNING' : 'NORMAL';
-      
+
       // Temporarily change icon for notification
       const originalState = this.currentIconState;
       this.updateTrayIcon(iconState);
-      
+
       // Show notification (balloon on Windows, falls back to tooltip on other platforms)
       if (process.platform === 'win32') {
         this.tray.displayBalloon({
@@ -575,23 +575,23 @@ export class TrayManager {
       } else {
         // On macOS/Linux, update tooltip with notification
         this.tray.setToolTip(`${title}\n${content}`);
-        
+
         // Reset tooltip after 5 seconds
         setTimeout(() => {
           this.updateTooltip();
           this.updateTrayIcon(originalState);
         }, 5000);
       }
-      
+
       this.llog.debug('Tray notification shown', { title, iconType });
-      
+
       // Restore original icon after notification
       if (process.platform === 'win32') {
         setTimeout(() => {
           this.updateTrayIcon(originalState);
         }, 3000);
       }
-      
+
     } catch (error) {
       this.llog.error('Failed to show tray notification', error as Error, { title });
     }
@@ -603,7 +603,7 @@ export class TrayManager {
   public updateConfig(config: AppConfig): void {
     const newConfig = this.mapConfig(config);
     const configChanged = JSON.stringify(this.config) !== JSON.stringify(newConfig);
-    
+
     this.config = newConfig;
 
     if (configChanged) {
@@ -651,10 +651,10 @@ export class TrayManager {
       this.tray.destroy();
       this.tray = null;
     }
-    
+
     this.menu = null;
     this.isInitialized = false;
-    
+
     this.llog.info('Tray manager destroyed');
   }
 }

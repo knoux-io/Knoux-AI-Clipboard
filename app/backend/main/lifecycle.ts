@@ -6,10 +6,10 @@
  */
 
 import { app, powerMonitor, dialog } from 'electron';
-import { llog } from '../shared/localized-logger';
-import { AppConfig } from '../shared/config-schema';
-import { APP_NAME, APP_VERSION } from '../shared/constants';
-import { AppLifecycleState, AppEventType } from '../shared/enums';
+import { llog } from '../../shared/localized-logger';
+import { AppConfig } from '../../shared/config-schema';
+import { APP_NAME, APP_VERSION } from '../../shared/constants';
+import { AppLifecycleState, AppEventType } from '../../shared/enums';
 
 // ==================== TYPES ====================
 
@@ -95,7 +95,7 @@ export class LifecycleManager {
     this.config = this.mapConfig(config);
     this.recoveryOptions = DEFAULT_RECOVERY_OPTIONS;
     this.state = this.createInitialState();
-    
+
     this.initialize();
   }
 
@@ -121,7 +121,7 @@ export class LifecycleManager {
    */
   private createInitialState(): LifecycleState {
     const now = Date.now();
-    
+
     return {
       currentState: AppLifecycleState.BOOTING,
       previousState: AppLifecycleState.BOOTING,
@@ -178,7 +178,7 @@ export class LifecycleManager {
    */
   private transitionState(newState: AppLifecycleState): void {
     const oldState = this.state.currentState;
-    
+
     // Validate state transition
     if (!this.isValidTransition(oldState, newState)) {
       this.llog.warn('Invalid state transition attempted', {
@@ -312,17 +312,17 @@ export class LifecycleManager {
    */
   private onActive(): void {
     this.llog.debug('Application became active');
-    
+
     // Resume auto-save if it was paused
     if (!this.autoSaveTimer) {
       this.setupAutoSave();
     }
-    
+
     // Resume activity monitoring
     if (!this.activityMonitorTimer) {
       this.setupActivityMonitoring();
     }
-    
+
     // Adjust performance mode if needed
     this.adjustPerformanceMode();
   }
@@ -332,7 +332,7 @@ export class LifecycleManager {
    */
   private onIdle(): void {
     this.llog.debug('Application became idle');
-    
+
     // Reduce resource usage
     this.reduceResourceUsage();
   }
@@ -342,7 +342,7 @@ export class LifecycleManager {
    */
   private onBackground(): void {
     this.llog.debug('Application moved to background');
-    
+
     // Pause non-essential operations
     this.pauseNonEssentialOperations();
   }
@@ -352,10 +352,10 @@ export class LifecycleManager {
    */
   private onSuspended(): void {
     this.llog.debug('Application suspended');
-    
+
     // Stop all timers and background tasks
     this.stopAllTimers();
-    
+
     // Release resources
     this.releaseResources();
   }
@@ -366,16 +366,16 @@ export class LifecycleManager {
   private onShuttingDown(): void {
     this.llog.info('Application shutting down');
     this.isShuttingDown = true;
-    
+
     // Stop all timers
     this.stopAllTimers();
-    
+
     // Save final state
     this.saveApplicationState();
-    
+
     // Cleanup resources
     this.cleanupResources();
-    
+
     // Log shutdown statistics
     this.logShutdownStatistics();
   }
@@ -389,7 +389,7 @@ export class LifecycleManager {
       errorCount: this.state.errorCount,
       recoveryAttempts: this.state.recoveryAttempts,
     });
-    
+
     // Attempt recovery if not shutting down
     if (!this.isShuttingDown && this.state.recoveryAttempts < this.recoveryOptions.maxAttempts) {
       this.attemptRecovery();
@@ -403,7 +403,7 @@ export class LifecycleManager {
    */
   private adjustPerformanceMode(): void {
     const { performanceMode } = this.config;
-    
+
     switch (performanceMode) {
       case 'power-saver':
         this.enablePowerSaverMode();
@@ -422,7 +422,7 @@ export class LifecycleManager {
    */
   private enablePowerSaverMode(): void {
     this.llog.debug('Enabling power saver mode');
-    
+
     // Reduce polling intervals
     // Lower CPU priority
     // Disable non-essential features
@@ -433,7 +433,7 @@ export class LifecycleManager {
    */
   private enableBalancedMode(): void {
     this.llog.debug('Enabling balanced mode');
-    
+
     // Use default settings
   }
 
@@ -442,7 +442,7 @@ export class LifecycleManager {
    */
   private enablePerformanceMode(): void {
     this.llog.debug('Enabling performance mode');
-    
+
     // Increase polling intervals
     // Enable all features
     // Optimize for speed
@@ -453,7 +453,7 @@ export class LifecycleManager {
    */
   private reduceResourceUsage(): void {
     this.llog.debug('Reducing resource usage');
-    
+
     // Increase auto-save interval
     if (this.autoSaveTimer) {
       clearInterval(this.autoSaveTimer);
@@ -461,7 +461,7 @@ export class LifecycleManager {
         this.saveApplicationState();
       }, AUTO_SAVE_INTERVAL * 2); // Double the interval
     }
-    
+
     // Pause non-critical background tasks
   }
 
@@ -470,7 +470,7 @@ export class LifecycleManager {
    */
   private pauseNonEssentialOperations(): void {
     this.llog.debug('Pausing non-essential operations');
-    
+
     // Pause clipboard monitoring
     // Pause AI processing
     // Reduce logging frequency
@@ -484,7 +484,7 @@ export class LifecycleManager {
       clearInterval(this.autoSaveTimer);
       this.autoSaveTimer = null;
     }
-    
+
     if (this.activityMonitorTimer) {
       clearInterval(this.activityMonitorTimer);
       this.activityMonitorTimer = null;
@@ -496,7 +496,7 @@ export class LifecycleManager {
    */
   private releaseResources(): void {
     this.llog.debug('Releasing resources');
-    
+
     // Clear caches
     // Close database connections
     // Release memory
@@ -507,7 +507,7 @@ export class LifecycleManager {
    */
   private cleanupResources(): void {
     this.llog.debug('Cleaning up resources');
-    
+
     // Close all open files
     // Flush all pending writes
     // Disconnect from external services
@@ -562,7 +562,7 @@ export class LifecycleManager {
    */
   private attemptRecovery(): void {
     this.state.recoveryAttempts++;
-    
+
     this.llog.info('Attempting application recovery', {
       attempt: this.state.recoveryAttempts,
       maxAttempts: this.recoveryOptions.maxAttempts,
@@ -573,23 +573,23 @@ export class LifecycleManager {
       try {
         // Attempt recovery actions
         this.performRecoveryActions();
-        
+
         // If recovery successful, transition back to ready state
         if (this.recoveryOptions.resetOnSuccess) {
           this.state.recoveryAttempts = 0;
         }
-        
+
         this.transitionState(AppLifecycleState.READY);
-        
+
         this.llog.info('Recovery successful', {
           attempt: this.state.recoveryAttempts,
         });
-        
+
       } catch (recoveryError) {
         this.llog.error('Recovery attempt failed', recoveryError as Error, {
           attempt: this.state.recoveryAttempts,
         });
-        
+
         // Try again if we haven't reached max attempts
         if (this.state.recoveryAttempts < this.recoveryOptions.maxAttempts) {
           this.attemptRecovery();
@@ -606,7 +606,7 @@ export class LifecycleManager {
    */
   private performRecoveryActions(): void {
     this.llog.debug('Performing recovery actions');
-    
+
     // Restart clipboard monitoring
     // Reinitialize database connections
     // Clear corrupted caches
@@ -630,7 +630,7 @@ export class LifecycleManager {
       `The application will now close. Please restart it.\n\n` +
       `Error details have been saved to the log file.`
     );
-    
+
     this.shutdown();
   }
 
@@ -643,7 +643,7 @@ export class LifecycleManager {
     this.activityMonitorTimer = setInterval(() => {
       this.checkActivity();
     }, 60000); // Check every minute
-    
+
     this.llog.debug('Activity monitoring setup');
   }
 
@@ -653,13 +653,13 @@ export class LifecycleManager {
   private checkActivity(): void {
     const now = Date.now();
     const timeSinceActivity = now - this.state.lastActivity;
-    
+
     // Check if application is idle
-    if (timeSinceActivity > IDLE_DETECTION_THRESHOLD && 
+    if (timeSinceActivity > IDLE_DETECTION_THRESHOLD &&
         this.state.currentState === AppLifecycleState.ACTIVE) {
       this.transitionState(AppLifecycleState.IDLE);
     }
-    
+
     // Update activity time
     this.updateActivityTime();
   }
@@ -670,7 +670,7 @@ export class LifecycleManager {
   private updateActivityTime(): void {
     const now = Date.now();
     const timeDiff = now - this.state.lastActivity;
-    
+
     switch (this.state.currentState) {
       case AppLifecycleState.ACTIVE:
         this.state.activeTime += timeDiff;
@@ -681,7 +681,7 @@ export class LifecycleManager {
         this.state.idleTime += timeDiff;
         break;
     }
-    
+
     this.state.lastActivity = now;
   }
 
@@ -694,31 +694,31 @@ export class LifecycleManager {
     if (!powerMonitor) {
       return;
     }
-    
+
     // System suspending
     powerMonitor.on('suspend', () => {
       this.llog.debug('System suspending');
       this.transitionState(AppLifecycleState.SUSPENDED);
     });
-    
+
     // System resuming
     powerMonitor.on('resume', () => {
       this.llog.debug('System resuming');
       this.transitionState(AppLifecycleState.READY);
     });
-    
+
     // AC power connected
     powerMonitor.on('on-ac', () => {
       this.llog.debug('AC power connected');
       // Adjust performance mode if needed
     });
-    
+
     // AC power disconnected
     powerMonitor.on('on-battery', () => {
       this.llog.debug('AC power disconnected');
       // Adjust performance mode for battery
     });
-    
+
     this.llog.debug('Power monitor setup completed');
   }
 
@@ -731,7 +731,7 @@ export class LifecycleManager {
     this.autoSaveTimer = setInterval(() => {
       this.saveApplicationState();
     }, AUTO_SAVE_INTERVAL);
-    
+
     this.llog.debug('Auto-save setup', { interval: AUTO_SAVE_INTERVAL });
   }
 
@@ -742,12 +742,12 @@ export class LifecycleManager {
     if (this.isShuttingDown) {
       return;
     }
-    
+
     try {
       // Save clipboard history
       // Save application settings
       // Backup database
-      
+
       this.llog.debug('Application state saved');
     } catch (error) {
       this.llog.error('Failed to save application state', error as Error);
@@ -796,7 +796,7 @@ export class LifecycleManager {
    */
   public reportActivity(): void {
     this.state.lastActivity = Date.now();
-    
+
     // Transition to active if idle
     if (this.state.currentState === AppLifecycleState.IDLE) {
       this.transitionState(AppLifecycleState.ACTIVE);
@@ -809,7 +809,7 @@ export class LifecycleManager {
   public updateConfig(config: AppConfig): void {
     const newConfig = this.mapConfig(config);
     const configChanged = JSON.stringify(this.config) !== JSON.stringify(newConfig);
-    
+
     this.config = newConfig;
 
     if (configChanged) {
@@ -865,10 +865,10 @@ export class LifecycleManager {
     if (this.isShuttingDown) {
       return;
     }
-    
+
     this.llog.info('Initiating graceful shutdown');
     this.transitionState(AppLifecycleState.SHUTTING_DOWN);
-    
+
     // Allow time for cleanup
     setTimeout(() => {
       this.transitionState(AppLifecycleState.TERMINATED);
@@ -921,7 +921,7 @@ export class LifecycleManager {
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes % 60}m`;
     } else if (minutes > 0) {
@@ -937,7 +937,7 @@ export class LifecycleManager {
   private logShutdownStatistics(): void {
     const totalTime = Date.now() - this.state.startTime;
     const uptime = this.formatTime(totalTime);
-    
+
     this.llog.info('Application shutdown statistics', {
       sessionId: this.state.sessionId,
       startTime: new Date(this.state.startTime).toISOString(),
