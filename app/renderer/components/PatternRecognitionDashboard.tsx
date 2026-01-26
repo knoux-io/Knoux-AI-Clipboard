@@ -22,8 +22,8 @@ export const PatternRecognitionDashboard: React.FC<
     try {
       setLoading(true);
       const [analysis, insights] = await Promise.all([
-        patternRecognizer.analyzeBehavior(userId),
-        patternRecognizer.getPatternInsights(userId),
+        window.knox.invoke("patternRecognizer:analyzeBehavior", userId),
+        window.knox.invoke("patternRecognizer:getPatternInsights", userId),
       ]);
 
       setBehaviorAnalysis(analysis);
@@ -37,7 +37,10 @@ export const PatternRecognitionDashboard: React.FC<
 
   const setupMonitoring = async () => {
     try {
-      const dashboard = await patternRecognizer.setupPatternMonitoring(userId);
+      const dashboard = await window.knox.invoke(
+        "patternRecognizer:setupPatternMonitoring",
+        userId,
+      );
       setMonitoringDashboard(dashboard);
     } catch (error) {
       console.error("Error setting up monitoring:", error);
