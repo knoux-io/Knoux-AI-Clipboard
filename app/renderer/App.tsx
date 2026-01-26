@@ -12,6 +12,8 @@ import DashboardPage from './pages/DashboardPage';
 import ClipboardHistory from './views/ClipboardHistory';
 import AIInsights from './views/AIInsights';
 import SecurityCenter from './views/SecurityCenter';
+import SmartActions from './views/SmartActions';
+import VIP from './views/VIP';
 import AboutKnoux from './components/AboutKnoux';
 import SettingsPanel from './components/SettingsPanel';
 import i18n from './utils/i18n';
@@ -79,7 +81,7 @@ function AppLayout() {
                   <h1 className="text-2xl font-black bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
                     {i18n.t('app.name')}
                   </h1>
-                  <p className="text-xs text-gray-400">{i18n.t('header.officialTime')}</p>
+                  <p className="text-xs text-gray-400">{i18n.t('dashboard.officialTime')}</p>
                 </div>
               </div>
 
@@ -111,6 +113,8 @@ function AppLayout() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/clipboard" element={<ClipboardHistory />} />
             <Route path="/ai" element={<AIInsights />} />
+            <Route path="/smart-actions" element={<SmartActions />} />
+            <Route path="/vip" element={<VIP />} />
             <Route path="/analytics" element={<DashboardPage />} />
             <Route path="/security" element={<SecurityCenter />} />
           </Routes>

@@ -3,7 +3,8 @@
  * Grid Cards عصري مع جميع المعلومات المطلوبة
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ClipboardCopy,
   Brain,
@@ -17,9 +18,9 @@ import {
   AlertCircle,
   CheckCircle,
   RefreshCw,
-} from 'lucide-react';
-import { useClipboard } from '../hooks/useClipboard';
-import i18n from '../utils/i18n';
+} from "lucide-react";
+import { useClipboard } from "../hooks/useClipboard";
+import i18n from "../utils/i18n";
 
 interface DashboardStats {
   totalItems: number;
@@ -40,7 +41,7 @@ interface CardData {
   icon: React.ReactNode;
   color: string;
   gradient: string;
-  status?: 'active' | 'warning' | 'error';
+  status?: "active" | "warning" | "error";
 }
 
 const DashboardPage: React.FC = () => {
@@ -62,16 +63,21 @@ const DashboardPage: React.FC = () => {
 
     const items = clipboard.items;
     const todayItems = items.filter(
-      (item) => new Date(item.timestamp) >= today
+      (item) => new Date(item.timestamp) >= today,
     ).length;
 
-    const totalSize = items.reduce((sum, item) => sum + (item.content?.length || 0), 0);
+    const totalSize = items.reduce(
+      (sum, item) => sum + (item.content?.length || 0),
+      0,
+    );
     const formats = new Set(items.map((item) => item.format)).size;
     const sensitiveItems = items.filter(
-      (item) => item.metadata?.sensitive
+      (item) => item.metadata?.sensitive,
     ).length;
     const urlItems = items.filter((item) => item.metadata?.isUrl).length;
-    const aiProcessed = items.filter((item) => item.metadata?.aiEnhanced).length;
+    const aiProcessed = items.filter(
+      (item) => item.metadata?.aiEnhanced,
+    ).length;
 
     setStats({
       totalItems: items.length,
@@ -85,74 +91,76 @@ const DashboardPage: React.FC = () => {
   }, [clipboard.items]);
 
   const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) return "0 B";
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
   };
 
   const cards: CardData[] = [
     {
-      id: 'clipboard-status',
-      title: 'Clipboard Status',
-      titleAr: 'حالة الحافظة',
-      value: isMonitoring ? 'Active' : 'Idle',
+      id: "clipboard-status",
+      title: "Clipboard Status",
+      titleAr: "حالة الحافظة",
+      value: isMonitoring ? "Active" : "Idle",
       subtitle: `${stats.totalItems} items`,
       icon: <ClipboardCopy className="w-8 h-8" />,
-      color: isMonitoring ? 'from-green-500 to-emerald-500' : 'from-gray-500 to-slate-500',
-      gradient: 'hover:from-green-600 hover:to-emerald-600',
-      status: isMonitoring ? 'active' : 'warning',
+      color: isMonitoring
+        ? "from-green-500 to-emerald-500"
+        : "from-gray-500 to-slate-500",
+      gradient: "hover:from-green-600 hover:to-emerald-600",
+      status: isMonitoring ? "active" : "warning",
     },
     {
-      id: 'ai-summary',
-      title: 'AI Summary',
-      titleAr: 'ملخص الذكاء الاصطناعي',
+      id: "ai-summary",
+      title: "AI Summary",
+      titleAr: "ملخص الذكاء الاصطناعي",
       value: stats.aiProcessed,
-      subtitle: 'Processed items',
+      subtitle: "Processed items",
       icon: <Brain className="w-8 h-8" />,
-      color: 'from-purple-500 to-pink-500',
-      gradient: 'hover:from-purple-600 hover:to-pink-600',
+      color: "from-purple-500 to-pink-500",
+      gradient: "hover:from-purple-600 hover:to-pink-600",
     },
     {
-      id: 'quick-actions',
-      title: 'Quick Actions',
-      titleAr: 'إجراءات سريعة',
-      value: 'Ready',
-      subtitle: 'All systems operational',
+      id: "quick-actions",
+      title: "Quick Actions",
+      titleAr: "إجراءات سريعة",
+      value: "Ready",
+      subtitle: "All systems operational",
       icon: <Zap className="w-8 h-8" />,
-      color: 'from-yellow-500 to-orange-500',
-      gradient: 'hover:from-yellow-600 hover:to-orange-600',
+      color: "from-yellow-500 to-orange-500",
+      gradient: "hover:from-yellow-600 hover:to-orange-600",
     },
     {
-      id: 'storage-usage',
-      title: 'Storage Usage',
-      titleAr: 'استخدام التخزين',
+      id: "storage-usage",
+      title: "Storage Usage",
+      titleAr: "استخدام التخزين",
       value: formatBytes(stats.totalSize),
       subtitle: `${stats.totalItems} items stored`,
       icon: <Database className="w-8 h-8" />,
-      color: 'from-blue-500 to-cyan-500',
-      gradient: 'hover:from-blue-600 hover:to-cyan-600',
+      color: "from-blue-500 to-cyan-500",
+      gradient: "hover:from-blue-600 hover:to-cyan-600",
     },
     {
-      id: 'security-status',
-      title: 'Security Status',
-      titleAr: 'حالة الأمان',
+      id: "security-status",
+      title: "Security Status",
+      titleAr: "حالة الأمان",
       value: stats.sensitiveItems,
-      subtitle: 'Sensitive items protected',
+      subtitle: "Sensitive items protected",
       icon: <Shield className="w-8 h-8" />,
-      color: 'from-red-500 to-pink-500',
-      gradient: 'hover:from-red-600 hover:to-pink-600',
+      color: "from-red-500 to-pink-500",
+      gradient: "hover:from-red-600 hover:to-pink-600",
     },
     {
-      id: 'analytics-snapshot',
-      title: 'Analytics Snapshot',
-      titleAr: 'لقطة التحليلات',
+      id: "analytics-snapshot",
+      title: "Analytics Snapshot",
+      titleAr: "لقطة التحليلات",
       value: `${stats.formats} formats`,
       subtitle: `${stats.urlItems} URLs detected`,
       icon: <BarChart3 className="w-8 h-8" />,
-      color: 'from-indigo-500 to-purple-500',
-      gradient: 'hover:from-indigo-600 hover:to-purple-600',
+      color: "from-indigo-500 to-purple-500",
+      gradient: "hover:from-indigo-600 hover:to-purple-600",
     },
   ];
 
@@ -162,10 +170,12 @@ const DashboardPage: React.FC = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent mb-2">
-            {i18n.t('dashboard.title')}
+            {i18n.t("dashboard.title")}
           </h1>
           <p className="text-gray-400">
-            {i18n.isRTL() ? 'نظرة شاملة على أداء التطبيق' : 'Comprehensive overview of application performance'}
+            {i18n.isRTL()
+              ? "نظرة شاملة على أداء التطبيق"
+              : "Comprehensive overview of application performance"}
           </p>
         </div>
 
@@ -184,14 +194,21 @@ const DashboardPage: React.FC = () => {
               {/* Content */}
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`p-3 rounded-xl bg-white/20 backdrop-blur-sm ${card.gradient}`}>
+                  <div
+                    className={`p-3 rounded-xl bg-white/20 backdrop-blur-sm ${card.gradient}`}
+                  >
                     {card.icon}
                   </div>
                   {card.status && (
-                    <div className={`w-3 h-3 rounded-full ${
-                      card.status === 'active' ? 'bg-green-400 animate-pulse' :
-                      card.status === 'warning' ? 'bg-yellow-400' : 'bg-red-400'
-                    }`} />
+                    <div
+                      className={`w-3 h-3 rounded-full ${
+                        card.status === "active"
+                          ? "bg-green-400 animate-pulse"
+                          : card.status === "warning"
+                            ? "bg-yellow-400"
+                            : "bg-red-400"
+                      }`}
+                    />
                   )}
                 </div>
 
@@ -203,9 +220,7 @@ const DashboardPage: React.FC = () => {
                     {card.value}
                   </div>
                   {card.subtitle && (
-                    <p className="text-sm text-white/80">
-                      {card.subtitle}
-                    </p>
+                    <p className="text-sm text-white/80">{card.subtitle}</p>
                   )}
                 </div>
               </div>
@@ -223,14 +238,14 @@ const DashboardPage: React.FC = () => {
             <div className="flex items-center gap-3 mb-4">
               <Activity className="w-6 h-6 text-purple-400" />
               <h3 className="text-lg font-semibold">
-                {i18n.isRTL() ? 'نشاط اليوم' : "Today's Activity"}
+                {i18n.isRTL() ? "نشاط اليوم" : "Today's Activity"}
               </h3>
             </div>
             <div className="text-4xl font-bold text-purple-400 mb-2">
               {stats.todayItems}
             </div>
             <p className="text-sm text-gray-400">
-              {i18n.isRTL() ? 'عنصر تم نسخه اليوم' : 'items copied today'}
+              {i18n.isRTL() ? "عنصر تم نسخه اليوم" : "items copied today"}
             </p>
           </div>
 
@@ -239,14 +254,14 @@ const DashboardPage: React.FC = () => {
             <div className="flex items-center gap-3 mb-4">
               <TrendingUp className="w-6 h-6 text-blue-400" />
               <h3 className="text-lg font-semibold">
-                {i18n.isRTL() ? 'إجمالي العناصر' : 'Total Items'}
+                {i18n.isRTL() ? "إجمالي العناصر" : "Total Items"}
               </h3>
             </div>
             <div className="text-4xl font-bold text-blue-400 mb-2">
               {stats.totalItems}
             </div>
             <p className="text-sm text-gray-400">
-              {i18n.isRTL() ? 'عنصر في السجل' : 'items in history'}
+              {i18n.isRTL() ? "عنصر في السجل" : "items in history"}
             </p>
           </div>
 
@@ -259,22 +274,30 @@ const DashboardPage: React.FC = () => {
                 <AlertCircle className="w-6 h-6 text-yellow-400" />
               )}
               <h3 className="text-lg font-semibold">
-                {i18n.isRTL() ? 'حالة النظام' : 'System Status'}
+                {i18n.isRTL() ? "حالة النظام" : "System Status"}
               </h3>
             </div>
-            <div className={`text-2xl font-bold mb-2 ${
-              isMonitoring ? 'text-green-400' : 'text-yellow-400'
-            }`}>
-              {isMonitoring 
-                ? (i18n.isRTL() ? 'نشط' : 'Active')
-                : (i18n.isRTL() ? 'خامل' : 'Idle')
-              }
+            <div
+              className={`text-2xl font-bold mb-2 ${
+                isMonitoring ? "text-green-400" : "text-yellow-400"
+              }`}
+            >
+              {isMonitoring
+                ? i18n.isRTL()
+                  ? "نشط"
+                  : "Active"
+                : i18n.isRTL()
+                  ? "خامل"
+                  : "Idle"}
             </div>
             <p className="text-sm text-gray-400">
               {isMonitoring
-                ? (i18n.isRTL() ? 'المراقبة تعمل' : 'Monitoring active')
-                : (i18n.isRTL() ? 'المراقبة متوقفة' : 'Monitoring paused')
-              }
+                ? i18n.isRTL()
+                  ? "المراقبة تعمل"
+                  : "Monitoring active"
+                : i18n.isRTL()
+                  ? "المراقبة متوقفة"
+                  : "Monitoring paused"}
             </p>
           </div>
         </div>
