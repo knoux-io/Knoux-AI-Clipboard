@@ -1,71 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { productivityScorer, ProductivityScore, CategoryScores } from '../../../backend/ai/productivity-scorer';
 
 interface ProductivityScorerUIProps {
   onScoreUpdate?: (score: number) => void;
 }
 
 export const ProductivityScorerUI: React.FC<ProductivityScorerUIProps> = ({ onScoreUpdate }) => {
-  const [currentScore, setCurrentScore] = useState<ProductivityScore | null>(null);
+  const [currentScore, setCurrentScore] = useState<any>(null);
   const [scoreSummary, setScoreSummary] = useState<any>(null);
-  const [dailyChallenge, setDailyChallenge] = useState<any>(null);
-  const [improvementPlan, setImprovementPlan] = useState<any>(null);
-  const [selectedTimeframe, setSelectedTimeframe] = useState('7d');
-  const [selectedUser, setSelectedUser] = useState('user1');
   const [isCalculating, setIsCalculating] = useState(false);
-  const [availableUsers, setAvailableUsers] = useState<string[]>([]);
 
   useEffect(() => {
-    loadInitialData();
-    loadAvailableUsers();
-  }, [selectedUser]);
+    loadMockData();
+  }, []);
 
-  const loadInitialData = async () => {
-    try {
-      const summary = await productivityScorer.getProductivityScore(selectedUser);
-      const challenge = await productivityScorer.getDailyChallenge(selectedUser);
-      const plan = await productivityScorer.getImprovementPlan(selectedUser);
-      
-      setScoreSummary(summary);
-      setDailyChallenge(challenge);
-      setImprovementPlan(plan);
-      
-      onScoreUpdate?.(summary.overall);
-    } catch (error) {
-      console.error('Error loading productivity data:', error);
-    }
+  const loadMockData = () => {
+    const mockSummary = {
+      overall: 75,
+      trend: 'increasing',
+      improvementNeeded: false,
+      categories: {
+        efficiency: 0.8,
+        quality: 0.75,
+        diversity: 0.7,
+        learning: 0.72,
+        focus: 0.78,
+        innovation: 0.68
+      }
+    };
+    setScoreSummary(mockSummary);
+    onScoreUpdate?.(mockSummary.overall);
   };
 
-  const loadAvailableUsers = () => {
-    const users = productivityScorer.getAvailableUsers();
-    setAvailableUsers(users.length > 0 ? users : ['user1', 'user2', 'user3']);
-  };
-
-  const handleCalculateScore = async () => {
+  const handleCalculateScore = () => {
     setIsCalculating(true);
-    try {
-      const score = await productivityScorer.calculateProductivityScore(selectedUser, selectedTimeframe);
-      setCurrentScore(score);
-      
-      // Update summary
-      const summary = await productivityScorer.getProductivityScore(selectedUser);
-      setScoreSummary(summary);
-      
-      onScoreUpdate?.(score.overallScore);
-    } catch (error) {
-      console.error('Error calculating score:', error);
-    } finally {
+    setTimeout(() => {
+      loadMockData();
       setIsCalculating(false);
-    }
-  };
-
-  const handleRefreshChallenge = async () => {
-    try {
-      const challenge = await productivityScorer.getDailyChallenge(selectedUser);
-      setDailyChallenge(challenge);
-    } catch (error) {
-      console.error('Error refreshing challenge:', error);
-    }
+    }, 1000);
   };
 
   const renderCategoryScore = (category: string, score: number, icon: string) => {
@@ -73,42 +44,18 @@ export const ProductivityScorerUI: React.FC<ProductivityScorerUIProps> = ({ onSc
     const color = percentage >= 80 ? 'excellent' : percentage >= 60 ? 'good' : percentage >= 40 ? 'fair' : 'poor';
     
     return (
-      <div className={`category-score ${color}`}>
+      <div key={category} className={`category-score ${color}`}>
         <div className="category-icon">{icon}</div>
         <div className="category-info">
           <div className="category-name">{category}</div>
           <div className="category-percentage">{percentage}%</div>
         </div>
         <div className="category-bar">
-          <div 
-            className="category-fill" 
-            style={{ width: `${percentage}%` }}
-          />
+          <div className="category-fill" style={{ width: `${percentage}%` }} />
         </div>
       </div>
     );
   };
-
-  const renderInsight = (insight: any, index: number) => (
-    <div key={index} className="insight-item">
-      <div className="insight-header">
-        <span className="insight-title">{insight.title}</span>
-        <span className="insight-impact">{Math.round(insight.impact * 100)}% impact</span>
-      </div>
-      <div className="insight-description">{insight.description}</div>
-    </div>
-  );
-
-  const renderRecommendation = (rec: any, index: number) => (
-    <div key={index} className="recommendation-item">
-      <div className="rec-header">
-        <span className="rec-title">{rec.title}</span>
-        <span className={`rec-difficulty ${rec.difficulty}`}>{rec.difficulty}</span>
-      </div>
-      <div className="rec-description">{rec.description}</div>
-      <div className="rec-impact">Expected impact: +{Math.round(rec.estimatedImpact * 100)}%</div>
-    </div>
-  );
 
   return (
     <div className="productivity-scorer-ui">
