@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-type Theme = 'light' | 'dark';
+export type Theme = 'light' | 'dark' | 'professional' | 'ai' | 'contrast';
 
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
   setTheme: (theme: Theme) => void;
+  availableThemes: { id: Theme; label: string; color: string }[];
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -29,12 +30,24 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
     const saved = localStorage.getItem('knoux-theme');
-    return (saved as Theme) || defaultTheme;
+    // Validate saved theme
+    if (saved && ['light', 'dark', 'professional', 'ai', 'contrast'].includes(saved)) {
+      return saved as Theme;
+    }
+    return defaultTheme;
   });
+
+  const availableThemes: { id: Theme; label: string; color: string }[] = [
+    { id: 'dark', label: 'Midnight', color: '#0F0F1A' },
+    { id: 'light', label: 'Daylight', color: '#F8FAFC' },
+    { id: 'professional', label: 'Professional', color: '#0056b3' },
+    { id: 'ai', label: 'AI Green', color: '#064E3B' },
+    { id: 'contrast', label: 'High Contrast', color: '#000000' }
+  ];
 
   useEffect(() => {
     localStorage.setItem('knoux-theme', theme);
-    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.remove('light', 'dark', 'professional', 'ai', 'contrast');
     document.documentElement.classList.add(theme);
   }, [theme]);
 
@@ -47,7 +60,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme, availableThemes }}>
       {children}
     </ThemeContext.Provider>
   );

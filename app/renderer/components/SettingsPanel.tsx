@@ -17,9 +17,13 @@ import {
   Zap,
   Eye,
   Trash2,
-  HardDrive
+  HardDrive,
+  Palette,
+  Layout,
+  Plus
 } from 'lucide-react';
 import { useSettingsContext } from '../contexts/SettingsContext';
+import { useTheme } from '../contexts/ThemeContext';
 import i18n from '../utils/i18n';
 
 interface SettingsPanelProps {
@@ -28,7 +32,8 @@ interface SettingsPanelProps {
 
 const SettingsPanel: React.FC<SettingsPanelProps> = ({ onClose }) => {
   const settings = useSettingsContext();
-  const [activeTab, setActiveTab] = useState<'general' | 'clipboard' | 'ai' | 'security'>('general');
+  const { theme, setTheme, availableThemes } = useTheme();
+  const [activeTab, setActiveTab] = useState<'general' | 'appearance' | 'clipboard' | 'ai' | 'security'>('general');
   const [localSettings, setLocalSettings] = useState(settings.settings);
 
   // Sync local state with context when context updates
@@ -40,6 +45,7 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onClose }) => {
 
   const tabs = [
     { id: 'general', label: i18n.t('settings.general.title'), labelAr: 'عام', icon: <Globe className="w-5 h-5" /> },
+    { id: 'appearance', label: i18n.isRTL() ? 'المظهر' : 'Appearance', labelAr: 'المظهر', icon: <Palette className="w-5 h-5" /> },
     { id: 'clipboard', label: i18n.t('settings.clipboard.title'), labelAr: 'الحافظة', icon: <Clipboard className="w-5 h-5" /> },
     { id: 'ai', label: i18n.t('settings.ai.title'), labelAr: 'الذكاء الاصطناعي', icon: <Brain className="w-5 h-5" /> },
     { id: 'security', label: i18n.t('settings.security.title'), labelAr: 'الأمان', icon: <Shield className="w-5 h-5" /> },
@@ -153,16 +159,6 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onClose }) => {
                 <Globe className="w-4 h-4 text-knoux-primary" />
               )}
 
-              {renderSelect(
-                i18n.t('settings.general.theme') || (i18n.isRTL() ? 'المظهر' : 'Theme'),
-                'theme',
-                [
-                  { value: 'dark', label: i18n.isRTL() ? 'داكن' : 'Dark' },
-                  { value: 'light', label: i18n.isRTL() ? 'فاتح' : 'Light' }
-                ],
-                <Moon className="w-4 h-4 text-knoux-secondary" />
-              )}
-
               {renderToggle(
                 i18n.isRTL() ? 'التشغيل مع النظام' : 'Start with System',
                 i18n.isRTL() ? 'تشغيل التطبيق تلقائياً عند بدء تشغيل الجهاز' : 'Launch application automatically on system startup',
@@ -176,6 +172,73 @@ const SettingsPanel: React.FC<SettingsPanelProps> = ({ onClose }) => {
                 'notifications',
                 <Bell className="w-5 h-5" />
               )}
+            </div>
+          </div>
+        );
+
+      case 'appearance':
+        return (
+          <div className="space-y-6 animate-fadeIn">
+            <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-knoux-primary-light to-knoux-secondary-light mb-6 flex items-center gap-2">
+              <Palette className="w-6 h-6 text-knoux-primary" />
+              {i18n.isRTL() ? 'المظهر والسمات' : 'Appearance & Themes'}
+            </h3>
+
+            <div className="space-y-4">
+              <label className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                <Layout className="w-4 h-4" />
+                {i18n.isRTL() ? 'السمة الحالية' : 'Current Theme'}
+              </label>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {availableThemes.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => setTheme(t.id)}
+                    className={`relative p-4 rounded-xl border transition-all duration-300 flex items-center gap-4 group overflow-hidden ${
+                      theme === t.id
+                        ? 'bg-knoux-primary/10 border-knoux-primary shadow-lg shadow-knoux-primary/10'
+                        : 'bg-knoux-background-surface/50 border-white/5 hover:border-white/20'
+                    }`}
+                  >
+                    <div 
+                      className="w-12 h-12 rounded-lg shadow-inner border border-white/10 flex items-center justify-center text-xl"
+                      style={{ backgroundColor: t.color }}
+                    >
+                      {theme === t.id && <div className="w-2 h-2 bg-white rounded-full animate-pulse" />}
+                    </div>
+                    <div className="text-left">
+                      <div className={`font-medium ${theme === t.id ? 'text-knoux-primary' : 'text-white'}`}>
+                        {t.label}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {theme === t.id ? (i18n.isRTL() ? 'نشط' : 'Active') : (i18n.isRTL() ? 'تطبيق' : 'Apply')}
+                      </div>
+                    </div>
+                    {theme === t.id && (
+                      <div className="absolute top-2 right-2 w-2 h-2 bg-knoux-primary rounded-full shadow-[0_0_10px_rgba(var(--knoux-primary),0.5)]" />
+                    )}
+                  </button>
+                ))}
+
+                {/* Custom Theme Builder Entry */}
+                <button
+                  className="relative p-4 rounded-xl border border-dashed border-white/20 bg-transparent hover:bg-white/5 transition-all duration-300 flex items-center gap-4 group"
+                  onClick={() => alert(i18n.isRTL() ? 'سيتم إطلاق منشئ السمات قريباً!' : 'Theme Builder coming soon!')}
+                >
+                  <div className="w-12 h-12 rounded-lg border-2 border-white/20 flex items-center justify-center">
+                    <Plus className="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-medium text-gray-300 group-hover:text-white transition-colors">
+                      {i18n.isRTL() ? 'تخصيص سمة' : 'Custom Theme'}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {i18n.isRTL() ? 'أنشئ مظهرك الخاص' : 'Create your own look'}
+                    </div>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         );
