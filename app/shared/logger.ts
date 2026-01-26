@@ -709,4 +709,3 @@ export const logger = {
 
 // Export the Logger class for custom instances
 export { Logger };
-export { createLogger } from './logger';
