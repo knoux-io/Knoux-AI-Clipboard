@@ -1,0 +1,95 @@
+{
+  "app": {
+    "name": "Knoux Clipboard AI",
+    "version": "Version",
+    "description": "Intelligent Clipboard Manager"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "refresh": "Refresh",
+    "search": "Search",
+    "clear": "Clear",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "clipboard": "Clipboard",
+    "aiTools": "AI Tools",
+    "history": "History",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "about": "About Knoux"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "clipboardStatus": "Clipboard Status",
+    "aiSummary": "AI Summary",
+    "quickActions": "Quick Actions",
+    "storageUsage": "Storage Usage",
+    "securityStatus": "Security Status",
+    "analyticsSnapshot": "Analytics Snapshot",
+    "totalItems": "Total Items",
+    "todayItems": "Today Items",
+    "totalSize": "Total Size",
+    "monitoring": "Monitoring",
+    "idle": "Idle"
+  },
+  "header": {
+    "officialTime": "Official Time for Al-Zuhur Residential Complex 🦾"
+  },
+  "settings": {
+    "title": "Settings",
+    "general": {
+      "title": "General",
+      "theme": "Theme",
+      "themeDark": "Dark",
+      "themeLight": "Light",
+      "themeAuto": "Auto",
+      "language": "Language",
+      "languageAr": "Arabic",
+      "languageEn": "English",
+      "startupBehavior": "Startup Behavior",
+      "notifications": "Notifications",
+      "notificationsEnabled": "Enable Notifications"
+    },
+    "clipboard": {
+      "title": "Clipboard",
+      "maxHistorySize": "Max History Size",
+      "autoCleanRules": "Auto-clean Rules",
+      "formatPriority": "Format Priority"
+    },
+    "ai": {
+      "title": "AI",
+      "enableAI": "Enable AI",
+      "modelSelection": "Model Selection",
+      "localMode": "Local Mode",
+      "cloudMode": "Cloud Mode"
+    },
+    "security": {
+      "title": "Security",
+      "encryption": "Encryption",
+      "encryptionOn": "Enable Encryption",
+      "encryptionOff": "Disable Encryption",
+      "clearOnLock": "Clear on Lock",
+      "secureMemory": "Secure Memory"
+    }
+  },
+  "about": {
+    "title": "About Knoux",
+    "developer": "Developer & Founder",
+    "vision": "Vision",
+    "links": {
+      "github": "GitHub",
+      "twitter": "Twitter",
+      "website": "Website"
+    }
+  }
+}
