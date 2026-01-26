@@ -7,7 +7,7 @@ import { app, BrowserWindow, Menu, Tray, shell, ipcMain, nativeImage, dialog } f
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { logger } from './shared/logger';
-import { initializeIpcHandlers } from './backend/ipc/handlers';
+import { initializeEnhancedHandlers } from './backend/ipc/enhanced-handlers';
 
 // Fix for __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -242,7 +242,7 @@ async function initializeApp(): Promise<void> {
     createApplicationMenu();
     
     // Initialize IPC handlers
-    initializeIpcHandlers();
+    initializeEnhancedHandlers();
     
     // Register global shortcuts
     registerGlobalShortcuts();
