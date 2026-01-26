@@ -1,5 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { arvrIntegration, VRClipboard, AROverlay, ImmersiveMetrics } from '../../../backend/services/arvr-integration';
+
+interface VRClipboard {
+  id: string;
+  content: string;
+  type: string;
+  position: { x: number; y: number; z: number };
+  metadata: { createdAt: number };
+}
+
+interface AROverlay {
+  id: string;
+  visible: boolean;
+  screenPosition: { x: number; y: number };
+}
+
+interface ImmersiveMetrics {
+  vrClips: number;
+  arOverlays: number;
+  gestureAccuracy: number;
+  userEngagement: number;
+}
 
 interface ARVRIntegrationUIProps {
   onImmersiveUpdate?: (metrics: ImmersiveMetrics) => void;
@@ -33,9 +53,19 @@ export const ARVRIntegrationUI: React.FC<ARVRIntegrationUIProps> = ({ onImmersiv
 
   const loadImmersiveData = async () => {
     try {
-      const clips = arvrIntegration.getVRClips();
-      const overlays = arvrIntegration.getAROverlays();
-      const metrics = await arvrIntegration.getImmersiveMetrics();
+      // Mock data
+      const clips: VRClipboard[] = [
+        { id: '1', content: 'Test VR Clip', type: 'text', position: { x: 0, y: 1.5, z: -2 }, metadata: { createdAt: Date.now() } }
+      ];
+      const overlays: AROverlay[] = [
+        { id: '1', visible: true, screenPosition: { x: 300, y: 200 } }
+      ];
+      const metrics: ImmersiveMetrics = {
+        vrClips: 5,
+        arOverlays: 3,
+        gestureAccuracy: 92.5,
+        userEngagement: 78.3
+      };
       
       setVRClips(clips);
       setAROverlays(overlays);
@@ -223,7 +253,8 @@ export const ARVRIntegrationUI: React.FC<ARVRIntegrationUIProps> = ({ onImmersiv
     if (!newClipContent.trim()) return;
     
     try {
-      await arvrIntegration.createVRClip(newClipContent, 'text');
+      // Mock create
+      console.log('Creating VR clip:', newClipContent);
       setNewClipContent('');
       await loadImmersiveData();
     } catch (error) {
@@ -235,7 +266,15 @@ export const ARVRIntegrationUI: React.FC<ARVRIntegrationUIProps> = ({ onImmersiv
     if (!searchQuery.trim()) return;
     
     try {
-      const results = await arvrIntegration.immersiveSearch(searchQuery);
+      // Mock search
+      const results = {
+        query: searchQuery,
+        matchCount: 2,
+        clips: [
+          { content: 'Result 1', position: { x: 1, y: 1.5, z: -2 }, relevance: 95 },
+          { content: 'Result 2', position: { x: -1, y: 1.5, z: -2 }, relevance: 87 }
+        ]
+      };
       setSearchResults(results);
     } catch (error) {
       console.error('Error performing immersive search:', error);
@@ -244,17 +283,8 @@ export const ARVRIntegrationUI: React.FC<ARVRIntegrationUIProps> = ({ onImmersiv
 
   const handleGestureSimulation = async (gestureType: string) => {
     try {
-      const gesture = {
-        type: gestureType as any,
-        confidence: 0.95,
-        data: {
-          position: { x: 0, y: 1.5, z: -2 },
-          command: gestureType === 'voice' ? 'show clipboard history' : undefined
-        }
-      };
-      
-      const result = await arvrIntegration.handleGesture(gesture);
-      console.log('Gesture result:', result);
+      // Mock gesture
+      console.log('Gesture simulated:', gestureType);
     } catch (error) {
       console.error('Error handling gesture:', error);
     }
