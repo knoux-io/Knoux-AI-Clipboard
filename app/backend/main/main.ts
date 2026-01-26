@@ -1,4 +1,4 @@
-// main.ts - Main Electron Process
+G,H[II// main.ts - Main Electron Process
 // KNOUX Clipboard AI Application
 
 import { app, BrowserWindow, ipcMain, Tray, Menu } from 'electron';
