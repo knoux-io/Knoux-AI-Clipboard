@@ -4,10 +4,12 @@
  */
 
 import { ipcMain, IpcMainInvokeEvent } from 'electron';
-import { settingsService } from '../../services/settingsService';
-import { languageService } from '../../services/languageService';
-import { themeService } from '../../services/themeService';
-import { databaseService } from '../../services/databaseService';
+import { settingsService } from '../services/settingsService';
+import { languageService } from '../services/languageService';
+import { themeService } from '../services/themeService';
+import { databaseService } from '../services/databaseService';
+
+let clipboardMonitoringEnabled = true;
 
 // Settings IPC Handlers
 export function registerSettingsHandlers() {
@@ -114,6 +116,15 @@ export function registerLanguageHandlers() {
     }
   });
 
+  ipcMain.on('language:translate', (event, key: string) => {
+    try {
+      event.returnValue = languageService.translate(key);
+    } catch (error) {
+      console.error('❌ Error translating (sync):', error);
+      event.returnValue = key;
+    }
+  });
+
   ipcMain.handle('language:is-rtl', async () => {
     try {
       const isRTL = languageService.isRTL();
@@ -131,6 +142,15 @@ export function registerLanguageHandlers() {
     } catch (error) {
       console.error('❌ Error getting translations:', error);
       return { success: false, error: 'Failed to get translations' };
+    }
+  });
+
+  ipcMain.on('language:get-all-translations', (event, lang?: 'en' | 'ar') => {
+    try {
+      event.returnValue = languageService.getAllTranslations(lang);
+    } catch (error) {
+      console.error('❌ Error getting translations (sync):', error);
+      event.returnValue = {};
     }
   });
 }
@@ -217,6 +237,15 @@ export function registerThemeHandlers() {
     }
   });
 
+  ipcMain.on('theme:get-css', (event) => {
+    try {
+      event.returnValue = themeService.getGlassmorphicCSS();
+    } catch (error) {
+      console.error('❌ Error getting theme CSS (sync):', error);
+      event.returnValue = '';
+    }
+  });
+
   ipcMain.handle('theme:apply-preset', async (event, preset: 'glass-dark' | 'glass-light' | 'minimal' | 'cyberpunk') => {
     try {
       themeService.applyPreset(preset);
@@ -225,6 +254,28 @@ export function registerThemeHandlers() {
       console.error('❌ Error applying preset:', error);
       return { success: false, error: 'Failed to apply preset' };
     }
+  });
+}
+
+// Clipboard Monitor IPC Handlers
+export function registerClipboardMonitorHandlers() {
+  ipcMain.handle('clipboard-monitor:status', async () => {
+    return {
+      success: true,
+      data: {
+        enabled: clipboardMonitoringEnabled,
+      },
+    };
+  });
+
+  ipcMain.handle('clipboard-monitor:start', async () => {
+    clipboardMonitoringEnabled = true;
+    return { success: true, data: true };
+  });
+
+  ipcMain.handle('clipboard-monitor:stop', async () => {
+    clipboardMonitoringEnabled = false;
+    return { success: true, data: true };
   });
 }
 
@@ -241,6 +292,16 @@ export function registerDatabaseHandlers() {
     }
   });
 
+  ipcMain.handle('clipboard:add', async (event, item) => {
+    try {
+      const id = await databaseService.saveClipboardItem(item);
+      return { success: true, data: id };
+    } catch (error) {
+      console.error('❌ Error adding clipboard item:', error);
+      return { success: false, error: 'Failed to add clipboard item' };
+    }
+  });
+
   ipcMain.handle('clipboard:get-items', async (event, limit = 100, offset = 0) => {
     try {
       const items = await databaseService.getClipboardItems(limit, offset);
@@ -251,7 +312,27 @@ export function registerDatabaseHandlers() {
     }
   });
 
+  ipcMain.handle('clipboard:get-recent', async (event, limit = 100) => {
+    try {
+      const items = await databaseService.getClipboardItems(limit, 0);
+      return { success: true, data: items };
+    } catch (error) {
+      console.error('❌ Error getting recent clipboard items:', error);
+      return { success: false, error: 'Failed to get recent clipboard items' };
+    }
+  });
+
   ipcMain.handle('clipboard:search-items', async (event, query: string, limit = 50) => {
+    try {
+      const items = await databaseService.searchClipboardItems(query, limit);
+      return { success: true, data: items };
+    } catch (error) {
+      console.error('❌ Error searching clipboard items:', error);
+      return { success: false, error: 'Failed to search clipboard items' };
+    }
+  });
+
+  ipcMain.handle('clipboard:search', async (event, query: string, limit = 50) => {
     try {
       const items = await databaseService.searchClipboardItems(query, limit);
       return { success: true, data: items };
@@ -273,8 +354,26 @@ export function registerDatabaseHandlers() {
 
   ipcMain.handle('clipboard:toggle-favorite', async (event, id: number) => {
     try {
-      const success = await databaseService.toggleFavorite(id);
-      return { success: true, data: success };
+      const changed = await databaseService.toggleFavorite(id);
+      if (!changed) {
+        return { success: false, error: 'Failed to toggle favorite' };
+      }
+      const item = await databaseService.getClipboardItemById(id);
+      return { success: true, data: Boolean(item?.isFavorite) };
+    } catch (error) {
+      console.error('❌ Error toggling favorite:', error);
+      return { success: false, error: 'Failed to toggle favorite' };
+    }
+  });
+
+  ipcMain.handle('clipboard:toggle-favorite-status', async (event, id: number) => {
+    try {
+      const changed = await databaseService.toggleFavorite(id);
+      if (!changed) {
+        return { success: false, error: 'Failed to toggle favorite' };
+      }
+      const item = await databaseService.getClipboardItemById(id);
+      return { success: true, data: Boolean(item?.isFavorite) };
     } catch (error) {
       console.error('❌ Error toggling favorite:', error);
       return { success: false, error: 'Failed to toggle favorite' };
@@ -282,6 +381,16 @@ export function registerDatabaseHandlers() {
   });
 
   ipcMain.handle('clipboard:delete-item', async (event, id: number) => {
+    try {
+      const success = await databaseService.deleteClipboardItem(id);
+      return { success: true, data: success };
+    } catch (error) {
+      console.error('❌ Error deleting clipboard item:', error);
+      return { success: false, error: 'Failed to delete clipboard item' };
+    }
+  });
+
+  ipcMain.handle('clipboard:delete', async (event, id: number) => {
     try {
       const success = await databaseService.deleteClipboardItem(id);
       return { success: true, data: success };
@@ -364,6 +473,23 @@ export function registerDatabaseHandlers() {
     }
   });
 
+  ipcMain.handle('clipboard:get-stats', async () => {
+    try {
+      const raw = await databaseService.getStatistics();
+      const total = Number(raw?.total_clipboard_items ?? 0);
+      const favorites = Number(raw?.favorite_items ?? 0);
+      const byType = {
+        text: Number(raw?.text_items ?? 0),
+        image: Number(raw?.image_items ?? 0),
+        file: Number(raw?.file_items ?? 0),
+      };
+      return { success: true, data: { total, favorites, byType } };
+    } catch (error) {
+      console.error('❌ Error getting clipboard stats:', error);
+      return { success: false, error: 'Failed to get clipboard stats' };
+    }
+  });
+
   // Settings Storage
   ipcMain.handle('storage:get-setting', async (event, key: string) => {
     try {
@@ -432,6 +558,7 @@ export function initializeEnhancedHandlers() {
   registerThemeHandlers();
   registerDatabaseHandlers();
   registerSystemHandlers();
+  registerClipboardMonitorHandlers();
 
   console.log('✅ Enhanced IPC handlers initialized');
 }

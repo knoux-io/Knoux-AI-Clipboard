@@ -205,6 +205,36 @@ class DatabaseService {
     });
   }
 
+  async getClipboardItemById(id: number): Promise<ClipboardItem | null> {
+    return new Promise((resolve, reject) => {
+      if (!this.db) {
+        reject(new Error('Database not initialized'));
+        return;
+      }
+
+      const sql = `
+        SELECT id, content, type, timestamp, isFavorite, category, source, metadata, searchIndex
+        FROM clipboard_items
+        WHERE id = ?
+        LIMIT 1
+      `;
+
+      this.db.get(sql, [id], (err, row: any) => {
+        if (err) {
+          console.error('❌ Error getting clipboard item by id:', err);
+          reject(err);
+        } else if (!row) {
+          resolve(null);
+        } else {
+          resolve({
+            ...row,
+            isFavorite: Boolean(row.isFavorite),
+          });
+        }
+      });
+    });
+  }
+
   async searchClipboardItems(query: string, limit: number = 50): Promise<ClipboardItem[]> {
     return new Promise((resolve, reject) => {
       if (!this.db) {
