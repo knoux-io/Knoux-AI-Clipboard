@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
-import { ClipboardCopy, Settings, Shield } from 'lucide-react';
+import { ClipboardCopy, Settings, Shield, Sparkles } from 'lucide-react';
 import SplashScreen from './components/SplashScreen';
 import Sidebar from './components/Sidebar';
 import DigitalClock from './components/DigitalClock';
@@ -12,6 +12,7 @@ import SmartActions from './views/SmartActions';
 import VIP from './views/VIP';
 import AboutKnoux from './components/AboutKnoux';
 import SettingsPanel from './components/SettingsPanel';
+import RevolutionaryFeatures from './components/RevolutionaryFeatures';
 import i18n from './utils/i18n';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -172,6 +173,13 @@ function AppLayout() {
               <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
                 <DigitalClock />
                 <button
+                  onClick={() => navigate('/revolutionary')}
+                  className="p-2 text-gray-400 hover:text-white hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 rounded-lg transition-all"
+                  title="Revolutionary Features"
+                >
+                  <Sparkles className="w-5 h-5" />
+                </button>
+                <button
                   onClick={() => navigate('/about')}
                   className="p-2 text-gray-400 hover:text-white hover:bg-purple-500/20 rounded-lg transition-all"
                   title={i18n.t('navigation.about')}
@@ -200,6 +208,7 @@ function AppLayout() {
             <Route path="/vip" element={<VIP />} />
             <Route path="/analytics" element={<DashboardPage />} />
             <Route path="/security" element={<SecurityCenter />} />
+            <Route path="/revolutionary" element={<RevolutionaryFeatures />} />
           </Routes>
         </main>
       </div>

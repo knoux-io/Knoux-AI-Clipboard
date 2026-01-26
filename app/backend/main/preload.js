@@ -5,6 +5,26 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
+contextBridge.exposeInMainWorld('knoux', {
+  clipboard: {
+    read: () => ipcRenderer.invoke('knoux.clipboard.read'),
+    write: (item) => ipcRenderer.invoke('knoux.clipboard.write', item),
+    history: () => ipcRenderer.invoke('knoux.clipboard.history'),
+    normalize: (content) => ipcRenderer.invoke('knoux.clipboard.normalize', content),
+    format: (content, format) => ipcRenderer.invoke('knoux.clipboard.format', content, format)
+  },
+  ai: {
+    summarize: (text) => ipcRenderer.invoke('knoux.ai.summarize', text),
+    enhance: (text, opts) => ipcRenderer.invoke('knoux.ai.enhance', text, opts),
+    predict: (context) => ipcRenderer.invoke('knoux.ai.predict', context)
+  },
+  storage: {
+    get: (key) => ipcRenderer.invoke('knoux.storage.get', key),
+    set: (key, value) => ipcRenderer.invoke('knoux.storage.set', key, value),
+    export: () => ipcRenderer.invoke('knoux.storage.export')
+  }
+});
+
 contextBridge.exposeInMainWorld(
     'electronAPI', {
         // Clipboard operations

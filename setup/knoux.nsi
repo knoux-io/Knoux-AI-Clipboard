@@ -40,7 +40,6 @@ ShowUnInstDetails show
 
 ; Colors
 !define MUI_HEADER_BACKGROUND_COLOR "1F2937"
-!define MUI_WELCOMEFINISHPAGE_BITMAP ".\assets\wizard.bmp"
 
 ; ================================
 ; Pages

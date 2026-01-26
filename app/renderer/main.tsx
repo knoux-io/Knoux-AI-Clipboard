@@ -5,25 +5,15 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import { MainDashboard } from './components/MainDashboard';
 
-// Import global styles
-import './styles/global.css';
-import './styles/animations.css';
-import './styles/theme-light.css';
-import './styles/theme-dark.css';
-import './styles/theme-professional.css';
-import './styles/theme-ai.css';
-import './styles/theme-contrast.css';
-
-// Mount React app into DOM
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
 root.render(
   <React.StrictMode>
-    <App />
+    <MainDashboard />
   </React.StrictMode>
 );
 

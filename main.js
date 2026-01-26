@@ -24,6 +24,28 @@ async function createWindow() {
     }
   });
 
+  // Register minimal IPC handler
+  ipcMain.handle('get-system-info', async () => {
+    return {
+      success: true,
+      data: {
+        platform: process.platform,
+        arch: process.arch,
+        version: app.getVersion(),
+        electronVersion: process.versions.electron
+      }
+    };
+  });
+
+  // Register priority IPC handlers
+  const { registerClipboardIPC } = require('./app/backend/ipc/clipboard-ipc');
+  const { registerAIIPC } = require('./app/backend/ipc/ai-ipc');
+  const { registerStorageIPC } = require('./app/backend/ipc/storage-ipc');
+  
+  registerClipboardIPC();
+  registerAIIPC();
+  registerStorageIPC();
+
   // Initialize backend services and IPC handlers
   try {
     if (isDev) {

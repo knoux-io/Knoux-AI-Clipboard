@@ -283,6 +283,10 @@ export function initializeIpcHandlers() {
   registerSystemHandlers();
   registerSecurityHandlers();
   
+  // Import and setup creative handlers
+  const { setupCreativeStudioIPC } = require('./creative-handlers');
+  setupCreativeStudioIPC();
+  
   logger.info('IPC handlers initialized successfully');
 }
 
