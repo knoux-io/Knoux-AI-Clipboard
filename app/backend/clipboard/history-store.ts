@@ -20,6 +20,7 @@ import {
 } from "../../shared/enums";
 import { ContentClassifier } from "../ai/classifier";
 import { ContentSummarizer } from "../ai/summarizer";
+import { createLogger } from "../../shared/logger";
 
 /**
  * Storage configuration

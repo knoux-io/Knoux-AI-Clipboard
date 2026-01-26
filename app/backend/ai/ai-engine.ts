@@ -508,7 +508,7 @@ export class AIEngine {
       this.stats.totalRequests++;
 
       const errorMessage = error instanceof Error ? error.message : 'Unknown AI error';
-      const aiError = new Error(AI request failed: );
+      const aiError = new Error(`AI request failed: ${errorMessage}`);
 
       this.llog.error('AI request failed', aiError, { requestId: request.id });
       request.reject(aiError);
@@ -535,7 +535,7 @@ export class AIEngine {
 
     const modelConfig = this.modelConfigs.get(this.activeModel);
     if (!modelConfig) {
-      throw new Error(Active model not found: );
+      throw new Error(`Active model not found: ${this.activeModel}`);
     }
 
     try {
@@ -628,7 +628,7 @@ export class AIEngine {
 
     return {
       text: responseText,
-      model:  - ,
+      model: this.activeModel || 'unknown',
       tokensUsed,
       finishReason: 'stop',
       processingTimeMs: 0, // Will be set by caller
@@ -650,7 +650,7 @@ export class AIEngine {
     // Try to find a fallback model
     const fallbackModel = this.findFallbackModel();
     if (!fallbackModel) {
-      throw new Error(All models failed. Last error: );
+      throw new Error(`All models failed. Last error: ${originalError.message}`);
     }
 
     // Switch to fallback model
@@ -716,12 +716,12 @@ export class AIEngine {
     let prompt = '';
 
     if (context) {
-      prompt += Context: \n\n;
+      prompt += `Context: ${context}\n\n`;
     }
 
-    prompt += Task: \n\n;
-    prompt += Content:\n\n\n;
-    prompt += Please analyze the above content and .;
+    prompt += `Task: ${task}\n\n`;
+    prompt += `Content:\n${content}\n\n`;
+    prompt += `Please analyze the above content and ${task}.`;
 
     return prompt;
   }
@@ -733,7 +733,7 @@ export class AIEngine {
     // Simple simulation based on task type
     switch (task.toLowerCase()) {
       case 'analyze':
-        return Analysis: The content appears to be . It contains approximately  words.;
+        return `Analysis: The content appears to be ${content.substring(0, 50)}... It contains approximately ${content.split(' ').length} words.`;
 
       case 'summarize':
         const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
@@ -741,7 +741,7 @@ export class AIEngine {
         return summary || 'Summary not available.';
 
       case 'enhance':
-        return Enhanced version: ... [Enhanced for clarity and conciseness];
+        return `Enhanced version: ${content} ... [Enhanced for clarity and conciseness]`;
 
       case 'classify':
         if (content.includes('function') || content.includes('const') || content.includes('var')) {
@@ -755,7 +755,7 @@ export class AIEngine {
         }
 
       default:
-        return Processed content for task "". Original length:  characters.;
+        return `Processed content for task "${task}". Original length: ${content.length} characters.`;
     }
   }
 
@@ -906,7 +906,7 @@ export class AIEngine {
     }
 
     const config = this.modelConfigs.get(this.activeModel);
-    return config ?  () : 'Unknown model';
+    return config ? config.name : 'Unknown model';
   }
 
   /**
@@ -915,7 +915,7 @@ export class AIEngine {
   public async switchModel(modelType: AIModelType): Promise<void> {
     const modelConfig = this.modelConfigs.get(modelType);
     if (!modelConfig) {
-      throw new Error(Model not found: );
+      throw new Error(`Model not found: ${modelType}`);
     }
 
     if (!modelConfig.isLoaded) {
@@ -1017,7 +1017,7 @@ export class AIEngine {
     // Unload models (in production)
     for (const config of this.modelConfigs.values()) {
       if (config.isLoaded && config.isLocal) {
-        this.llog.debug(Unloading local model: );
+        this.llog.debug(`Unloading local model: ${config.name}`);
         config.isLoaded = false;
       }
     }
