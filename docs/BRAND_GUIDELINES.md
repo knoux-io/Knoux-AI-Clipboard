@@ -15,6 +15,13 @@ The Knoux logo represents intelligence, efficiency, and seamless integration.
   - Do not place the logo on cluttered backgrounds.
   - Ensure sufficient contrast (at least 4.5:1) against the background color.
 
+- **Incorrect Usage**:
+  - Do NOT stretch or distort the logo.
+  - Do NOT change the colors of the gradient or wordmark.
+  - Do NOT rotate the logo.
+  - Do NOT place the logo on a busy background without a scrim or container.
+  - Do NOT add drop shadows or glow effects to the logo (unless part of a specific dark mode treatment).
+
 ## 2. Color System
 
 ### Primary Palette (Midnight Theme)
@@ -90,6 +97,12 @@ Icons should be consistent, clear, and follow the "Outline" style.
   - Default: Text Secondary (`#8a8a9e`)
   - Active: Primary Color (`#667EEA`)
   - Hover: White (`#FFFFFF`)
+
+- **Animation Principles**:
+  - **Micro-interactions**: Use subtle scale (1.1x) or color shifts on hover.
+  - **Morphing**: Icons can morph between states (e.g., Menu -> Close) using smooth path transitions.
+  - **Stroke Animation**: Use `stroke-dasharray` and `stroke-dashoffset` for drawing effects on load or action.
+  - **Duration**: Keep icon animations fast (200ms - 300ms).
 
 ## 5. Components
 
