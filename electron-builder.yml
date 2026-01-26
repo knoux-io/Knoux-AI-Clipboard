@@ -33,6 +33,7 @@ files:
 
 # Windows Configuration
 win:
+  icon: "assets/app-icon.ico"
   target:
     - portable
     - nsis
