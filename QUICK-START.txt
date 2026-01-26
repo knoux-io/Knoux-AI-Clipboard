@@ -1,0 +1,123 @@
+╔═══════════════════════════════════════════════════════════════╗
+║         KNOUX CLIPBOARD AI v1.0.0 - QUICK START GUIDE         ║
+╚═══════════════════════════════════════════════════════════════╝
+
+📦 WHAT YOU HAVE
+================
+
+Single executable file:
+  • Knoux-Clipboard-AI-FIXED.exe (156 MB)
+
+No installation required - fully portable!
+
+
+🚀 HOW TO RUN
+=============
+
+Windows Users:
+──────────────
+1. Double-click: Knoux-Clipboard-AI-FIXED.exe
+2. OR run: run.bat
+3. Application will start in system tray
+
+
+Command Line:
+─────────────
+Open PowerShell in this directory and type:
+  .\Knoux-Clipboard-AI-FIXED.exe
+
+
+⌨️ KEYBOARD SHORTCUTS
+====================
+
+Tray Ico
+  • Click: Open application
+  • Right-click: Menu options
+
+
+📋 SYSTEM REQUIREMENTS
+======================
+
+✓ Windows 10 or Windows 11 (64-bit)
+✓ 2 GB RAM minimum (4 GB recommended)
+✓ 200 MB free disk space
+✓ No other software needed - all dependencies included!
+
+
+🎯 FEATURES
+===========
+
+✓ Real-time clipboard monitoring
+✓ AI-powered text analysis
+✓ Pattern recognition
+✓ Multi-language support
+✓ Secure clipboard history
+✓ Dark theme UI
+✓ System tray integration
+✓ Background operation
+
+
+⚙️ FIRST TIME SETUP
+===================
+
+1. Extract and run the EXE
+2. Allow Windows Defender (if prompted)
+3. App starts in system tray
+4. Click tray icon to open settings
+5. Configure preferences
+6. Done! App runs in background
+
+
+❓ TROUBLESHOOTING
+==================
+
+Problem: "Cannot find ffmpeg.dll"
+Solution: This version is fixed - should not occur
+
+Problem: Application won't start
+Solution:
+  • Check Windows 10/11 64-bit
+  • Ensure 2+ GB RAM available
+  • Run as administrator
+
+Problem: High CPU usage
+Solution:
+  • Normal on first launch (30-60 seconds)
+  • Usage decreases after initialization
+  • Contact support if persists
+
+
+📞 SUPPORT
+==========
+
+Developer: Eng / Sadek Elgazar 👑
+  • Email: knouxguard@gmail.com
+  • WhatsApp: +971503281920
+  • Facebook: facebook.com/share/1bXebP7S7D/
+
+
+📚 DOCUMENTATION
+================
+
+In this folder:
+  • README.md - Full documentation
+  • HOW-TO-USE.md - Detailed guide
+  • ROOT-CAUSE-ANALYSIS.md - Technical details
+
+
+✅ YOU'RE READY!
+================
+
+Everything is configured and ready to use.
+Just run the executable and enjoy!
+
+Questions? See the documentation files.
+
+
+═══════════════════════════════════════════════════════════════
+
+Version: 1.0.0
+Build: January 26, 2026
+Status: Production Ready ✅
+
+═══════════════════════════════════════════════════════════════

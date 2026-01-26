@@ -1,8 +1,10 @@
 {
   "name": "knoux-clipboard-ai",
   "version": "1.0.0",
+  "description": "Clipboard Intelligence • Desktop Precision • Premium Engineering",
+  "author": "Abu Retaj",
   "private": true,
-  "main": "electron.js",
+  "main": "main.js",
   "scripts": {
     "dev": "node ./scripts/run-dev.js",
     "start": "electron .",

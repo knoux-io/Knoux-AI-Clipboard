@@ -55,7 +55,7 @@ export interface EnhancementMetadata {
 }
 
 export class ContentEnhancer {
-  private logger = createLogger({ module: 'enhancer' });
+  // Logger is provided via llog injection from localized-logger
   private aiEngine: AIEngine;
   private classifier: Classifier;
   private promptLibrary: PromptLibrary;
@@ -77,14 +77,14 @@ export class ContentEnhancer {
     }
 
     this.llog.info('Initializing content enhancer');
-    
+
     try {
       // Verify AI engine is ready
       await this.aiEngine.ensureReady();
-      
+
       // Initialize prompt library
       await this.promptLibrary.initialize();
-      
+
       this.isInitialized = true;
       this.llog.info('Content enhancer initialized successfully');
     } catch (error) {
@@ -102,7 +102,7 @@ export class ContentEnhancer {
     options: EnhancementOptions = {}
   ): Promise<EnhancementResult> {
     const startTime = Date.now();
-    
+
     if (!this.isInitialized) {
       await this.initialize();
     }
@@ -197,7 +197,7 @@ export class ContentEnhancer {
         contentLength: content.length,
         contentType,
       });
-      
+
       throw new Error(Enhancement failed: );
     }
   }
@@ -283,7 +283,7 @@ export class ContentEnhancer {
 
     const textType = classification.secondaryTypes.includes('EMAIL') ? 'email' :
                     classification.secondaryTypes.includes('DOCUMENT') ? 'document' : 'general';
-    
+
     const prompt = this.promptLibrary.getTextEnhancementPrompt(textType, options);
 
     try {
@@ -331,7 +331,7 @@ export class ContentEnhancer {
     if (classification.primaryType === 'CODE') {
       const originalComplexity = this.estimateComplexity(original);
       const enhancedComplexity = this.estimateComplexity(enhanced);
-      
+
       if (enhancedComplexity < originalComplexity * 0.7) {
         suggestions.push({
           id: suggestion__2,
@@ -349,7 +349,7 @@ export class ContentEnhancer {
     if (options.securityCheck) {
       const securityIssues = await this.detectSecurityIssues(original);
       const fixedIssues = await this.detectSecurityIssues(enhanced);
-      
+
       if (securityIssues.length > fixedIssues.length) {
         suggestions.push({
           id: suggestion__3,
@@ -375,11 +375,11 @@ export class ContentEnhancer {
     classification: ContentClassification
   ): Promise<string[]> {
     const improvements: string[] = [];
-    
+
     // Check for syntax errors
     const originalErrors = await this.detectSyntaxErrors(original, classification.language);
     const enhancedErrors = await this.detectSyntaxErrors(enhanced, classification.language);
-    
+
     if (enhancedErrors.length < originalErrors.length) {
       improvements.push(Fixed  syntax errors);
     }
@@ -387,7 +387,7 @@ export class ContentEnhancer {
     // Check for best practices
     const originalBestPractices = this.checkCodeBestPractices(original, classification.language);
     const enhancedBestPractices = this.checkCodeBestPractices(enhanced, classification.language);
-    
+
     if (enhancedBestPractices.score > originalBestPractices.score) {
       improvements.push(Improved code quality score from /10 to /10);
     }
@@ -406,11 +406,11 @@ export class ContentEnhancer {
    */
   private async analyzePromptImprovements(original: string, enhanced: string): Promise<string[]> {
     const improvements: string[] = [];
-    
+
     // Clarity improvement
     const originalClarity = this.assessClarity(original);
     const enhancedClarity = this.assessClarity(enhanced);
-    
+
     if (enhancedClarity > originalClarity) {
       improvements.push(Improved clarity from /10 to /10);
     }
@@ -418,7 +418,7 @@ export class ContentEnhancer {
     // Specificity improvement
     const originalSpecificity = this.assessSpecificity(original);
     const enhancedSpecificity = this.assessSpecificity(enhanced);
-    
+
     if (enhancedSpecificity > originalSpecificity) {
       improvements.push(Improved specificity from /10 to /10);
     }
@@ -426,7 +426,7 @@ export class ContentEnhancer {
     // Structure improvement
     const originalStructure = this.assessStructure(original);
     const enhancedStructure = this.assessStructure(enhanced);
-    
+
     if (enhancedStructure > originalStructure) {
       improvements.push(Improved structure from /10 to /10);
     }
@@ -443,11 +443,11 @@ export class ContentEnhancer {
     classification: ContentClassification
   ): Promise<string[]> {
     const improvements: string[] = [];
-    
+
     // Readability improvement
     const originalReadability = this.calculateReadability(original);
     const enhancedReadability = this.calculateReadability(enhanced);
-    
+
     if (enhancedReadability.score > originalReadability.score) {
       improvements.push(Improved readability from  to );
     }
@@ -476,10 +476,10 @@ export class ContentEnhancer {
   ): EnhancementMetadata {
     const originalLength = original.length;
     const enhancedLength = enhanced.length;
-    
+
     let reductionPercentage: number | undefined;
     let expansionPercentage: number | undefined;
-    
+
     if (enhancedLength < originalLength) {
       reductionPercentage = (1 - enhancedLength / originalLength) * 100;
     } else if (enhancedLength > originalLength) {
@@ -524,15 +524,15 @@ export class ContentEnhancer {
     if (this.enhancementCache.size > 100) {
       const keysToDelete: string[] = [];
       const now = Date.now();
-      
+
       for (const [key, result] of this.enhancementCache.entries()) {
         if (!this.isCacheValid(result)) {
           keysToDelete.push(key);
         }
       }
-      
+
       keysToDelete.forEach(key => this.enhancementCache.delete(key));
-      
+
       if (keysToDelete.length > 0) {
         this.llog.debug('Cleaned up cache entries', { count: keysToDelete.length });
       }
@@ -548,7 +548,7 @@ export class ContentEnhancer {
     const nesting = (code.match(/{/g) || []).length;
     const conditionals = (code.match(/(if|else|switch|case)/gi) || []).length;
     const loops = (code.match(/(for|while|do)/gi) || []).length;
-    
+
     return lines * 0.1 + nesting * 0.3 + conditionals * 0.2 + loops * 0.4;
   }
 
@@ -560,13 +560,13 @@ export class ContentEnhancer {
     const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
     const words = text.split(/\s+/).filter(w => w.length > 0);
     const syllables = words.reduce((count, word) => count + this.countSyllables(word), 0);
-    
+
     if (sentences.length === 0 || words.length === 0) {
       return { score: 0, grade: 'N/A' };
     }
-    
+
     const score = 206.835 - 1.015 * (words.length / sentences.length) - 84.6 * (syllables / words.length);
-    
+
     let grade = 'Very Difficult';
     if (score >= 90) grade = 'Very Easy';
     else if (score >= 80) grade = 'Easy';
@@ -574,7 +574,7 @@ export class ContentEnhancer {
     else if (score >= 60) grade = 'Standard';
     else if (score >= 50) grade = 'Fairly Difficult';
     else if (score >= 30) grade = 'Difficult';
-    
+
     return { score, grade };
   }
 
@@ -584,7 +584,7 @@ export class ContentEnhancer {
   private countSyllables(word: string): number {
     word = word.toLowerCase();
     if (word.length <= 3) return 1;
-    
+
     const vowels = word.match(/[aeiouy]+/g);
     return vowels ? vowels.length : 1;
   }
@@ -599,14 +599,14 @@ export class ContentEnhancer {
       /Here(?:'s| is) the enhanced version:\s*\n?\s*([\s\S]+?)(?:\n\n|\n#|$)/i,
       /Improved version:\s*\n?\s*([\s\S]+?)(?:\n\n|\n#|$)/i,
     ];
-    
+
     for (const pattern of patterns) {
       const match = response.match(pattern);
       if (match && match[1].trim().length > 10) {
         return match[1].trim();
       }
     }
-    
+
     // If no pattern matched, return the response or original
     return response.trim().length > original.length * 0.5 ? response.trim() : original;
   }
@@ -624,15 +624,15 @@ export class ContentEnhancer {
         return false;
       }
     }
-    
+
     // For other languages, check for balanced braces and basic structure
     const openBraces = (code.match(/{/g) || []).length;
     const closeBraces = (code.match(/}/g) || []).length;
-    
+
     if (Math.abs(openBraces - closeBraces) > 2) {
       return false;
     }
-    
+
     return true;
   }
 
@@ -642,14 +642,14 @@ export class ContentEnhancer {
   private async detectSyntaxErrors(code: string, language?: ProgrammingLanguage): Promise<string[]> {
     // Simplified syntax error detection
     const errors: string[] = [];
-    
+
     // Check for unmatched quotes
     const singleQuotes = (code.match(/'/g) || []).length;
     const doubleQuotes = (code.match(/"/g) || []).length;
-    
+
     if (singleQuotes % 2 !== 0) errors.push('Unmatched single quotes');
     if (doubleQuotes % 2 !== 0) errors.push('Unmatched double quotes');
-    
+
     // Check for common syntax issues
     const lines = code.split('\n');
     lines.forEach((line, index) => {
@@ -657,7 +657,7 @@ export class ContentEnhancer {
         errors.push(Line : Mixed equality operators);
       }
     });
-    
+
     return errors;
   }
 
@@ -667,7 +667,7 @@ export class ContentEnhancer {
   private checkCodeBestPractices(code: string, language?: ProgrammingLanguage): { score: number; issues: string[] } {
     let score = 10;
     const issues: string[] = [];
-    
+
     // Check line length
     const lines = code.split('\n');
     const longLines = lines.filter(line => line.length > 120);
@@ -675,20 +675,20 @@ export class ContentEnhancer {
       score -= longLines.length * 0.5;
       issues.push( lines exceed 120 characters);
     }
-    
+
     // Check for TODO comments
     const todoCount = (code.match(/TODO:/gi) || []).length;
     if (todoCount > 0) {
       score -= todoCount;
       issues.push( TODO comments found);
     }
-    
+
     // Check for console.log in production code
     if (code.includes('console.log') && !code.includes('// debug')) {
       score -= 2;
       issues.push('console.log statements found');
     }
-    
+
     return { score: Math.max(0, score), issues };
   }
 
@@ -699,9 +699,9 @@ export class ContentEnhancer {
     // Simplified performance estimation
     const originalLoops = (original.match(/(for|while|forEach|map|filter|reduce)/gi) || []).length;
     const enhancedLoops = (enhanced.match(/(for|while|forEach|map|filter|reduce)/gi) || []).length;
-    
+
     if (originalLoops === 0) return 0;
-    
+
     return Math.max(0, (originalLoops - enhancedLoops) / originalLoops);
   }
 
@@ -712,7 +712,7 @@ export class ContentEnhancer {
     // Simple clarity assessment
     const sentences = prompt.split(/[.!?]+/).filter(s => s.trim().length > 0);
     const avgSentenceLength = sentences.reduce((sum, s) => sum + s.length, 0) / (sentences.length || 1);
-    
+
     if (avgSentenceLength < 20) return 9;
     if (avgSentenceLength < 40) return 7;
     if (avgSentenceLength < 60) return 5;
@@ -730,13 +730,13 @@ export class ContentEnhancer {
       /["'][^"']+["']/g, // Quotes
       /(specific|concrete|detailed|exact|precise)/gi, // Specificity words
     ];
-    
+
     let score = 0;
     specificIndicators.forEach(indicator => {
       const matches = prompt.match(indicator) || [];
       score += matches.length * 2;
     });
-    
+
     return Math.min(10, score);
   }
 
@@ -747,12 +747,12 @@ export class ContentEnhancer {
     const hasSections = prompt.includes('\n') || prompt.includes('#') || prompt.includes('- ');
     const hasContext = prompt.toLowerCase().includes('context') || prompt.toLowerCase().includes('background');
     const hasInstructions = prompt.toLowerCase().includes('instruction') || prompt.toLowerCase().includes('please');
-    
+
     let score = 0;
     if (hasSections) score += 4;
     if (hasContext) score += 3;
     if (hasInstructions) score += 3;
-    
+
     return score;
   }
 
@@ -762,7 +762,7 @@ export class ContentEnhancer {
   private async checkGrammar(text: string): Promise<string[]> {
     // Simplified grammar check
     const issues: string[] = [];
-    
+
     // Common grammar mistakes
     if (text.includes(' alot ')) issues.push('Use "a lot" instead of "alot"');
     if (text.includes(' its ') && !text.includes(" it's ")) {
@@ -772,10 +772,10 @@ export class ContentEnhancer {
         issues.push('Check "its" vs "it\'s" usage');
       }
     }
-    
+
     // Double spaces
     if (text.includes('  ')) issues.push('Multiple consecutive spaces');
-    
+
     // Capitalization after period
     const sentences = text.split(/[.!?]+/);
     for (let i = 0; i < sentences.length - 1; i++) {
@@ -785,7 +785,7 @@ export class ContentEnhancer {
         break;
       }
     }
-    
+
     return issues;
   }
 
@@ -794,7 +794,7 @@ export class ContentEnhancer {
    */
   private async detectSecurityIssues(content: string): Promise<string[]> {
     const issues: string[] = [];
-    
+
     // Common security patterns
     const securityPatterns = [
       { pattern: /eval\s*\(/, issue: 'eval() function usage' },
@@ -804,13 +804,13 @@ export class ContentEnhancer {
       { pattern: /password\s*[:=]/, issue: 'Hardcoded password' },
       { pattern: /api[_-]?key\s*[:=]/, issue: 'Hardcoded API key' },
     ];
-    
+
     securityPatterns.forEach(({ pattern, issue }) => {
       if (pattern.test(content)) {
         issues.push(issue);
       }
     });
-    
+
     return issues;
   }
 

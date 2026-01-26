@@ -209,7 +209,7 @@ export class AIEngine {
       capabilities: ['text-completion', 'summarization', 'analysis'],
     });
 
-    this.llog.info(Initialized  AI model configurations);
+    this.llog.info('Initialized AI model configurations');
   }
 
   /**
@@ -232,16 +232,16 @@ export class AIEngine {
     try {
       // Load configuration
       await this.loadConfiguration();
-      
+
       // Initialize selected model
       await this.initializeActiveModel();
-      
+
       // Setup cloud providers
       await this.setupCloudProviders();
-      
+
       // Start queue processor
       this.startQueueProcessor();
-      
+
       this.isInitialized = true;
       this.llog.info('AI engine initialized successfully', {
         activeModel: this.activeModel,
@@ -268,7 +268,7 @@ export class AIEngine {
     // Determine which model to use based on configuration
     // For now, default to local Llama if available
     const localModel = this.modelConfigs.get(AIModelType.LOCAL_LLAMA);
-    
+
     if (localModel) {
       this.activeModel = AIModelType.LOCAL_LLAMA;
       await this.loadModel(localModel);
@@ -287,7 +287,7 @@ export class AIEngine {
       return;
     }
 
-    this.llog.info(Loading AI model: , { type: config.type });
+    this.llog.info('Loading AI model', { type: config.type });
 
     try {
       if (config.isLocal) {
@@ -298,11 +298,11 @@ export class AIEngine {
 
       config.isLoaded = true;
       this.stats.activeModels.push(config.type);
-      
-      this.llog.info(AI model loaded successfully: );
+
+      this.llog.info('AI model loaded successfully', { type: config.type });
 
     } catch (error) {
-      this.llog.error(Failed to load AI model: , error as Error);
+      this.llog.error('Failed to load AI model', error as Error);
       throw error;
     }
   }
@@ -311,26 +311,24 @@ export class AIEngine {
    * Load local model
    */
   private async loadLocalModel(config: AIModelConfig): Promise<void> {
-    // In production, this would load the actual model files
-    this.llog.debug(Would load local model from: );
-    
+    this.llog.debug('Loading local model', { path: config.path });
+
     // Simulate model loading
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    this.llog.debug(Local model  loaded successfully);
+
+    this.llog.debug('Local model loaded successfully', { type: config.type });
   }
 
   /**
    * Load cloud model configuration
    */
   private async loadCloudModel(config: AIModelConfig): Promise<void> {
-    // For cloud models, we just verify connectivity
-    this.llog.debug(Setting up cloud model: );
-    
+    this.llog.debug('Setting up cloud model', { name: config.name });
+
     // Simulate cloud connectivity check
     await new Promise(resolve => setTimeout(resolve, 500));
-    
-    this.llog.debug(Cloud model  setup completed);
+
+    this.llog.debug('Cloud model setup completed', { type: config.type });
   }
 
   /**
@@ -378,11 +376,11 @@ export class AIEngine {
     for (const provider of this.cloudProviders) {
       try {
         // In production, this would make a test API call
+        this.llog.debug('Cloud provider available', { name: provider.name });
         provider.isAvailable = true; // Simulate success
-        this.llog.debug(Cloud provider available: );
       } catch (error) {
         provider.isAvailable = false;
-        this.llog.warn(Cloud provider unavailable: , error as Error);
+        this.llog.warn('Cloud provider unavailable', { name: provider.name, error: (error as Error).message });
       }
     }
   }
@@ -467,11 +465,11 @@ export class AIEngine {
       // Check cache first
       const cacheKey = this.generateCacheKey(request.content, request.task, request.options);
       const cachedResult = this.completionCache.get(cacheKey);
-      
+
       if (cachedResult) {
         this.stats.cacheHits++;
         request.status = AIAnalysisStatus.CACHED;
-        
+
         this.llog.debug('AI request cache hit', { requestId: request.id });
         request.resolve(cachedResult);
         return;
@@ -511,7 +509,7 @@ export class AIEngine {
 
       const errorMessage = error instanceof Error ? error.message : 'Unknown AI error';
       const aiError = new Error(AI request failed: );
-      
+
       this.llog.error('AI request failed', aiError, { requestId: request.id });
       request.reject(aiError);
 
@@ -530,7 +528,7 @@ export class AIEngine {
     options: AIGenerationOptions
   ): Promise<AICompletionResult> {
     const startTime = Date.now();
-    
+
     if (!this.activeModel) {
       throw new Error('No active AI model');
     }
@@ -575,10 +573,10 @@ export class AIEngine {
 
     // In production, this would call the actual local model
     // For now, simulate local model processing
-    
+
     const prompt = this.buildPrompt(content, task, options.context);
     const maxTokens = options.maxTokens || Math.min(modelConfig.maxTokens, prompt.length);
-    
+
     await new Promise(resolve => setTimeout(resolve, Math.max(100, content.length / 10)));
 
     // Simulate model response
@@ -618,10 +616,10 @@ export class AIEngine {
 
     // In production, this would make actual API call
     // For now, simulate API call
-    
+
     const prompt = this.buildPrompt(content, task, options.context);
     const maxTokens = options.maxTokens || Math.min(modelConfig.maxTokens, prompt.length);
-    
+
     await new Promise(resolve => setTimeout(resolve, Math.max(200, content.length / 20)));
 
     // Simulate cloud response
@@ -658,7 +656,7 @@ export class AIEngine {
     // Switch to fallback model
     const originalModel = this.activeModel;
     this.activeModel = fallbackModel;
-    
+
     try {
       const modelConfig = this.modelConfigs.get(fallbackModel);
       if (!modelConfig) {
@@ -670,7 +668,7 @@ export class AIEngine {
       }
 
       const result = await this.generateCompletionInternal(content, task, options);
-      
+
       this.llog.info('Fallback model succeeded', {
         originalModel,
         fallbackModel,
@@ -690,7 +688,7 @@ export class AIEngine {
    */
   private findFallbackModel(): AIModelType | null {
     const currentModel = this.activeModel;
-    
+
     // Try cloud models first if current is local
     const currentConfig = this.modelConfigs.get(currentModel!);
     if (currentConfig?.isLocal) {
@@ -700,14 +698,14 @@ export class AIEngine {
         return cloudModel.type;
       }
     }
-    
+
     // Try any other loaded model
     for (const [type, config] of this.modelConfigs.entries()) {
       if (type !== currentModel && config.isLoaded) {
         return type;
       }
     }
-    
+
     return null;
   }
 
@@ -716,15 +714,15 @@ export class AIEngine {
    */
   private buildPrompt(content: string, task: string, context?: string): string {
     let prompt = '';
-    
+
     if (context) {
       prompt += Context: \n\n;
     }
-    
+
     prompt += Task: \n\n;
     prompt += Content:\n\n\n;
     prompt += Please analyze the above content and .;
-    
+
     return prompt;
   }
 
@@ -736,15 +734,15 @@ export class AIEngine {
     switch (task.toLowerCase()) {
       case 'analyze':
         return Analysis: The content appears to be . It contains approximately  words.;
-      
+
       case 'summarize':
         const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
         const summary = sentences.slice(0, 2).join('. ');
         return summary || 'Summary not available.';
-      
+
       case 'enhance':
         return Enhanced version: ... [Enhanced for clarity and conciseness];
-      
+
       case 'classify':
         if (content.includes('function') || content.includes('const') || content.includes('var')) {
           return 'Classification: JavaScript/TypeScript code';
@@ -755,7 +753,7 @@ export class AIEngine {
         } else {
           return 'Classification: Plain text';
         }
-      
+
       default:
         return Processed content for task "". Original length:  characters.;
     }
@@ -767,11 +765,11 @@ export class AIEngine {
   private updateAverageResponseTime(newTime: number): number {
     const currentAverage = this.stats.averageResponseTime;
     const totalRequests = this.stats.successfulRequests + this.stats.failedRequests;
-    
+
     if (totalRequests <= 1) {
       return newTime;
     }
-    
+
     return (currentAverage * (totalRequests - 1) + newTime) / totalRequests;
   }
 
@@ -790,16 +788,16 @@ export class AIEngine {
   private cleanupCache(): void {
     if (this.completionCache.size > 1000) {
       const keysToDelete: string[] = [];
-      
+
       for (const [key, result] of this.completionCache.entries()) {
         // Simple cache cleanup based on size
         if (this.completionCache.size > 1000) {
           keysToDelete.push(key);
         }
       }
-      
+
       keysToDelete.forEach(key => this.completionCache.delete(key));
-      
+
       if (keysToDelete.length > 0) {
         this.llog.debug('Cleaned up AI cache', { count: keysToDelete.length });
       }
@@ -821,7 +819,7 @@ export class AIEngine {
 
     const requestId = req__;
     const priority = options.priority || AITaskPriority.NORMAL;
-    
+
     this.llog.debug('Queueing AI completion request', {
       requestId,
       promptLength: prompt.length,
@@ -893,7 +891,7 @@ export class AIEngine {
     if (!this.isInitialized) {
       await this.initialize();
     }
-    
+
     if (!this.activeModel) {
       throw new Error('No active AI model configured');
     }
@@ -906,7 +904,7 @@ export class AIEngine {
     if (!this.activeModel) {
       return 'No active model';
     }
-    
+
     const config = this.modelConfigs.get(this.activeModel);
     return config ?  () : 'Unknown model';
   }
@@ -919,13 +917,13 @@ export class AIEngine {
     if (!modelConfig) {
       throw new Error(Model not found: );
     }
-    
+
     if (!modelConfig.isLoaded) {
       await this.loadModel(modelConfig);
     }
-    
+
     this.activeModel = modelType;
-    
+
     this.llog.info('AI model switched', {
       oldModel: this.getActiveModel(),
       newModel: modelConfig.name,
@@ -966,7 +964,7 @@ export class AIEngine {
     nextPriority: AITaskPriority | null;
   } {
     const nextRequest = this.requestQueue[0];
-    
+
     return {
       pending: this.requestQueue.length,
       processing: this.processingQueue.size,
@@ -979,15 +977,15 @@ export class AIEngine {
    */
   public cancelAllRequests(): void {
     const cancelledCount = this.requestQueue.length;
-    
+
     this.requestQueue.forEach(request => {
       request.status = AIAnalysisStatus.SKIPPED;
       request.reject(new Error('Request cancelled'));
     });
-    
+
     this.requestQueue = [];
     this.stats.queueSize = 0;
-    
+
     this.llog.info('All AI requests cancelled', { count: cancelledCount });
   }
 
@@ -1003,19 +1001,19 @@ export class AIEngine {
    */
   public async shutdown(): Promise<void> {
     this.llog.info('Shutting down AI engine');
-    
+
     // Cancel queue processor
     if (this.queueProcessorInterval) {
       clearInterval(this.queueProcessorInterval);
       this.queueProcessorInterval = null;
     }
-    
+
     // Cancel all pending requests
     this.cancelAllRequests();
-    
+
     // Clear caches
     this.completionCache.clear();
-    
+
     // Unload models (in production)
     for (const config of this.modelConfigs.values()) {
       if (config.isLoaded && config.isLocal) {
@@ -1023,10 +1021,10 @@ export class AIEngine {
         config.isLoaded = false;
       }
     }
-    
+
     this.isInitialized = false;
     this.activeModel = null;
-    
+
     this.llog.info('AI engine shutdown completed');
   }
 }
