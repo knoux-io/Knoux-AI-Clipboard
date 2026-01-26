@@ -42,11 +42,18 @@
     "databaseStatus": "Database Status",
     "active": "Active",
     "idle": "Idle",
+    "error": "Error",
     "clearClipboard": "Clear Clipboard",
     "pauseMonitoring": "Pause Monitoring",
     "resumeMonitoring": "Resume Monitoring",
     "systemInfo": "System Information",
-    "quickActions": "Quick Actions"
+    "quickActions": "Quick Actions",
+    "statusUpdateFailed": "Failed to update system status",
+    "clipboardCleared": "Clipboard cleared successfully",
+    "clearClipboardFailed": "Failed to clear clipboard",
+    "monitoringStopped": "Clipboard monitoring stopped",
+    "monitoringStarted": "Clipboard monitoring started",
+    "toggleMonitoringFailed": "Failed to toggle monitoring"
   },
   "ai": {
     "askQuestion": "Ask a Question",

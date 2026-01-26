@@ -42,11 +42,18 @@
     "databaseStatus": "حالة قاعدة البيانات",
     "active": "نشط",
     "idle": "خامل",
+    "error": "خطأ",
     "clearClipboard": "مسح الحافظة",
     "pauseMonitoring": "إيقاف المراقبة مؤقتًا",
     "resumeMonitoring": "استئناف المراقبة",
     "systemInfo": "معلومات النظام",
-    "quickActions": "إجراءات سريعة"
+    "quickActions": "إجراءات سريعة",
+    "statusUpdateFailed": "فشل في تحديث حالة النظام",
+    "clipboardCleared": "تم مسح الحافظة بنجاح",
+    "clearClipboardFailed": "فشل في مسح الحافظة",
+    "monitoringStopped": "تم إيقاف مراقبة الحافظة",
+    "monitoringStarted": "تم بدء مراقبة الحافظة",
+    "toggleMonitoringFailed": "فشل في تبديل المراقبة"
   },
   "ai": {
     "askQuestion": "اطرح سؤالاً",

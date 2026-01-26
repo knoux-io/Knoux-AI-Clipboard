@@ -1,26 +1,31 @@
 /**
- * Dashboard View - Knoux Clipboard AI
+ * Dashboard View - Knoux Clipboard AI (Refactored)
  * Real-time dashboard with clock and system status
+ * Performance optimized with proper error handling and accessibility
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useDatabase } from '../hooks/useDatabase';
 import { useAISimple } from '../hooks/useAISimple';
 import { useTheme } from '../hooks/useTheme';
 import { useLanguage } from '../hooks/useLanguage';
 import { useSettings } from '../hooks/useSettings';
+import { useToast } from '../hooks/useToast';
 import {
   Activity,
-  Clock,
   Database,
   Cpu,
-  Zap,
-  Shield,
   Trash2,
   Pause,
   Play,
-  RefreshCw
+  RefreshCw,
+  CheckCircle,
+  AlertCircle
 } from 'lucide-react';
+import { StatusCard } from '../components/StatusCard';
+import { ActionButton } from '../components/ActionButton';
+import { ItemPreview } from '../components/ItemPreview';
+import { dashboardConfig } from '../config/dashboardConfig';
 import './Dashboard.css';
 
 interface SystemStatus {
