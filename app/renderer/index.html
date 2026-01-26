@@ -12,11 +12,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
         // Detect dark mode and apply immediately to avoid flash
-        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            if (document.body) {
-                document.body.classList.add('dark');
+        function applyDarkMode() {
+            if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                if (document.body) {
+                    document.body.classList.add('dark');
+                }
             }
+        }
+        
+        // Apply immediately if DOM is ready, otherwise wait for DOMContentLoaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', applyDarkMode);
+        } else {
+            applyDarkMode();
         }
     </script>
 </head>

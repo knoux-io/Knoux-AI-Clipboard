@@ -54,7 +54,8 @@
   "exclude": ["node_modules", "dist", "build", "release"],
   "ts-node": {
     "compilerOptions": {
-      "module": "commonjs"
+      "module": "commonjs",
+      "moduleResolution": "node"
     }
   }
 }

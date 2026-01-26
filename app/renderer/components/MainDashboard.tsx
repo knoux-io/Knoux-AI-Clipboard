@@ -226,19 +226,19 @@ const HomeView: React.FC<{
         title="Clipboard Items"
         value={clipboardItems.length.toString()}
         icon="📋"
-        status={testResults.clipboard}
+        status={testResults.clipboard || "Testing..."}
       />
       <StatCard
         title="AI Engine"
         value={aiProcessing ? "Processing..." : "Ready"}
         icon="🧠"
-        status={testResults.ai}
+        status={testResults.ai || "Testing..."}
       />
       <StatCard
         title="Storage"
         value="Active"
         icon="💾"
-        status={testResults.storage}
+        status={testResults.storage || "Testing..."}
       />
     </div>
 
