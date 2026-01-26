@@ -13,32 +13,38 @@ export default {
       colors: {
         knoux: {
           primary: {
-            DEFAULT: '#0ea5e9',
-            light: '#38bdf8',
-            dark: '#0284c7',
-            50: '#f0f9ff',
-            100: '#e0f2fe',
-            200: '#bae6fd',
-            300: '#7dd3fc',
-            400: '#38bdf8',
-            500: '#0ea5e9',
-            600: '#0284c7',
-            700: '#0369a1',
-            800: '#075985',
-            900: '#0c4a6e',
+            DEFAULT: '#667EEA', // Smart Blue
+            light: '#8BA1F5',
+            dark: '#4B5FCC',
+            50: '#F0F4FF',
+            100: '#E0E8FF',
+            200: '#C0D0FF',
+            300: '#A0B8FF',
+            400: '#667EEA',
+            500: '#5566D6',
+            600: '#444EC2',
+            700: '#3336AE',
+            800: '#221E9A',
+            900: '#110686',
           },
           secondary: {
-            DEFAULT: '#d946ef',
-            light: '#e879f9',
-            dark: '#c026d3',
+            DEFAULT: '#764BA2', // Purple-Blue
+            light: '#9B6BC7',
+            dark: '#542E80',
+          },
+          background: {
+            DEFAULT: '#0F0F1A', // Dark Background
+            surface: '#1A1A2E',
+            lighter: '#252540',
           },
           accent: {
+            DEFAULT: '#00D4AA', // AI Green
             cyan: '#06b6d4',
             purple: '#a855f7',
             pink: '#ec4899',
             emerald: '#10b981',
           },
-          success: { DEFAULT: '#10b981', light: '#d1fae5', dark: '#047857' },
+          success: { DEFAULT: '#00D4AA', light: '#33EDC8', dark: '#00A382' },
           warning: { DEFAULT: '#f59e0b', light: '#fef3c7', dark: '#d97706' },
           error: { DEFAULT: '#ef4444', light: '#fee2e2', dark: '#dc2626' },
         },

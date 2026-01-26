@@ -285,3 +285,5 @@ export function initializeIpcHandlers() {
   
   logger.info('IPC handlers initialized successfully');
 }
+
+export const setupIPC = initializeIpcHandlers;

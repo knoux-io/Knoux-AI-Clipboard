@@ -22,6 +22,7 @@ import {
   Play,
 } from "lucide-react";
 import { useClipboard } from "../hooks/useClipboard";
+import DigitalClock from "../components/DigitalClock";
 import i18n from "../utils/i18n";
 
 interface DashboardStats {
@@ -58,6 +59,28 @@ const DashboardPage: React.FC = () => {
     aiProcessed: 0,
   });
   const [isMonitoring, setIsMonitoring] = useState(true);
+  const [systemInfo, setSystemInfo] = useState<any>(null);
+  const [aiStatus, setAiStatus] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (window.knoux?.getSystemInfo) {
+          const sys = await window.knoux.getSystemInfo();
+          if (sys.success) setSystemInfo(sys.data);
+        }
+        if (window.knoux?.getAIStatus) {
+          const ai = await window.knoux.getAIStatus();
+          if (ai.success) setAiStatus(ai.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard data", error);
+      }
+    };
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const today = new Date();
@@ -175,26 +198,37 @@ const DashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-6">
+    <div className="min-h-screen bg-knoux-background text-white p-6 font-sans">
       <div className="container mx-auto max-w-7xl">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent mb-2">
-            {i18n.t("dashboard.title")}
-          </h1>
-          <p className="text-gray-400">
-            {i18n.isRTL()
-              ? "نظرة شاملة على أداء التطبيق"
-              : "Comprehensive overview of application performance"}
-          </p>
+        {/* Header & Clock Section */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 bg-knoux-background-surface/50 p-6 rounded-2xl backdrop-blur-md border border-knoux-primary/20 shadow-knoux-lg">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-knoux-primary via-knoux-secondary to-knoux-accent bg-clip-text text-transparent mb-2">
+              {i18n.t("dashboard.title")}
+            </h1>
+            <p className="text-gray-400 text-lg">
+              {i18n.isRTL()
+                ? "نظرة شاملة على أداء التطبيق"
+                : "Comprehensive overview of application performance"}
+            </p>
+          </div>
+
+          <div className="mt-4 md:mt-0 flex flex-col items-center md:items-end bg-knoux-background/40 p-4 rounded-xl border border-knoux-primary/10">
+            <h3 className="text-sm font-medium text-knoux-accent mb-2 font-mono tracking-wider">
+              {i18n.isRTL()
+                ? "التوقيت الرسمي لمساكن حي الزهور 🦾"
+                : "Official Time"}
+            </h3>
+            <DigitalClock />
+          </div>
         </div>
 
         {/* Grid Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {cards.map((card) => (
             <div
               key={card.id}
-              className={`group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 transform hover:scale-105 bg-gradient-to-br ${card.color} shadow-lg`}
+              className={`group relative overflow-hidden rounded-2xl p-6 transition-all duration-300 transform hover:scale-105 hover:shadow-knoux-glow border border-white/5 bg-gradient-to-br ${card.gradient} shadow-lg`}
             >
               {/* Background Pattern */}
               <div className="absolute inset-0 opacity-10">
