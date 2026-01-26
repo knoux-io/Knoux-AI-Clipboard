@@ -21,7 +21,7 @@ import ClipboardHistory from './views/ClipboardHistory';
 import AIInsights from './views/AIInsights';
 import SecurityCenter from './views/SecurityCenter';
 import VIP from './views/VIP';
-import About from './views/AboutNew';
+import About from './views/AboutClean';
 import SettingsPanel from './components/SettingsPanel';
 import ToastContainer from './components/ToastContainer';
 import { useLanguage } from './hooks/useLanguage';
