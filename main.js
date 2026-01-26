@@ -34,15 +34,32 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     show: false,
-    icon: path.join(__dirname, 'public', 'favicon.ico'),
+    icon: path.join(__dirname, 'dist', 'favicon.ico'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
       webSecurity: true,
-      sandbox: true
+      sandbox: true,
+      preload: path.join(__dirname, 'preload.js')
     }
   });
+
+  // Initialize IPC handlers (compiled output) if available
+  try {
+    const handlersPath = path.join(__dirname, 'build', 'electron', 'app', 'backend', 'ipc', 'enhanced-handlers.js');
+    if (fs.existsSync(handlersPath)) {
+      const { initializeEnhancedHandlers } = require(handlersPath);
+      if (typeof initializeEnhancedHandlers === 'function') {
+        initializeEnhancedHandlers();
+        console.log('✅ Enhanced IPC handlers initialized (compiled)');
+      }
+    } else {
+      console.warn('⚠️ Compiled IPC handlers not found. Run `npm run build:main`.');
+    }
+  } catch (e) {
+    console.error('❌ Failed to initialize IPC handlers:', e);
+  }
 
   // Load the app
   const startUrl = isDev

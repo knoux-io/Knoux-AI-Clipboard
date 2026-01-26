@@ -14,8 +14,6 @@
     "declaration": false
   },
   "include": [
-    "app/main.ts",
-    "app/preload.ts",
     "app/backend/ipc/enhanced-handlers.ts",
     "app/backend/services/**/*.ts",
     "app/shared/**/*.ts"

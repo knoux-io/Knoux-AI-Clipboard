@@ -10,7 +10,7 @@
     "start": "electron .",
     "start:renderer": "vite",
     "build:renderer": "vite build",
-    "build:main": "echo \"No main build step configured\"",
+    "build:main": "tsc -p tsconfig.electron.json",
     "build": "npm run build:renderer && npm run build:main",
     "dist": "electron-builder --publish never",
     "test": "echo \"No tests configured\" && exit 0"

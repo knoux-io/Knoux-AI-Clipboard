@@ -26,10 +26,17 @@ class LanguageService {
 
   private loadLanguageFile(lang: 'en' | 'ar'): Translations {
     try {
-      const langPath = path.join(app.getAppPath(), 'locales', `${lang}.json`);
-      if (fs.existsSync(langPath)) {
-        const data = fs.readFileSync(langPath, 'utf-8');
-        return JSON.parse(data);
+      const candidatePaths = [
+        path.join(app.getAppPath(), 'app', 'renderer', 'i18n', `${lang}.json`),
+        path.join(app.getAppPath(), 'renderer', 'i18n', `${lang}.json`),
+        path.join(app.getAppPath(), 'locales', `${lang}.json`)
+      ];
+
+      for (const langPath of candidatePaths) {
+        if (fs.existsSync(langPath)) {
+          const data = fs.readFileSync(langPath, 'utf-8');
+          return JSON.parse(data);
+        }
       }
     } catch (error) {
       console.error(`❌ Error loading ${lang} translations:`, error);
