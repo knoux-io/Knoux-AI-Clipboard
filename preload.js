@@ -100,3 +100,39 @@ contextBridge.exposeInMainWorld('knoux', {
     set: (lang) => ipcRenderer.invoke('language:set', lang),
   },
 });
+
+// Extended Backend API for new features
+contextBridge.exposeInMainWorld('backendAPI', {
+  voice: {
+    getProfiles: () => ipcRenderer.invoke('voice:getProfiles'),
+    customize: (audioData, options) => ipcRenderer.invoke('voice:customize', audioData, options),
+  },
+  
+  quantum: {
+    secureClip: (clipData, securityLevel) => ipcRenderer.invoke('quantum:secureClip', clipData, securityLevel),
+    audit: () => ipcRenderer.invoke('quantum:audit'),
+    getAnalytics: () => ipcRenderer.invoke('quantum:getAnalytics'),
+    backup: (data) => ipcRenderer.invoke('quantum:backup', data),
+    activateShield: () => ipcRenderer.invoke('quantum:activateShield'),
+  },
+  
+  security: {
+    storeClip: (clipData) => ipcRenderer.invoke('security:storeClip', clipData),
+    retrieveClip: (clipId) => ipcRenderer.invoke('security:retrieveClip', clipId),
+    getMetrics: () => ipcRenderer.invoke('security:getMetrics'),
+    audit: () => ipcRenderer.invoke('security:audit'),
+    verify: (clipId) => ipcRenderer.invoke('security:verify', clipId),
+  },
+  
+  arvr: {
+    createVRClip: (clipData, options) => ipcRenderer.invoke('arvr:createVRClip', clipData, options),
+    getMetrics: () => ipcRenderer.invoke('arvr:getMetrics'),
+    search: (query) => ipcRenderer.invoke('arvr:search', query),
+  },
+  
+  ui: {
+    getProfiles: () => ipcRenderer.invoke('ui:getProfiles'),
+    morph: (morphType, options) => ipcRenderer.invoke('ui:morph', morphType, options),
+    switchStyle: (styleId) => ipcRenderer.invoke('ui:switchStyle', styleId),
+  },
+});

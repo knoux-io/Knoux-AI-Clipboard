@@ -17,7 +17,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, '.'),
       '@app': path.resolve(__dirname, 'app'),
       '@shared': path.resolve(__dirname, 'app/shared'),
-      '@backend': path.resolve(__dirname, 'app/backend'),
+      // ❌ @backend removed - renderer must use IPC only
       '@renderer': path.resolve(__dirname, 'app/renderer'),
       '@components': path.resolve(__dirname, 'app/renderer/components'),
       '@hooks': path.resolve(__dirname, 'app/renderer/hooks'),

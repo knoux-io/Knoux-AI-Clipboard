@@ -50,7 +50,20 @@ async function createWindow() {
     registerTestIPC();
     registerAIServicesIPC();
     
-    console.log('✅ ALL IPC handlers registered (101 services + testing)');
+    // Register new IPC handlers
+    const { registerVoiceHandlers } = require('./app/backend/ipc/voice-ipc');
+    const { registerQuantumHandlers } = require('./app/backend/ipc/quantum-ipc');
+    const { registerSecurityHandlers } = require('./app/backend/ipc/security-ipc');
+    const { registerARVRHandlers } = require('./app/backend/ipc/arvr-ipc');
+    const { registerUIHandlers } = require('./app/backend/ipc/ui-ipc');
+    
+    registerVoiceHandlers();
+    registerQuantumHandlers();
+    registerSecurityHandlers();
+    registerARVRHandlers();
+    registerUIHandlers();
+    
+    console.log('✅ ALL IPC handlers registered (101 services + testing + new features)');
     
     app.on('before-quit', () => {
       cleanupComprehensiveIPC();
