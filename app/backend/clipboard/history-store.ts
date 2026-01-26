@@ -220,14 +220,14 @@ export class HistoryStore {
   private async createBackup(): Promise<void> {
     try {
       const backupPath = ".backup.json";
-      this.llog.info("Creating backup", { path: backupPath });
+      this.logger.info("Creating backup", { path: backupPath });
 
       // In production, this would copy the database/file
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      this.llog.debug("Backup created successfully");
+      this.logger.debug("Backup created successfully");
     } catch (error) {
-      this.llog.error("Failed to create backup", error as Error);
+      this.logger.error("Failed to create backup", error as Error);
     }
   }
 
@@ -236,7 +236,7 @@ export class HistoryStore {
    */
   private async saveToStorage(): Promise<void> {
     try {
-      this.llog.debug("Saving items to storage", {
+      this.logger.debug("Saving items to storage", {
         itemCount: this.items.size,
         path: this.storagePath,
       });
@@ -244,9 +244,9 @@ export class HistoryStore {
       // In production, this would save to SQLite/JSON file
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      this.llog.debug("Storage save completed");
+      this.logger.debug("Storage save completed");
     } catch (error) {
-      this.llog.error("Failed to save to storage", error as Error);
+      this.logger.error("Failed to save to storage", error as Error);
     }
   }
 
@@ -265,7 +265,7 @@ export class HistoryStore {
     const startTime = Date.now();
     const itemId = item__;
 
-    this.llog.debug("Adding item to history", {
+    this.logger.debug("Adding item to history", {
       itemId,
       contentLength: content.length,
       format,
@@ -349,7 +349,7 @@ export class HistoryStore {
       await this.saveToStorage();
 
       const processingTime = Date.now() - startTime;
-      this.llog.info("Item added to history", {
+      this.logger.info("Item added to history", {
         itemId,
         contentType: classification.primaryType,
         isSensitive: classification.isSensitive,
