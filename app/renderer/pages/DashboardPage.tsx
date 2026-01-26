@@ -4,7 +4,6 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   ClipboardCopy,
   Brain,
@@ -18,6 +17,9 @@ import {
   AlertCircle,
   CheckCircle,
   RefreshCw,
+  Trash2,
+  Pause,
+  Play,
 } from "lucide-react";
 import { useClipboard } from "../hooks/useClipboard";
 import i18n from "../utils/i18n";
@@ -103,66 +105,74 @@ const DashboardPage: React.FC = () => {
       id: "clipboard-status",
       title: "Clipboard Status",
       titleAr: "حالة الحافظة",
-      value: isMonitoring ? "Active" : "Idle",
-      subtitle: `${stats.totalItems} items`,
-      icon: <ClipboardCopy className="w-8 h-8" />,
-      color: isMonitoring
-        ? "from-green-500 to-emerald-500"
-        : "from-gray-500 to-slate-500",
-      gradient: "hover:from-green-600 hover:to-emerald-600",
-      status: isMonitoring ? "active" : "warning",
+      value: clipboard.isMonitoring ? "Active" : "Paused",
+      subtitle: clipboard.isMonitoring
+        ? "Monitoring clipboard changes"
+        : "Monitoring paused",
+      icon: <ClipboardCopy className="w-6 h-6 text-white" />,
+      color: "bg-green-500",
+      gradient: "from-green-500 to-emerald-500",
+      status: clipboard.isMonitoring ? "active" : "warning",
     },
     {
-      id: "ai-summary",
-      title: "AI Summary",
-      titleAr: "ملخص الذكاء الاصطناعي",
-      value: stats.aiProcessed,
-      subtitle: "Processed items",
-      icon: <Brain className="w-8 h-8" />,
-      color: "from-purple-500 to-pink-500",
-      gradient: "hover:from-purple-600 hover:to-pink-600",
+      id: "ai-engine",
+      title: "AI Engine Status",
+      titleAr: "حالة المحرك الذكي",
+      value: aiStatus?.initialized ? "Ready" : "Standby",
+      subtitle: aiStatus?.model || "Local Model",
+      icon: <Brain className="w-6 h-6 text-white" />,
+      color: "bg-purple-500",
+      gradient: "from-purple-500 to-indigo-500",
+      status: aiStatus?.initialized ? "active" : "active",
     },
     {
-      id: "quick-actions",
-      title: "Quick Actions",
-      titleAr: "إجراءات سريعة",
-      value: "Ready",
-      subtitle: "All systems operational",
-      icon: <Zap className="w-8 h-8" />,
-      color: "from-yellow-500 to-orange-500",
-      gradient: "hover:from-yellow-600 hover:to-orange-600",
-    },
-    {
-      id: "storage-usage",
-      title: "Storage Usage",
-      titleAr: "استخدام التخزين",
-      value: formatBytes(stats.totalSize),
+      id: "database-status",
+      title: "Database Status",
+      titleAr: "حالة قاعدة البيانات",
+      value: "Connected",
       subtitle: `${stats.totalItems} items stored`,
-      icon: <Database className="w-8 h-8" />,
-      color: "from-blue-500 to-cyan-500",
-      gradient: "hover:from-blue-600 hover:to-cyan-600",
+      icon: <Database className="w-6 h-6 text-white" />,
+      color: "bg-blue-500",
+      gradient: "from-blue-500 to-cyan-500",
+      status: "active",
     },
     {
-      id: "security-status",
-      title: "Security Status",
-      titleAr: "حالة الأمان",
-      value: stats.sensitiveItems,
-      subtitle: "Sensitive items protected",
-      icon: <Shield className="w-8 h-8" />,
-      color: "from-red-500 to-pink-500",
-      gradient: "hover:from-red-600 hover:to-pink-600",
-    },
-    {
-      id: "analytics-snapshot",
-      title: "Analytics Snapshot",
-      titleAr: "لقطة التحليلات",
-      value: `${stats.formats} formats`,
-      subtitle: `${stats.urlItems} URLs detected`,
-      icon: <BarChart3 className="w-8 h-8" />,
-      color: "from-indigo-500 to-purple-500",
-      gradient: "hover:from-indigo-600 hover:to-purple-600",
+      id: "memory-usage",
+      title: "Memory / Performance",
+      titleAr: "الذاكرة / الأداء",
+      value: systemInfo ? formatBytes(systemInfo.memoryUsage.rss) : "...",
+      subtitle: "Optimized",
+      icon: <Activity className="w-6 h-6 text-white" />,
+      color: "bg-orange-500",
+      gradient: "from-orange-500 to-red-500",
+      status: "active",
     },
   ];
+
+  const handleQuickAction = async (action: string) => {
+    switch (action) {
+      case "clear-clipboard":
+        if (
+          confirm(
+            i18n.t("dashboard.confirmClear") ||
+              "Are you sure you want to clear history?",
+          )
+        ) {
+          await clipboard.clearAll();
+        }
+        break;
+      case "pause-monitoring":
+        if (clipboard.isMonitoring) {
+          clipboard.stopMonitoring();
+        } else {
+          clipboard.startMonitoring();
+        }
+        break;
+      case "open-ai":
+        navigate("/ai");
+        break;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-6">
