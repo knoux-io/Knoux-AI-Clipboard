@@ -41,6 +41,7 @@ async function createWindow() {
   // Register ALL service IPC handlers
   const { registerAllServiceIPC } = require("./app/backend/ipc/unified-service-ipc");
   const { registerComprehensiveIPC, cleanupComprehensiveIPC } = require("./app/backend/ipc/comprehensive-ipc");
+  const { registerTestIPC } = require("./app/backend/ipc/test-ipc");
 
   try {
     // Register unified service handlers
@@ -49,7 +50,10 @@ async function createWindow() {
     // Register comprehensive handlers
     registerComprehensiveIPC();
     
-    console.log('✅ ALL IPC handlers registered (98 services connected)');
+    // Register test handlers
+    registerTestIPC();
+    
+    console.log('✅ ALL IPC handlers registered (98 services + testing)');
     
     app.on('before-quit', () => {
       cleanupComprehensiveIPC();
