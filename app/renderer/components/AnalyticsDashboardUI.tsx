@@ -1,58 +1,67 @@
-import React, { useState, useEffect } from 'react';
-import { analyticsDashboard, AnalyticsDashboard, UsageMetrics, RealTimeMetrics } from '../../../backend/ai/analytics-dashboard';
+import React, { useState, useEffect } from "react";
 
 interface AnalyticsDashboardUIProps {
   onInsightGenerated?: (insight: string) => void;
 }
 
-export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onInsightGenerated }) => {
+export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({
+  onInsightGenerated,
+}) => {
   const [dashboard, setDashboard] = useState<AnalyticsDashboard | null>(null);
   const [metrics, setMetrics] = useState<UsageMetrics | null>(null);
-  const [realTimeMetrics, setRealTimeMetrics] = useState<RealTimeMetrics | null>(null);
-  const [selectedTimeframe, setSelectedTimeframe] = useState('7d');
+  const [realTimeMetrics, setRealTimeMetrics] =
+    useState<RealTimeMetrics | null>(null);
+  const [selectedTimeframe, setSelectedTimeframe] = useState("7d");
   const [analysisResults, setAnalysisResults] = useState<any>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   useEffect(() => {
     loadDashboard();
     loadRealTimeMetrics();
-    
+
     const interval = setInterval(loadRealTimeMetrics, 5000);
     return () => clearInterval(interval);
   }, []);
 
   const loadDashboard = async () => {
     try {
-      const dashboardData = await analyticsDashboard.getDashboardData();
+      const dashboardData = await window.knox.invoke(
+        "analyticsDashboard:getDashboardData",
+      );
       setDashboard(dashboardData.dashboard);
       setMetrics(dashboardData.metrics);
     } catch (error) {
-      console.error('Error loading dashboard:', error);
+      console.error("Error loading dashboard:", error);
     }
   };
 
   const loadRealTimeMetrics = async () => {
     try {
-      const rtMetrics = await analyticsDashboard.getRealTimeMetrics();
+      const rtMetrics = await window.knox.invoke(
+        "analyticsDashboard:getRealTimeMetrics",
+      );
       setRealTimeMetrics(rtMetrics);
     } catch (error) {
-      console.error('Error loading real-time metrics:', error);
+      console.error("Error loading real-time metrics:", error);
     }
   };
 
   const handleQuickAnalysis = async () => {
     setIsAnalyzing(true);
     try {
-      const analysis = await analyticsDashboard.quickAnalyze(selectedTimeframe);
+      const analysis = await window.knox.invoke(
+        "analyticsDashboard:quickAnalyze",
+        selectedTimeframe,
+      );
       setAnalysisResults(analysis);
-      
+
       if (analysis.recommendations.length > 0) {
         onInsightGenerated?.(analysis.recommendations[0]);
       }
     } catch (error) {
-      console.error('Error performing analysis:', error);
+      console.error("Error performing analysis:", error);
     } finally {
       setIsAnalyzing(false);
     }
@@ -61,10 +70,13 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
   const handleCopyHabitsAnalysis = async () => {
     setIsAnalyzing(true);
     try {
-      const habits = await analyticsDashboard.analyzeCopyHabits(selectedTimeframe);
-      setAnalysisResults({ type: 'habits', data: habits });
+      const habits = await window.knox.invoke(
+        "analyticsDashboard:analyzeCopyHabits",
+        selectedTimeframe,
+      );
+      setAnalysisResults({ type: "habits", data: habits });
     } catch (error) {
-      console.error('Error analyzing copy habits:', error);
+      console.error("Error analyzing copy habits:", error);
     } finally {
       setIsAnalyzing(false);
     }
@@ -73,10 +85,13 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
   const handleProductivityAnalysis = async () => {
     setIsAnalyzing(true);
     try {
-      const productivity = await analyticsDashboard.detectProductivityPeaks(selectedTimeframe);
-      setAnalysisResults({ type: 'productivity', data: productivity });
+      const productivity = await window.knox.invoke(
+        "analyticsDashboard:detectProductivityPeaks",
+        selectedTimeframe,
+      );
+      setAnalysisResults({ type: "productivity", data: productivity });
     } catch (error) {
-      console.error('Error analyzing productivity:', error);
+      console.error("Error analyzing productivity:", error);
     } finally {
       setIsAnalyzing(false);
     }
@@ -85,10 +100,13 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
   const handleInterestGraph = async () => {
     setIsAnalyzing(true);
     try {
-      const interests = await analyticsDashboard.createInterestGraph(selectedTimeframe);
-      setAnalysisResults({ type: 'interests', data: interests });
+      const interests = await window.knox.invoke(
+        "analyticsDashboard:createInterestGraph",
+        selectedTimeframe,
+      );
+      setAnalysisResults({ type: "interests", data: interests });
     } catch (error) {
-      console.error('Error creating interest graph:', error);
+      console.error("Error creating interest graph:", error);
     } finally {
       setIsAnalyzing(false);
     }
@@ -96,16 +114,24 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
 
   const handleSemanticSearch = async () => {
     if (!searchQuery.trim()) return;
-    
+
     try {
-      const results = await analyticsDashboard.semanticSearch(searchQuery);
+      const results = await window.knox.invoke(
+        "analyticsDashboard:semanticSearch",
+        searchQuery,
+      );
       setSearchResults(results);
     } catch (error) {
-      console.error('Error performing semantic search:', error);
+      console.error("Error performing semantic search:", error);
     }
   };
 
-  const renderMetricCard = (title: string, value: string | number, icon: string, color: string) => (
+  const renderMetricCard = (
+    title: string,
+    value: string | number,
+    icon: string,
+    color: string,
+  ) => (
     <div className={`metric-card ${color}`}>
       <div className="metric-icon">{icon}</div>
       <div className="metric-content">
@@ -119,122 +145,156 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
     if (!analysisResults) return null;
 
     switch (analysisResults.type) {
-      case 'habits':
+      case "habits":
         return (
           <div className="analysis-results">
             <h4>📈 Copy Habits Analysis</h4>
             <div className="habits-summary">
               <div className="productivity-score">
-                Productivity Score: <span className="score">{(analysisResults.data.productivity.score * 100).toFixed(1)}%</span>
+                Productivity Score:{" "}
+                <span className="score">
+                  {(analysisResults.data.productivity.score * 100).toFixed(1)}%
+                </span>
               </div>
               <div className="patterns-count">
-                Patterns Identified: <span className="count">{analysisResults.data.patterns.length}</span>
+                Patterns Identified:{" "}
+                <span className="count">
+                  {analysisResults.data.patterns.length}
+                </span>
               </div>
             </div>
-            
+
             <div className="insights-section">
               <h5>💡 Key Insights:</h5>
               <ul>
-                {analysisResults.data.insights.map((insight: string, index: number) => (
-                  <li key={index}>{insight}</li>
-                ))}
+                {analysisResults.data.insights.map(
+                  (insight: string, index: number) => (
+                    <li key={index}>{insight}</li>
+                  ),
+                )}
               </ul>
             </div>
-            
+
             <div className="recommendations-section">
               <h5>🎯 Recommendations:</h5>
               <ul>
-                {analysisResults.data.recommendations.map((rec: string, index: number) => (
-                  <li key={index}>{rec}</li>
-                ))}
+                {analysisResults.data.recommendations.map(
+                  (rec: string, index: number) => (
+                    <li key={index}>{rec}</li>
+                  ),
+                )}
               </ul>
             </div>
           </div>
         );
-      
-      case 'productivity':
+
+      case "productivity":
         return (
           <div className="analysis-results">
             <h4>⏰ Productivity Peaks Analysis</h4>
             <div className="peaks-summary">
               <div className="peaks-count">
-                Peak Hours Identified: <span className="count">{analysisResults.data.peaks.length}</span>
+                Peak Hours Identified:{" "}
+                <span className="count">
+                  {analysisResults.data.peaks.length}
+                </span>
               </div>
               <div className="data-points">
-                Data Points: <span className="count">{analysisResults.data.totalDataPoints}</span>
+                Data Points:{" "}
+                <span className="count">
+                  {analysisResults.data.totalDataPoints}
+                </span>
               </div>
             </div>
-            
+
             <div className="peaks-list">
               <h5>🔥 Peak Times:</h5>
               {analysisResults.data.peaks.map((peak: any, index: number) => (
                 <div key={index} className="peak-item">
                   <span className="peak-time">{peak.time}:00</span>
-                  <span className="peak-intensity">{(peak.intensity * 100).toFixed(0)}% intensity</span>
+                  <span className="peak-intensity">
+                    {(peak.intensity * 100).toFixed(0)}% intensity
+                  </span>
                   <span className="peak-duration">{peak.duration}min</span>
                 </div>
               ))}
             </div>
-            
+
             <div className="recommendations-section">
               <h5>📋 Recommendations:</h5>
               <ul>
-                {analysisResults.data.recommendations.map((rec: string, index: number) => (
-                  <li key={index}>{rec}</li>
-                ))}
+                {analysisResults.data.recommendations.map(
+                  (rec: string, index: number) => (
+                    <li key={index}>{rec}</li>
+                  ),
+                )}
               </ul>
             </div>
           </div>
         );
-      
-      case 'interests':
+
+      case "interests":
         return (
           <div className="analysis-results">
             <h4>📊 Interest Graph</h4>
             <div className="graph-summary">
               <div className="nodes-count">
-                Topics: <span className="count">{analysisResults.data.nodes}</span>
+                Topics:{" "}
+                <span className="count">{analysisResults.data.nodes}</span>
               </div>
               <div className="edges-count">
-                Connections: <span className="count">{analysisResults.data.edges}</span>
+                Connections:{" "}
+                <span className="count">{analysisResults.data.edges}</span>
               </div>
             </div>
-            
+
             <div className="topics-section">
               <h5>🏷️ Main Topics:</h5>
               <div className="topics-list">
-                {analysisResults.data.topics.map((topic: string, index: number) => (
-                  <span key={index} className="topic-tag">{topic}</span>
-                ))}
+                {analysisResults.data.topics.map(
+                  (topic: string, index: number) => (
+                    <span key={index} className="topic-tag">
+                      {topic}
+                    </span>
+                  ),
+                )}
               </div>
             </div>
-            
+
             <div className="insights-section">
               <h5>🔍 Graph Insights:</h5>
               <ul>
-                {analysisResults.data.insights.map((insight: string, index: number) => (
-                  <li key={index}>{insight}</li>
-                ))}
+                {analysisResults.data.insights.map(
+                  (insight: string, index: number) => (
+                    <li key={index}>{insight}</li>
+                  ),
+                )}
               </ul>
             </div>
           </div>
         );
-      
+
       default:
         return (
           <div className="analysis-results">
             <h4>⚡ Quick Analysis Results</h4>
             <div className="quick-summary">
-              <p><strong>Timeframe:</strong> {analysisResults.timeframe}</p>
-              <p><strong>Summary:</strong> {analysisResults.summary}</p>
+              <p>
+                <strong>Timeframe:</strong> {analysisResults.timeframe}
+              </p>
+              <p>
+                <strong>Summary:</strong> {analysisResults.summary}
+              </p>
             </div>
-            
+
             <div className="recommendations-section">
               <h5>💡 Top Recommendations:</h5>
               <ul>
-                {analysisResults.recommendations.map((rec: string, index: number) => (
-                  <li key={index}>{rec}</li>
-                ))}
+                {analysisResults.recommendations.map(
+                  (rec: string, index: number) => (
+                    <li key={index}>{rec}</li>
+                  ),
+                )}
               </ul>
             </div>
           </div>
@@ -264,10 +324,30 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
         <div className="realtime-section">
           <h4>⚡ Real-time Activity</h4>
           <div className="metrics-grid">
-            {renderMetricCard('Current Activity', realTimeMetrics.currentActivity, '🔥', 'orange')}
-            {renderMetricCard('Copies/Min', realTimeMetrics.copiesPerMinute.toFixed(1), '📋', 'blue')}
-            {renderMetricCard('Active Apps', realTimeMetrics.activeApps, '💻', 'green')}
-            {renderMetricCard('Productivity', `${(realTimeMetrics.productivityScore * 100).toFixed(0)}%`, '📈', 'purple')}
+            {renderMetricCard(
+              "Current Activity",
+              realTimeMetrics.currentActivity,
+              "🔥",
+              "orange",
+            )}
+            {renderMetricCard(
+              "Copies/Min",
+              realTimeMetrics.copiesPerMinute.toFixed(1),
+              "📋",
+              "blue",
+            )}
+            {renderMetricCard(
+              "Active Apps",
+              realTimeMetrics.activeApps,
+              "💻",
+              "green",
+            )}
+            {renderMetricCard(
+              "Productivity",
+              `${(realTimeMetrics.productivityScore * 100).toFixed(0)}%`,
+              "📈",
+              "purple",
+            )}
           </div>
         </div>
       )}
@@ -277,10 +357,25 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
         <div className="metrics-section">
           <h4>📊 Usage Overview</h4>
           <div className="metrics-grid">
-            {renderMetricCard('Total Copies', metrics.totalCopies, '📋', 'blue')}
-            {renderMetricCard('Unique Content', metrics.uniqueContent, '🎯', 'green')}
-            {renderMetricCard('Apps Used', metrics.appsUsed, '💻', 'orange')}
-            {renderMetricCard('Productivity Score', `${(metrics.productivityScore * 100).toFixed(0)}%`, '📈', 'purple')}
+            {renderMetricCard(
+              "Total Copies",
+              metrics.totalCopies,
+              "📋",
+              "blue",
+            )}
+            {renderMetricCard(
+              "Unique Content",
+              metrics.uniqueContent,
+              "🎯",
+              "green",
+            )}
+            {renderMetricCard("Apps Used", metrics.appsUsed, "💻", "orange")}
+            {renderMetricCard(
+              "Productivity Score",
+              `${(metrics.productivityScore * 100).toFixed(0)}%`,
+              "📈",
+              "purple",
+            )}
           </div>
         </div>
       )}
@@ -294,9 +389,9 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
             disabled={isAnalyzing}
             className="analysis-btn quick"
           >
-            {isAnalyzing ? '⏳ Analyzing...' : '⚡ Quick Analysis'}
+            {isAnalyzing ? "⏳ Analyzing..." : "⚡ Quick Analysis"}
           </button>
-          
+
           <button
             onClick={handleCopyHabitsAnalysis}
             disabled={isAnalyzing}
@@ -304,7 +399,7 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
           >
             📈 Copy Habits
           </button>
-          
+
           <button
             onClick={handleProductivityAnalysis}
             disabled={isAnalyzing}
@@ -312,7 +407,7 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
           >
             ⏰ Productivity Peaks
           </button>
-          
+
           <button
             onClick={handleInterestGraph}
             disabled={isAnalyzing}
@@ -342,37 +437,42 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
             🔍 Search
           </button>
         </div>
-        
+
         {searchResults && (
           <div className="search-results">
             <div className="results-summary">
-              Found {searchResults.totalResults} results (Relevance: {(searchResults.relevanceScore * 100).toFixed(1)}%)
+              Found {searchResults.totalResults} results (Relevance:{" "}
+              {(searchResults.relevanceScore * 100).toFixed(1)}%)
             </div>
             <div className="results-list">
-              {searchResults.results.slice(0, 5).map((result: any, index: number) => (
-                <div key={index} className="result-item">
-                  <div className="result-content">{result.content}</div>
-                  <div className="result-meta">
-                    Relevance: {(result.relevance * 100).toFixed(0)}% | 
-                    {new Date(result.timestamp).toLocaleString()}
+              {searchResults.results
+                .slice(0, 5)
+                .map((result: any, index: number) => (
+                  <div key={index} className="result-item">
+                    <div className="result-content">{result.content}</div>
+                    <div className="result-meta">
+                      Relevance: {(result.relevance * 100).toFixed(0)}% |
+                      {new Date(result.timestamp).toLocaleString()}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
-            
+
             {searchResults.suggestions.length > 0 && (
               <div className="search-suggestions">
                 <h5>💡 Suggested Searches:</h5>
                 <div className="suggestions-list">
-                  {searchResults.suggestions.map((suggestion: string, index: number) => (
-                    <button
-                      key={index}
-                      onClick={() => setSearchQuery(suggestion)}
-                      className="suggestion-btn"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
+                  {searchResults.suggestions.map(
+                    (suggestion: string, index: number) => (
+                      <button
+                        key={index}
+                        onClick={() => setSearchQuery(suggestion)}
+                        className="suggestion-btn"
+                      >
+                        {suggestion}
+                      </button>
+                    ),
+                  )}
                 </div>
               </div>
             )}
@@ -412,14 +512,16 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
           color: #333;
         }
 
-        .realtime-section, .metrics-section {
+        .realtime-section,
+        .metrics-section {
           background: rgba(255, 255, 255, 0.1);
           padding: 15px;
           border-radius: 8px;
           margin-bottom: 20px;
         }
 
-        .realtime-section h4, .metrics-section h4 {
+        .realtime-section h4,
+        .metrics-section h4 {
           margin: 0 0 15px 0;
         }
 
@@ -437,10 +539,18 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
           background: rgba(255, 255, 255, 0.1);
         }
 
-        .metric-card.blue { border-left: 4px solid #3498db; }
-        .metric-card.green { border-left: 4px solid #2ecc71; }
-        .metric-card.orange { border-left: 4px solid #f39c12; }
-        .metric-card.purple { border-left: 4px solid #9b59b6; }
+        .metric-card.blue {
+          border-left: 4px solid #3498db;
+        }
+        .metric-card.green {
+          border-left: 4px solid #2ecc71;
+        }
+        .metric-card.orange {
+          border-left: 4px solid #f39c12;
+        }
+        .metric-card.purple {
+          border-left: 4px solid #9b59b6;
+        }
 
         .metric-icon {
           font-size: 1.5em;
@@ -485,10 +595,18 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
           transition: all 0.3s ease;
         }
 
-        .analysis-btn.quick { background: #e74c3c; }
-        .analysis-btn.habits { background: #3498db; }
-        .analysis-btn.productivity { background: #f39c12; }
-        .analysis-btn.interests { background: #9b59b6; }
+        .analysis-btn.quick {
+          background: #e74c3c;
+        }
+        .analysis-btn.habits {
+          background: #3498db;
+        }
+        .analysis-btn.productivity {
+          background: #f39c12;
+        }
+        .analysis-btn.interests {
+          background: #9b59b6;
+        }
 
         .analysis-btn:disabled {
           opacity: 0.6;
@@ -609,7 +727,10 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
           color: #f1c40f;
         }
 
-        .habits-summary, .peaks-summary, .graph-summary, .quick-summary {
+        .habits-summary,
+        .peaks-summary,
+        .graph-summary,
+        .quick-summary {
           display: flex;
           gap: 20px;
           margin-bottom: 15px;
@@ -628,21 +749,25 @@ export const AnalyticsDashboardUI: React.FC<AnalyticsDashboardUIProps> = ({ onIn
           color: #2ecc71;
         }
 
-        .insights-section, .recommendations-section {
+        .insights-section,
+        .recommendations-section {
           margin-bottom: 15px;
         }
 
-        .insights-section h5, .recommendations-section h5 {
+        .insights-section h5,
+        .recommendations-section h5 {
           margin: 0 0 10px 0;
           color: #3498db;
         }
 
-        .insights-section ul, .recommendations-section ul {
+        .insights-section ul,
+        .recommendations-section ul {
           margin: 0;
           padding-left: 20px;
         }
 
-        .insights-section li, .recommendations-section li {
+        .insights-section li,
+        .recommendations-section li {
           margin-bottom: 5px;
         }
 
