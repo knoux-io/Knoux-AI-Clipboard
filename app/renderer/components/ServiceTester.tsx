@@ -15,6 +15,15 @@ export const ServiceTester: React.FC = () => {
   const [progress, setProgress] = useState(0);
 
   const serviceTests: Omit<ServiceTest, 'status'>[] = [
+    // AI Core Services
+    { name: 'aiEngine.summarize', category: 'AI Core' },
+    { name: 'aiEngine.classify', category: 'AI Core' },
+    { name: 'aiEngine.enhance', category: 'AI Core' },
+    { name: 'classifier.classify', category: 'AI Core' },
+    { name: 'classifier.getStats', category: 'AI Core' },
+    { name: 'summarizer.summarize', category: 'AI Core' },
+    { name: 'summarizer.getCacheStats', category: 'AI Core' },
+    
     // Clipboard Services
     { name: 'clipboard.getHistory', category: 'Clipboard' },
     { name: 'clipboard.addItem', category: 'Clipboard' },
@@ -78,6 +87,30 @@ export const ServiceTester: React.FC = () => {
 
       let result;
       switch (test.name) {
+        // AI Core Services
+        case 'aiEngine.summarize':
+          result = await api.aiEngine.summarize('This is test text for summarization');
+          break;
+        case 'aiEngine.classify':
+          result = await api.aiEngine.classify('function test() { return true; }');
+          break;
+        case 'aiEngine.enhance':
+          result = await api.aiEngine.enhance('test text');
+          break;
+        case 'classifier.classify':
+          result = await api.classifier.classify('test content', {});
+          break;
+        case 'classifier.getStats':
+          result = await api.classifier.getStats();
+          break;
+        case 'summarizer.summarize':
+          result = await api.summarizer.summarize('Long text to summarize', {});
+          break;
+        case 'summarizer.getCacheStats':
+          result = await api.summarizer.getCacheStats();
+          break;
+        
+        // Clipboard Services
         case 'clipboard.getHistory':
           result = await api.clipboard.getHistory();
           break;

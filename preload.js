@@ -7,6 +7,25 @@ contextBridge.exposeInMainWorld('knoux', {
     runSingle: (testName) => ipcRenderer.invoke('test:run-single', testName),
   },
   
+  // AI Engine
+  aiEngine: {
+    summarize: (text) => ipcRenderer.invoke('ai-engine:summarize', text),
+    classify: (content) => ipcRenderer.invoke('ai-engine:classify', content),
+    enhance: (text) => ipcRenderer.invoke('ai-engine:enhance', text),
+  },
+  
+  // Classifier
+  classifier: {
+    classify: (content, options) => ipcRenderer.invoke('classifier:classify', content, options),
+    getStats: () => ipcRenderer.invoke('classifier:getStats'),
+  },
+  
+  // Summarizer
+  summarizer: {
+    summarize: (content, options) => ipcRenderer.invoke('summarizer:summarize', content, options),
+    getCacheStats: () => ipcRenderer.invoke('summarizer:getCacheStats'),
+  },
+  
   // Clipboard API
   clipboard: {
     getHistory: () => ipcRenderer.invoke('clipboard:get-history'),

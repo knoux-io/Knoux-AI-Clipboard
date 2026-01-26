@@ -2,6 +2,36 @@ const { ipcMain } = require('electron');
 
 // Service test registry
 const serviceTests = {
+  // AI Core Services
+  'aiEngine.summarize': async () => {
+    const result = await global.aiEngine?.summarize('Test text');
+    return { success: !!result, data: result };
+  },
+  'aiEngine.classify': async () => {
+    const result = await global.aiEngine?.classify('Test content');
+    return { success: !!result, data: result };
+  },
+  'aiEngine.enhance': async () => {
+    const result = await global.aiEngine?.enhance('Test text');
+    return { success: !!result, data: result };
+  },
+  'classifier.classify': async () => {
+    const result = await global.classifier?.classify('Test content');
+    return { success: !!result, data: result };
+  },
+  'classifier.getStats': async () => {
+    const result = await global.classifier?.getStats();
+    return { success: !!result, data: result };
+  },
+  'summarizer.summarize': async () => {
+    const result = await global.summarizer?.summarize('Test content');
+    return { success: !!result, data: result };
+  },
+  'summarizer.getCacheStats': async () => {
+    const result = await global.summarizer?.getCacheStats();
+    return { success: !!result, data: result };
+  },
+  
   // Clipboard Services
   'clipboard.getHistory': async () => {
     const result = await global.clipboardService?.getHistory();
