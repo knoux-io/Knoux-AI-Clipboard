@@ -39,102 +39,139 @@ export interface VIPStatus {
 class DatabaseService {
   private db: Database | null = null;
   private dbPath: string;
+  private isInitialized: boolean = false;
 
   constructor() {
-    const userDataPath = app.getPath('userData');
-    this.dbPath = path.join(userDataPath, 'knoux-clipboard.db');
-    this.initialize();
+    // Use a fallback path if app is not available
+    try {
+      const userDataPath = app?.getPath('userData') || process.cwd() + '/data';
+      this.dbPath = path.join(userDataPath, 'knoux-clipboard.db');
+    } catch (error) {
+      this.dbPath = path.join(process.cwd(), 'data', 'knoux-clipboard.db');
+    }
   }
 
-  private initialize(): void {
-    this.db = new sqlite3.Database(this.dbPath, (err) => {
-      if (err) {
-        console.error('❌ Error opening database:', err);
-        return;
-      }
-      console.log('✅ Database connected:', this.dbPath);
-      this.createTables();
-    });
-  }
-
-  private createTables(): void {
-    if (!this.db) return;
-
-    const createTableSQL = `
-      CREATE TABLE IF NOT EXISTS clipboard_items (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        content TEXT NOT NULL,
-        type TEXT NOT NULL CHECK(type IN ('text', 'image', 'file')),
-        timestamp INTEGER NOT NULL,
-        isFavorite INTEGER DEFAULT 0,
-        category TEXT,
-        source TEXT,
-        metadata TEXT,
-        searchIndex TEXT
-      );
-
-      CREATE TABLE IF NOT EXISTS ai_chat_history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        role TEXT NOT NULL CHECK(role IN ('user', 'assistant')),
-        content TEXT NOT NULL,
-        timestamp INTEGER NOT NULL,
-        sessionId TEXT
-      );
-
-      CREATE TABLE IF NOT EXISTS vip_status (
-        id INTEGER PRIMARY KEY CHECK(id = 1),
-        is_vip INTEGER DEFAULT 0,
-        activation_date INTEGER,
-        expiry_date INTEGER,
-        features TEXT
-      );
-
-      CREATE TABLE IF NOT EXISTS app_settings (
-        key TEXT PRIMARY KEY,
-        value TEXT NOT NULL,
-        timestamp INTEGER DEFAULT (strftime('%s', 'now'))
-      );
-
-      CREATE TABLE IF NOT EXISTS system_logs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        level TEXT NOT NULL CHECK(level IN ('info', 'warn', 'error')),
-        message TEXT NOT NULL,
-        timestamp INTEGER DEFAULT (strftime('%s', 'now')),
-        context TEXT
-      );
-
-      CREATE INDEX IF NOT EXISTS idx_clipboard_timestamp ON clipboard_items(timestamp DESC);
-      CREATE INDEX IF NOT EXISTS idx_clipboard_favorite ON clipboard_items(isFavorite);
-      CREATE INDEX IF NOT EXISTS idx_clipboard_type ON clipboard_items(type);
-      CREATE INDEX IF NOT EXISTS idx_clipboard_search ON clipboard_items(searchIndex);
-      CREATE INDEX IF NOT EXISTS idx_chat_timestamp ON ai_chat_history(timestamp DESC);
-      CREATE INDEX IF NOT EXISTS idx_chat_session ON ai_chat_history(sessionId);
-      CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON system_logs(timestamp DESC);
-    `;
-
-    this.db.exec(createTableSQL, (err) => {
-      if (err) {
-        console.error('❌ Error creating tables:', err);
-      } else {
-        console.log('✅ Database tables ready');
-        this.initializeDefaultData();
-      }
-    });
-  }
-
-  private initializeDefaultData(): void {
-    if (!this.db) return;
-
-    // Initialize VIP status
-    this.db.run(
-      'INSERT OR IGNORE INTO vip_status (id, is_vip, features) VALUES (1, 0, ?)',
-      [JSON.stringify([])],
-      (err) => {
-        if (err) {
-          console.error('Error initializing VIP status:', err);
+  async initialize(): Promise<void> {
+    if (this.isInitialized) return;
+    
+    return new Promise((resolve, reject) => {
+      try {
+        // Ensure directory exists
+        const dir = path.dirname(this.dbPath);
+        if (!require('fs').existsSync(dir)) {
+          require('fs').mkdirSync(dir, { recursive: true });
         }
+
+        this.db = new sqlite3.Database(this.dbPath, (err) => {
+          if (err) {
+            console.error('❌ Error opening database:', err);
+            reject(err);
+            return;
+          }
+          console.log('✅ Database connected:', this.dbPath);
+          this.createTables()
+            .then(() => {
+              this.isInitialized = true;
+              resolve();
+            })
+            .catch(reject);
+        });
+      } catch (error) {
+        console.error('❌ Database initialization failed:', error);
+        reject(error);
       }
-    );
+    });
+  }
+
+  private async createTables(): Promise<void> {
+    if (!this.db) throw new Error('Database not connected');
+
+    return new Promise((resolve, reject) => {
+      const createTableSQL = `
+        CREATE TABLE IF NOT EXISTS clipboard_items (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          content TEXT NOT NULL,
+          type TEXT NOT NULL CHECK(type IN ('text', 'image', 'file')),
+          timestamp INTEGER NOT NULL,
+          isFavorite INTEGER DEFAULT 0,
+          category TEXT,
+          source TEXT,
+          metadata TEXT,
+          searchIndex TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS ai_chat_history (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          role TEXT NOT NULL CHECK(role IN ('user', 'assistant')),
+          content TEXT NOT NULL,
+          timestamp INTEGER NOT NULL,
+          sessionId TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS vip_status (
+          id INTEGER PRIMARY KEY CHECK(id = 1),
+          is_vip INTEGER DEFAULT 0,
+          activation_date INTEGER,
+          expiry_date INTEGER,
+          features TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS app_settings (
+          key TEXT PRIMARY KEY,
+          value TEXT NOT NULL,
+          timestamp INTEGER DEFAULT (strftime('%s', 'now'))
+        );
+
+        CREATE TABLE IF NOT EXISTS system_logs (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          level TEXT NOT NULL CHECK(level IN ('info', 'warn', 'error')),
+          message TEXT NOT NULL,
+          timestamp INTEGER DEFAULT (strftime('%s', 'now')),
+          context TEXT
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_clipboard_timestamp ON clipboard_items(timestamp DESC);
+        CREATE INDEX IF NOT EXISTS idx_clipboard_favorite ON clipboard_items(isFavorite);
+        CREATE INDEX IF NOT EXISTS idx_clipboard_type ON clipboard_items(type);
+        CREATE INDEX IF NOT EXISTS idx_clipboard_search ON clipboard_items(searchIndex);
+        CREATE INDEX IF NOT EXISTS idx_chat_timestamp ON ai_chat_history(timestamp DESC);
+        CREATE INDEX IF NOT EXISTS idx_chat_session ON ai_chat_history(sessionId);
+        CREATE INDEX IF NOT EXISTS idx_logs_timestamp ON system_logs(timestamp DESC);
+      `;
+
+      this.db!.exec(createTableSQL, (err) => {
+        if (err) {
+          console.error('❌ Error creating tables:', err);
+          reject(err);
+        } else {
+          console.log('✅ Database tables ready');
+          this.initializeDefaultData()
+            .then(resolve)
+            .catch(reject);
+        }
+      });
+    });
+  }
+
+  private async initializeDefaultData(): Promise<void> {
+    if (!this.db) return;
+
+    return new Promise((resolve, reject) => {
+      // Initialize VIP status
+      this.db!.run(
+        'INSERT OR IGNORE INTO vip_status (id, is_vip, features) VALUES (1, 0, ?)',
+        [JSON.stringify([])],
+        (err) => {
+          if (err) {
+            console.error('Error initializing VIP status:', err);
+            reject(err);
+          } else {
+            console.log('✅ Default data initialized');
+            resolve();
+          }
+        }
+      );
+    });
   }
 
   // Clipboard Items Methods
