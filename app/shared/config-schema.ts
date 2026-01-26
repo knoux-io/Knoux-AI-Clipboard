@@ -5,26 +5,26 @@
  * Clipboard Intelligence • Desktop Precision • Premium Engineering
  */
 
-import { z } from 'zod';
-import { 
-  ClipboardFormat, 
-  AIModelType, 
-  EncryptionAlgorithm, 
-  Theme, 
+import { z } from "zod";
+import {
+  ClipboardFormat,
+  AIModelType,
+  EncryptionAlgorithm,
+  Theme,
   OperatingSystem,
   NotificationPosition,
   UpdateChannel,
   BackupFrequency,
-  ExportFormat 
-} from './enums';
-import { 
-  CONTENT_TYPES, 
-  CLIPBOARD, 
-  AI, 
-  SECURITY, 
-  UI, 
-  DEFAULT_SETTINGS 
-} from './constants';
+  ExportFormat,
+} from "./enums";
+import {
+  CONTENT_TYPES,
+  CLIPBOARD,
+  AI,
+  SECURITY,
+  UI,
+  DEFAULT_SETTINGS,
+} from "./constants";
 
 // ==================== BASE SCHEMAS ====================
 
@@ -56,7 +56,9 @@ export const EmailSchema = z.string().email();
 /**
  * Hex color schema
  */
-export const HexColorSchema = z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/);
+export const HexColorSchema = z
+  .string()
+  .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/);
 
 /**
  * Base64 schema
@@ -80,8 +82,15 @@ export const ClipboardStateSchema = z.nativeEnum(ClipboardFormat);
  */
 export const ClipboardMonitoringSchema = z.object({
   enabled: z.boolean().default(DEFAULT_SETTINGS.clipboard.enableMonitoring),
-  pollIntervalMs: z.number().int().min(100).max(10000).default(CLIPBOARD.POLL_INTERVAL_MS),
-  detectionMode: z.enum(['polling', 'event_driven', 'hybrid', 'manual']).default('polling'),
+  pollIntervalMs: z
+    .number()
+    .int()
+    .min(100)
+    .max(10000)
+    .default(CLIPBOARD.POLL_INTERVAL_MS),
+  detectionMode: z
+    .enum(["polling", "event_driven", "hybrid", "manual"])
+    .default("polling"),
   captureImages: z.boolean().default(DEFAULT_SETTINGS.clipboard.captureImages),
   captureHtml: z.boolean().default(DEFAULT_SETTINGS.clipboard.captureHtml),
   captureRtf: z.boolean().default(true),
@@ -93,9 +102,21 @@ export const ClipboardMonitoringSchema = z.object({
  * Clipboard history settings schema
  */
 export const ClipboardHistorySchema = z.object({
-  maxItems: z.number().int().min(10).max(10000).default(DEFAULT_SETTINGS.clipboard.maxHistoryItems),
-  autoClearSensitive: z.boolean().default(DEFAULT_SETTINGS.clipboard.autoClearSensitive),
-  autoClearMinutes: z.number().int().min(1).max(1440).default(DEFAULT_SETTINGS.clipboard.autoClearMinutes),
+  maxItems: z
+    .number()
+    .int()
+    .min(10)
+    .max(10000)
+    .default(DEFAULT_SETTINGS.clipboard.maxHistoryItems),
+  autoClearSensitive: z
+    .boolean()
+    .default(DEFAULT_SETTINGS.clipboard.autoClearSensitive),
+  autoClearMinutes: z
+    .number()
+    .int()
+    .min(1)
+    .max(1440)
+    .default(DEFAULT_SETTINGS.clipboard.autoClearMinutes),
   backupEnabled: z.boolean().default(true),
   backupIntervalHours: z.number().int().min(1).max(720).default(24),
   backupLocation: FilePathSchema.optional(),
@@ -119,8 +140,13 @@ export const AIEngineSchema = z.object({
   modelType: AIModelTypeSchema.default(AIModelType.LOCAL_LLAMA),
   modelPath: FilePathSchema.default(AI.LOCAL_MODEL_PATH),
   apiEndpoint: z.string().url().default(AI.CLOUD_API_ENDPOINT),
-  apiKey: z.string().max(256).default(''),
-  apiTimeoutMs: z.number().int().min(1000).max(30000).default(AI.ANALYSIS_TIMEOUT_MS),
+  apiKey: z.string().max(256).default(""),
+  apiTimeoutMs: z
+    .number()
+    .int()
+    .min(1000)
+    .max(30000)
+    .default(AI.ANALYSIS_TIMEOUT_MS),
   maxRetries: z.number().int().min(0).max(5).default(3),
   rateLimitPerMinute: z.number().int().min(1).max(1000).default(60),
 });
@@ -133,9 +159,23 @@ export const AIAnalysisSchema = z.object({
   analyzeText: z.boolean().default(DEFAULT_SETTINGS.ai.analyzeText),
   detectSensitive: z.boolean().default(DEFAULT_SETTINGS.ai.detectSensitive),
   cacheResults: z.boolean().default(DEFAULT_SETTINGS.ai.cacheResults),
-  cacheDurationMinutes: z.number().int().min(1).max(10080).default(AI.CACHE_DURATION_MINUTES),
-  maxContextLength: z.number().int().min(100).max(32000).default(AI.MAX_CONTEXT_LENGTH),
-  confidenceThreshold: z.number().min(0.1).max(1.0).default(AI.CONFIDENCE_THRESHOLD),
+  cacheDurationMinutes: z
+    .number()
+    .int()
+    .min(1)
+    .max(10080)
+    .default(AI.CACHE_DURATION_MINUTES),
+  maxContextLength: z
+    .number()
+    .int()
+    .min(100)
+    .max(32000)
+    .default(AI.MAX_CONTEXT_LENGTH),
+  confidenceThreshold: z
+    .number()
+    .min(0.1)
+    .max(1.0)
+    .default(AI.CONFIDENCE_THRESHOLD),
   languageDetection: z.boolean().default(true),
   complexityAnalysis: z.boolean().default(true),
   suggestionGeneration: z.boolean().default(true),
@@ -146,17 +186,32 @@ export const AIAnalysisSchema = z.object({
  * AI content classification schema
  */
 export const AIClassificationSchema = z.object({
-  enabledCategories: z.array(z.enum([
-    'code', 'text', 'data', 'media', 'document', 'executable', 'other'
-  ])).default(['code', 'text', 'data']),
+  enabledCategories: z
+    .array(
+      z.enum([
+        "code",
+        "text",
+        "data",
+        "media",
+        "document",
+        "executable",
+        "other",
+      ]),
+    )
+    .default(["code", "text", "data"]),
   minConfidence: z.number().min(0.1).max(1.0).default(0.5),
   maxClassifications: z.number().int().min(1).max(10).default(3),
   fallbackToDefault: z.boolean().default(true),
-  customPatterns: z.array(z.object({
-    pattern: z.string().regex(/^.+$/),
-    type: z.string().min(1).max(50),
-    confidence: z.number().min(0.1).max(1.0),
-  })).max(100).default([]),
+  customPatterns: z
+    .array(
+      z.object({
+        pattern: z.string().regex(/^.+$/),
+        type: z.string().min(1).max(50),
+        confidence: z.number().min(0.1).max(1.0),
+      }),
+    )
+    .max(100)
+    .default([]),
 });
 
 // ==================== SECURITY SCHEMAS ====================
@@ -170,14 +225,34 @@ export const EncryptionAlgorithmSchema = z.nativeEnum(EncryptionAlgorithm);
  * Security settings schema
  */
 export const SecuritySettingsSchema = z.object({
-  encryptSensitive: z.boolean().default(DEFAULT_SETTINGS.security.encryptSensitive),
-  requirePassword: z.boolean().default(DEFAULT_SETTINGS.security.requirePassword),
-  password: z.string().min(0).max(256).default(''),
-  autoLockMinutes: z.number().int().min(1).max(1440).default(DEFAULT_SETTINGS.security.autoLockMinutes),
-  showSecurityAlerts: z.boolean().default(DEFAULT_SETTINGS.security.showSecurityAlerts),
-  sandboxExternalContent: z.boolean().default(DEFAULT_SETTINGS.security.sandboxExternalContent),
-  encryptionAlgorithm: EncryptionAlgorithmSchema.default(EncryptionAlgorithm.AES_GCM),
-  keyDerivationIterations: z.number().int().min(1000).max(1000000).default(SECURITY.KEY_DERIVATION_ITERATIONS),
+  encryptSensitive: z
+    .boolean()
+    .default(DEFAULT_SETTINGS.security.encryptSensitive),
+  requirePassword: z
+    .boolean()
+    .default(DEFAULT_SETTINGS.security.requirePassword),
+  password: z.string().min(0).max(256).default(""),
+  autoLockMinutes: z
+    .number()
+    .int()
+    .min(1)
+    .max(1440)
+    .default(DEFAULT_SETTINGS.security.autoLockMinutes),
+  showSecurityAlerts: z
+    .boolean()
+    .default(DEFAULT_SETTINGS.security.showSecurityAlerts),
+  sandboxExternalContent: z
+    .boolean()
+    .default(DEFAULT_SETTINGS.security.sandboxExternalContent),
+  encryptionAlgorithm: EncryptionAlgorithmSchema.default(
+    EncryptionAlgorithm.AES_GCM,
+  ),
+  keyDerivationIterations: z
+    .number()
+    .int()
+    .min(1000)
+    .max(1000000)
+    .default(SECURITY.KEY_DERIVATION_ITERATIONS),
 });
 
 /**
@@ -224,8 +299,17 @@ export const ThemeSchema = z.nativeEnum(Theme);
  */
 export const UIApperanceSchema = z.object({
   theme: ThemeSchema.default(DEFAULT_SETTINGS.ui.theme),
-  fontSize: z.number().int().min(8).max(32).default(DEFAULT_SETTINGS.ui.fontSize),
-  fontFamily: z.string().min(1).max(256).default(DEFAULT_SETTINGS.ui.fontFamily),
+  fontSize: z
+    .number()
+    .int()
+    .min(8)
+    .max(32)
+    .default(DEFAULT_SETTINGS.ui.fontSize),
+  fontFamily: z
+    .string()
+    .min(1)
+    .max(256)
+    .default(DEFAULT_SETTINGS.ui.fontFamily),
   lineHeight: z.number().min(1.0).max(2.0).default(1.5),
   borderRadius: z.number().int().min(0).max(20).default(8),
   spacingUnit: z.number().int().min(2).max(16).default(8),
@@ -244,8 +328,18 @@ export const WindowSettingsSchema = z.object({
   startMinimized: z.boolean().default(DEFAULT_SETTINGS.ui.startMinimized),
   alwaysOnTop: z.boolean().default(false),
   rememberPosition: z.boolean().default(true),
-  defaultWidth: z.number().int().min(400).max(3840).default(UI.WINDOW.DEFAULT_WIDTH),
-  defaultHeight: z.number().int().min(300).max(2160).default(UI.WINDOW.DEFAULT_HEIGHT),
+  defaultWidth: z
+    .number()
+    .int()
+    .min(400)
+    .max(3840)
+    .default(UI.WINDOW.DEFAULT_WIDTH),
+  defaultHeight: z
+    .number()
+    .int()
+    .min(300)
+    .max(2160)
+    .default(UI.WINDOW.DEFAULT_HEIGHT),
   minWidth: z.number().int().min(200).max(1920).default(UI.WINDOW.MIN_WIDTH),
   minHeight: z.number().int().min(150).max(1080).default(UI.WINDOW.MIN_HEIGHT),
   maxWidth: z.number().int().min(400).max(7680).default(UI.WINDOW.MAX_WIDTH),
@@ -279,14 +373,33 @@ export const NotificationPositionSchema = z.nativeEnum(NotificationPosition);
 export const NotificationSettingsSchema = z.object({
   enabled: z.boolean().default(DEFAULT_SETTINGS.notifications.enabled),
   sound: z.boolean().default(DEFAULT_SETTINGS.notifications.sound),
-  duration: z.number().int().min(1000).max(10000).default(DEFAULT_SETTINGS.notifications.duration),
-  position: NotificationPositionSchema.default(DEFAULT_SETTINGS.notifications.position as NotificationPosition),
-  showOnClipboardUpdate: z.boolean().default(DEFAULT_SETTINGS.notifications.showOnClipboardUpdate),
-  showOnAiAnalysis: z.boolean().default(DEFAULT_SETTINGS.notifications.showOnAiAnalysis),
-  showOnSecurityAlert: z.boolean().default(DEFAULT_SETTINGS.notifications.showOnSecurityAlert),
+  duration: z
+    .number()
+    .int()
+    .min(1000)
+    .max(10000)
+    .default(DEFAULT_SETTINGS.notifications.duration),
+  position: NotificationPositionSchema.default(
+    DEFAULT_SETTINGS.notifications.position as NotificationPosition,
+  ),
+  showOnClipboardUpdate: z
+    .boolean()
+    .default(DEFAULT_SETTINGS.notifications.showOnClipboardUpdate),
+  showOnAiAnalysis: z
+    .boolean()
+    .default(DEFAULT_SETTINGS.notifications.showOnAiAnalysis),
+  showOnSecurityAlert: z
+    .boolean()
+    .default(DEFAULT_SETTINGS.notifications.showOnSecurityAlert),
   doNotDisturb: z.boolean().default(false),
-  doNotDisturbStart: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).default('22:00'),
-  doNotDisturbEnd: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).default('07:00'),
+  doNotDisturbStart: z
+    .string()
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+    .default("22:00"),
+  doNotDisturbEnd: z
+    .string()
+    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+    .default("07:00"),
   maxNotifications: z.number().int().min(1).max(50).default(10),
   autoDismiss: z.boolean().default(true),
 });
@@ -314,7 +427,9 @@ export const SystemSettingsSchema = z.object({
   analyticsEnabled: z.boolean().default(false),
   crashReportsEnabled: z.boolean().default(true),
   logsRetentionDays: z.number().int().min(1).max(365).default(30),
-  performanceMode: z.enum(['power-saver', 'balanced', 'performance']).default('balanced'),
+  performanceMode: z
+    .enum(["power-saver", "balanced", "performance"])
+    .default("balanced"),
   memoryLimitMB: z.number().int().min(64).max(8192).default(512),
   cpuLimitPercent: z.number().int().min(10).max(100).default(50),
 });
@@ -333,7 +448,7 @@ export const BackupSettingsSchema = z.object({
   includeLogs: z.boolean().default(false),
   compressBackups: z.boolean().default(true),
   encryptionEnabled: z.boolean().default(false),
-  encryptionKey: z.string().min(0).max(256).default(''),
+  encryptionKey: z.string().min(0).max(256).default(""),
 });
 
 // ==================== STORAGE SCHEMAS ====================
@@ -347,10 +462,10 @@ export const ExportFormatSchema = z.nativeEnum(ExportFormat);
  * Storage settings schema
  */
 export const StorageSettingsSchema = z.object({
-  databasePath: FilePathSchema.default('userData/knoux-clipboard.db'),
-  cachePath: FilePathSchema.default('userData/cache'),
-  logsPath: FilePathSchema.default('userData/logs'),
-  backupsPath: FilePathSchema.default('userData/backups'),
+  databasePath: FilePathSchema.default("userData/knoux-clipboard.db"),
+  cachePath: FilePathSchema.default("userData/cache"),
+  logsPath: FilePathSchema.default("userData/logs"),
+  backupsPath: FilePathSchema.default("userData/backups"),
   maxDbSizeMB: z.number().int().min(10).max(10240).default(100),
   cleanupIntervalHours: z.number().int().min(1).max(720).default(24),
   exportFormat: ExportFormatSchema.default(ExportFormat.JSON),
@@ -364,82 +479,101 @@ export const StorageSettingsSchema = z.object({
  * Complete application configuration schema
  */
 export const AppConfigSchema = z.object({
-  version: z.string().regex(/^\d+\.\d+\.\d+$/).default('1.0.0'),
-  environment: z.enum(['development', 'production', 'test']).default('development'),
-  
-  clipboard: z.object({
-    monitoring: ClipboardMonitoringSchema,
-    history: ClipboardHistorySchema,
-  }).default({
-    monitoring: DEFAULT_SETTINGS.clipboard,
-    history: DEFAULT_SETTINGS.clipboard,
-  }),
-  
-  ai: z.object({
-    engine: AIEngineSchema,
-    analysis: AIAnalysisSchema,
-    classification: AIClassificationSchema,
-  }).default({
-    engine: DEFAULT_SETTINGS.ai,
-    analysis: DEFAULT_SETTINGS.ai,
-    classification: DEFAULT_SETTINGS.ai,
-  }),
-  
-  security: z.object({
-    settings: SecuritySettingsSchema,
-    detection: SensitiveDetectionSchema,
-    permissions: PermissionSettingsSchema,
-  }).default({
-    settings: DEFAULT_SETTINGS.security,
-    detection: DEFAULT_SETTINGS.security,
-    permissions: DEFAULT_SETTINGS.security,
-  }),
-  
-  ui: z.object({
-    appearance: UIApperanceSchema,
-    window: WindowSettingsSchema,
-    hotkeys: HotkeySchema,
-  }).default({
-    appearance: DEFAULT_SETTINGS.ui,
-    window: DEFAULT_SETTINGS.ui,
-    hotkeys: DEFAULT_SETTINGS.ui,
-  }),
-  
-  notifications: NotificationSettingsSchema.default(DEFAULT_SETTINGS.notifications),
-  
-  system: z.object({
-    settings: SystemSettingsSchema,
-    backup: BackupSettingsSchema,
-  }).default({
-    settings: DEFAULT_SETTINGS.system,
-    backup: DEFAULT_SETTINGS.system,
-  }),
-  
+  version: z
+    .string()
+    .regex(/^\d+\.\d+\.\d+$/)
+    .default("1.0.0"),
+  environment: z
+    .enum(["development", "production", "test"])
+    .default("development"),
+
+  clipboard: z
+    .object({
+      monitoring: ClipboardMonitoringSchema,
+      history: ClipboardHistorySchema,
+    })
+    .default({
+      monitoring: DEFAULT_SETTINGS.clipboard,
+      history: DEFAULT_SETTINGS.clipboard,
+    }),
+
+  ai: z
+    .object({
+      engine: AIEngineSchema,
+      analysis: AIAnalysisSchema,
+      classification: AIClassificationSchema,
+    })
+    .default({
+      engine: DEFAULT_SETTINGS.ai,
+      analysis: DEFAULT_SETTINGS.ai,
+      classification: DEFAULT_SETTINGS.ai,
+    }),
+
+  security: z
+    .object({
+      settings: SecuritySettingsSchema,
+      detection: SensitiveDetectionSchema,
+      permissions: PermissionSettingsSchema,
+    })
+    .default({
+      settings: DEFAULT_SETTINGS.security,
+      detection: DEFAULT_SETTINGS.security,
+      permissions: DEFAULT_SETTINGS.security,
+    }),
+
+  ui: z
+    .object({
+      appearance: UIApperanceSchema,
+      window: WindowSettingsSchema,
+      hotkeys: HotkeySchema,
+    })
+    .default({
+      appearance: DEFAULT_SETTINGS.ui,
+      window: DEFAULT_SETTINGS.ui,
+      hotkeys: DEFAULT_SETTINGS.ui,
+    }),
+
+  notifications: NotificationSettingsSchema.default(
+    DEFAULT_SETTINGS.notifications,
+  ),
+
+  system: z
+    .object({
+      settings: SystemSettingsSchema,
+      backup: BackupSettingsSchema,
+    })
+    .default({
+      settings: DEFAULT_SETTINGS.system,
+      backup: DEFAULT_SETTINGS.system,
+    }),
+
   storage: StorageSettingsSchema.default({
-    databasePath: 'userData/knoux-clipboard.db',
-    cachePath: 'userData/cache',
-    logsPath: 'userData/logs',
-    backupsPath: 'userData/backups',
+    databasePath: "userData/knoux-clipboard.db",
+    cachePath: "userData/cache",
+    logsPath: "userData/logs",
+    backupsPath: "userData/backups",
     maxDbSizeMB: 100,
     cleanupIntervalHours: 24,
     exportFormat: ExportFormat.JSON,
     importConfirmation: true,
     autoExportOnClose: false,
   }),
-  
+
   // Metadata
-  metadata: z.object({
-    createdAt: TimestampSchema.default(Date.now()),
-    updatedAt: TimestampSchema.default(Date.now()),
-    createdBy: z.string().default('system'),
-    lastModifiedBy: z.string().default('system'),
-    signature: z.string().optional(),
-  }).default({
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-    createdBy: 'system',
-    lastModifiedBy: 'system',
-  }),
+  metadata: z
+    .object({
+      createdAt: TimestampSchema.default(Date.now()),
+      updatedAt: TimestampSchema.default(Date.now()),
+      createdBy: z.string().default("system"),
+      lastModifiedBy: z.string().default("system"),
+      signature: z.string().optional(),
+    })
+    .default({
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      createdBy: "system",
+      lastModifiedBy: "system",
+    }),
 });
 
 // ==================== TYPE INFERENCES ====================
@@ -448,11 +582,15 @@ export const AppConfigSchema = z.object({
  * Inferred TypeScript types from schemas
  */
 export type AppConfig = z.infer<typeof AppConfigSchema>;
-export type ClipboardMonitoringConfig = z.infer<typeof ClipboardMonitoringSchema>;
+export type ClipboardMonitoringConfig = z.infer<
+  typeof ClipboardMonitoringSchema
+>;
 export type AIEngineConfig = z.infer<typeof AIEngineSchema>;
 export type SecuritySettingsConfig = z.infer<typeof SecuritySettingsSchema>;
 export type UIApperanceConfig = z.infer<typeof UIApperanceSchema>;
-export type NotificationSettingsConfig = z.infer<typeof NotificationSettingsSchema>;
+export type NotificationSettingsConfig = z.infer<
+  typeof NotificationSettingsSchema
+>;
 export type SystemSettingsConfig = z.infer<typeof SystemSettingsSchema>;
 export type StorageSettingsConfig = z.infer<typeof StorageSettingsSchema>;
 
@@ -474,7 +612,7 @@ export function sanitizeConfig(config: Partial<AppConfig>): AppConfig {
     metadata: {
       ...config.metadata,
       updatedAt: Date.now(),
-      lastModifiedBy: 'user',
+      lastModifiedBy: "user",
     },
   });
 }
@@ -492,7 +630,7 @@ export function mergeWithDefaults(partial: Partial<AppConfig>): AppConfig {
  */
 export function getModuleConfig<T extends keyof AppConfig>(
   config: AppConfig,
-  module: T
+  module: T,
 ): AppConfig[T] {
   return config[module];
 }
@@ -503,7 +641,7 @@ export function getModuleConfig<T extends keyof AppConfig>(
 export function updateModuleConfig<T extends keyof AppConfig>(
   config: AppConfig,
   module: T,
-  updates: Partial<AppConfig[T]>
+  updates: Partial<AppConfig[T]>,
 ): AppConfig {
   return AppConfigSchema.parse({
     ...config,
@@ -511,7 +649,7 @@ export function updateModuleConfig<T extends keyof AppConfig>(
     metadata: {
       ...config.metadata,
       updatedAt: Date.now(),
-      lastModifiedBy: 'user',
+      lastModifiedBy: "user",
     },
   });
 }
@@ -531,7 +669,9 @@ export function importConfig(json: string): AppConfig {
     const parsed = JSON.parse(json);
     return validateAppConfig(parsed);
   } catch (error) {
-    throw new Error(`Failed to import configuration: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to import configuration: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
   }
 }
 
@@ -566,17 +706,17 @@ export function isValidConfig(config: unknown): config is AppConfig {
 /**
  * Default configuration file name
  */
-export const CONFIG_FILE_NAME = 'knoux-config.json';
+export const CONFIG_FILE_NAME = "knoux-config.json";
 
 /**
  * Configuration file encoding
  */
-export const CONFIG_FILE_ENCODING = 'utf8';
+export const CONFIG_FILE_ENCODING = "utf8";
 
 /**
  * Configuration backup file pattern
  */
-export const CONFIG_BACKUP_PATTERN = 'knoux-config-backup-*.json';
+export const CONFIG_BACKUP_PATTERN = "knoux-config-backup-*.json";
 
 /**
  * Maximum configuration file size (10MB)
@@ -586,4 +726,4 @@ export const MAX_CONFIG_FILE_SIZE = 10 * 1024 * 1024;
 /**
  * Configuration schema version
  */
-export const CONFIG_SCHEMA_VERSION = '1.0.0';
+export const CONFIG_SCHEMA_VERSION = "1.0.0";
