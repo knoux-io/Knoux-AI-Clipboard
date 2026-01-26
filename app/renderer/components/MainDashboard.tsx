@@ -31,6 +31,7 @@ import HistoryTimeline from "./HistoryTimeline";
 import FilterPanel from "./FilterPanel";
 import TagManager from "./TagManager";
 import SearchBar from "./SearchBar";
+import { ServiceTester } from "./ServiceTester";
 
 export const MainDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("home");
@@ -171,6 +172,7 @@ export const MainDashboard: React.FC = () => {
         {/* Management */}
         <div>
           <h3 style={{ fontSize: "12px", opacity: 0.7, margin: "0 0 8px 0" }}>MANAGEMENT</h3>
+          <NavButton active={activeTab === "tester"} onClick={() => setActiveTab("tester")}>🧪 Service Tester</NavButton>
           <NavButton active={activeTab === "features"} onClick={() => setActiveTab("features")}>⚙️ Feature Manager</NavButton>
           <NavButton active={activeTab === "revolutionary"} onClick={() => setActiveTab("revolutionary")}>🚀 Revolutionary</NavButton>
           <NavButton active={activeTab === "super"} onClick={() => setActiveTab("super")}>💎 Super Dashboard</NavButton>
@@ -217,6 +219,7 @@ export const MainDashboard: React.FC = () => {
         {activeTab === "features" && <FeatureManager />}
         {activeTab === "revolutionary" && <RevolutionaryFeatures />}
         {activeTab === "super" && <SuperDashboard />}
+        {activeTab === "tester" && <ServiceTester />}
         {activeTab === "tags" && <TagManager />}
         {activeTab === "filter" && <FilterPanel />}
       </div>

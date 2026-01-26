@@ -6,9 +6,9 @@
   "private": true,
   "main": "main.js",
   "scripts": {
-    "dev": "concurrently \"npm run dev:renderer\" \"npm run dev:main\"",
+    "dev": "concurrently --kill-others \"npm run dev:renderer\" \"npm run dev:main\"",
     "dev:renderer": "vite --host",
-    "dev:main": "wait-on http://localhost:3000 && electron . --dev",
+    "dev:main": "wait-on http://localhost:5173 && electron . --dev",
     "start": "electron .",
     "build:renderer": "vite build",
     "build:main": "tsc --project tsconfig.json --outDir build",
