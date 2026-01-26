@@ -16,18 +16,10 @@ if errorlevel 1 (
     call npm install react-scripts --no-warnings
 )
 
-echo Starting React dev server...
-start "React Server" cmd /c "npm start"
+echo Starting development runner (Vite + Electron)...
+start "Dev Runner" cmd /c "npm run dev"
 
-REM Wait using ping instead of timeout
-echo Waiting for React to start...
-ping -n 10 127.0.0.1 >nul
-
-echo Starting Electron...
-electron .
-
+echo Development runner started in a new window. The dev runner launches both the renderer (Vite) and Electron automatically.
+echo If you prefer to start the renderer and Electron separately, run `npm run start:renderer` then `npm start`.
 echo.
-echo Development environment started!
-echo React: http://localhost:3000
-echo Electron: Running
 pause

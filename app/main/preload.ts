@@ -7,7 +7,7 @@
 
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 import { IPC_CHANNELS } from '../shared/constants';
-import { llog } from '../shared/localized-logger';
+import { createLogger } from '../shared/logger';
 
 // ==================== TYPES ====================
 
@@ -20,14 +20,524 @@ interface KnouxAPI {
   setAutostart: (enabled: boolean) => Promise<{ success: boolean; error?: string }>;
   restartApp: () => Promise<void>;
   quitApp: () => Promise<void>;
-  
+
   // Settings
   getAllSettings: () => Promise<any>;
   updateSettings: (updates: any) => Promise<{ success: boolean; error?: string }>;
   resetSettings: () => Promise<{ success: boolean; error?: string }>;
   exportSettings: () => Promise<{ success: boolean; data?: string; error?: string }>;
   importSettings: (data: string) => Promise<{ success: boolean; error?: string }>;
-  
+
+  // Clipboard
+  getClipboardHistory: (options?: any) => Promise<any[]>;
+  addClipboardItem: (item: any) => Promise<{ success: boolean; id?: string; error?: string }>;
+  deleteClipboardItem: (id: string) => Promise<{ success: boolean; error?: string }>;
+  updateClipboardItem: (id: string, updates: any) => Promise<{ success: boolean; error?: string }>;
+  clearClipboardHistory: () => Promise<{ success: boolean; error?: string }>;
+
+  // AI
+  analyzeContent: (content: string, options?: any) => Promise<any>;
+  getSuggestions: (content: string, context?: any) => Promise<any[]>;
+  classifyContent: (content: string) => Promise<any>;
+  enhancePrompt: (prompt: string) => Promise<{ success: boolean; enhanced?: string; error?: string }>;
+  summarizeText: (text: string, maxLength?: number) => Promise<{ success: boolean; summary?: string; error?: string }>;
+
+  // Security
+  checkSensitive: (content: string) => Promise<any>;
+
+  // Window Management
+  minimizeWindow: () => Promise<void>;
+  maximizeWindow: () => Promise<void>;
+  closeWindow: () => Promise<void>;
+  toggleWindow: () => Promise<void>;
+
+  // Events
+  onAppEvent: (callback: (event: any) => void) => () => void;
+
+  // Utility
+  openExternal: (url: string) => Promise<void>;
+  getAppVersion: () => Promise<string>;
+}
+
+// ==================== SECURITY CONFIGURATION ====================
+
+/**
+ * Allowed IPC channels for security
+ */
+const ALLOWED_CHANNELS = new Set([
+  // System channels
+  'system:getPlatform',
+  'system:setAutostart',
+  'system:restartApp',
+  'system:quitApp',
+
+  // Settings channels
+  'settings:getAll',
+  'settings:update',
+  'settings:reset',
+
+  // Clipboard channels
+  'clipboard:getHistory',
+  'clipboard:addItem',
+  'clipboard:deleteItem',
+  'clipboard:updateItem',
+  'clipboard:clearHistory',
+
+  // AI channels
+  'ai:analyzeContent',
+  'ai:getSuggestions',
+  'ai:classifyContent',
+  'ai:enhancePrompt',
+  'ai:summarizeText',
+
+  // Security channels
+  'security:checkSensitive',
+
+  // Window channels
+  'window:minimize',
+  'window:maximize',
+  'window:close',
+  'window:toggle',
+
+  // Custom channels
+  'app:sendEvent',
+  'app:event',
+  'shell:openExternal',
+]);
+
+/**
+ * Sanitize data going to main process
+ */
+function sanitizeData(data: any): any {
+  if (data === null || data === undefined) {
+    return data;
+  }
+
+  // Handle basic types
+  if (typeof data !== 'object') {
+    return data;
+  }
+
+  // Handle arrays
+  if (Array.isArray(data)) {
+    return data.map(sanitizeData);
+  }
+
+  // Handle objects - remove any functions or complex objects
+  const sanitized: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(data)) {
+    // Skip functions
+    if (typeof value === 'function') {
+      continue;
+    }
+
+    // Skip complex objects that aren't plain objects or arrays
+    if (value !== null && typeof value === 'object') {
+      const proto = Object.getPrototypeOf(value);
+      if (proto !== Object.prototype && proto !== Array.prototype) {
+        continue;
+      }
+    }
+
+    // Recursively sanitize
+    sanitized[key] = sanitizeData(value);
+  }
+
+  return sanitized;
+}
+
+/**
+ * Validate IPC channel is allowed
+ */
+function validateChannel(channel: string): boolean {
+  if (!ALLOWED_CHANNELS.has(channel)) {
+    preloadLogger.warn(`Blocked attempt to access restricted IPC channel: ${channel}`);
+    return false;
+  }
+  return true;
+}
+
+// ==================== LOGGER ====================
+
+const preloadLogger = createLogger({ module: 'preload' });
+
+// ==================== IPC WRAPPER FUNCTIONS ====================
+
+/**
+ * Safe IPC invoke wrapper with validation and sanitization
+ */
+async function safeIpcInvoke<T = any>(
+  channel: string,
+  ...args: any[]
+): Promise<T> {
+  // Validate channel
+  if (!validateChannel(channel)) {
+    throw new Error(`Access to IPC channel "${channel}" is not allowed`);
+  }
+
+  // Sanitize arguments
+  const sanitizedArgs = args.map(sanitizeData);
+
+  preloadLogger.debug(`IPC invoke: ${channel}`, { args: sanitizedArgs });
+
+  try {
+    const result = await ipcRenderer.invoke(channel, ...sanitizedArgs);
+
+    // Sanitize response
+    const sanitizedResult = sanitizeData(result);
+
+    preloadLogger.debug(`IPC response: ${channel}`, { result: sanitizedResult });
+
+    return sanitizedResult;
+  } catch (error) {
+    preloadLogger.error(`IPC invoke failed: ${channel}`, error as Error, { args: sanitizedArgs });
+    throw error;
+  }
+}
+
+/**
+ * Safe IPC send wrapper
+ */
+function safeIpcSend(channel: string, ...args: any[]): void {
+  // Validate channel
+  if (!validateChannel(channel)) {
+    preloadLogger.warn(`Blocked attempt to send to restricted IPC channel: ${channel}`);
+    return;
+  }
+
+  // Sanitize arguments
+  const sanitizedArgs = args.map(sanitizeData);
+
+  preloadLogger.debug(`IPC send: ${channel}`, { args: sanitizedArgs });
+
+  ipcRenderer.send(channel, ...sanitizedArgs);
+}
+
+/**
+ * Safe IPC event listener wrapper
+ */
+function safeIpcOn(
+  channel: string,
+  listener: (event: IpcRendererEvent, ...args: any[]) => void
+): () => void {
+  // Validate channel
+  if (!ALLOWED_CHANNELS.has(channel)) {
+    preloadLogger.warn(`Blocked attempt to listen to restricted IPC channel: ${channel}`);
+    return () => {};
+  }
+
+  // Wrap listener to sanitize arguments
+  const wrappedListener = (event: IpcRendererEvent, ...args: any[]) => {
+    const sanitizedArgs = args.map(sanitizeData);
+    listener(event, ...sanitizedArgs);
+  };
+
+  ipcRenderer.on(channel, wrappedListener);
+
+  // Return cleanup function
+  return () => {
+    ipcRenderer.off(channel, wrappedListener);
+  };
+}
+
+// ==================== EXPOSED API IMPLEMENTATION ====================
+
+const knouxAPI: KnouxAPI = {
+  // ========== System Methods ==========
+  getPlatform: () => safeIpcInvoke<string>('system:getPlatform'),
+
+  setAutostart: (enabled: boolean) =>
+    safeIpcInvoke<{ success: boolean; error?: string }>(
+      'system:setAutostart',
+      enabled
+    ),
+
+  restartApp: () => safeIpcInvoke<void>('system:restartApp'),
+
+  quitApp: () => safeIpcInvoke<void>('system:quitApp'),
+
+  // ========== Settings Methods ==========
+  getAllSettings: () => safeIpcInvoke<any>('settings:getAll'),
+
+  updateSettings: (updates: any) =>
+    safeIpcInvoke<{ success: boolean; error?: string }>(
+      'settings:update',
+      updates
+    ),
+
+  resetSettings: () =>
+    safeIpcInvoke<{ success: boolean; error?: string }>(
+      'settings:reset'
+    ),
+
+  exportSettings: () =>
+    safeIpcInvoke<{ success: boolean; data?: string; error?: string }>(
+      'settings:export'
+    ),
+
+  importSettings: (data: string) =>
+    safeIpcInvoke<{ success: boolean; error?: string }>(
+      'settings:import',
+      data
+    ),
+
+  // ========== Clipboard Methods ==========
+  getClipboardHistory: (options?: any) =>
+    safeIpcInvoke<any[]>(
+      'clipboard:getHistory',
+      options
+    ),
+
+  addClipboardItem: (item: any) =>
+    safeIpcInvoke<{ success: boolean; id?: string; error?: string }>(
+      'clipboard:addItem',
+      item
+    ),
+
+  deleteClipboardItem: (id: string) =>
+    safeIpcInvoke<{ success: boolean; error?: string }>(
+      'clipboard:deleteItem',
+      id
+    ),
+
+  updateClipboardItem: (id: string, updates: any) =>
+    safeIpcInvoke<{ success: boolean; error?: string }>(
+      'clipboard:updateItem',
+      id,
+      updates
+    ),
+
+  clearClipboardHistory: () =>
+    safeIpcInvoke<{ success: boolean; error?: string }>(
+      'clipboard:clearHistory'
+    ),
+
+  // ========== AI Methods ==========
+  analyzeContent: (content: string, options?: any) =>
+    safeIpcInvoke<any>(
+      'ai:analyzeContent',
+      content,
+      options
+    ),
+
+  getSuggestions: (content: string, context?: any) =>
+    safeIpcInvoke<any[]>(
+      'ai:getSuggestions',
+      content,
+      context
+    ),
+
+  classifyContent: (content: string) =>
+    safeIpcInvoke<any>(
+      'ai:classifyContent',
+      content
+    ),
+
+  enhancePrompt: (prompt: string) =>
+    safeIpcInvoke<{ success: boolean; enhanced?: string; error?: string }>(
+      'ai:enhancePrompt',
+      prompt
+    ),
+
+  summarizeText: (text: string, maxLength?: number) =>
+    safeIpcInvoke<{ success: boolean; summary?: string; error?: string }>(
+      'ai:summarizeText',
+      text,
+      maxLength
+    ),
+
+  // ========== Security Methods ==========
+  checkSensitive: (content: string) =>
+    safeIpcInvoke<any>(
+      'security:checkSensitive',
+      content
+    ),
+
+  // ========== Window Management Methods ==========
+  minimizeWindow: () => safeIpcInvoke<void>('window:minimize'),
+
+  maximizeWindow: () => safeIpcInvoke<void>('window:maximize'),
+
+  closeWindow: () => safeIpcInvoke<void>('window:close'),
+
+  toggleWindow: () => safeIpcInvoke<void>('window:toggle'),
+
+  // ========== Event Methods ==========
+  onAppEvent: (callback: (event: any) => void) => {
+    const unsubscribe = safeIpcOn('app:event', (event, appEvent) => {
+      callback(appEvent);
+    });
+
+    return unsubscribe;
+  },
+
+  // ========== Utility Methods ==========
+  openExternal: async (url: string) => {
+    // Validate URL for security
+    try {
+      const parsedUrl = new URL(url);
+
+      // Only allow http/https protocols
+      if (!parsedUrl.protocol.startsWith('http')) {
+        throw new Error('Invalid protocol');
+      }
+
+      safeIpcSend('shell:openExternal', url);
+    } catch (error) {
+      preloadLogger.warn('Blocked attempt to open invalid URL', { url });
+      throw new Error('Invalid URL');
+    }
+  },
+
+  getAppVersion: async () => {
+    const version = await ipcRenderer.invoke('app:getVersion');
+    return version || 'unknown';
+  },
+};
+
+// ==================== CONTEXT BRIDGE SETUP ====================
+
+/**
+ * Validate context bridge exposure
+ */
+function validateContextBridge(): boolean {
+  // Check if we're in the right context
+  if (typeof contextBridge === 'undefined') {
+    preloadLogger.error('contextBridge is not available');
+    return false;
+  }
+
+  // Check if we're in a preload script
+  if (typeof window === 'undefined') {
+    preloadLogger.error('window is not available');
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Setup context bridge with the exposed API
+ */
+function setupContextBridge(): void {
+  if (!validateContextBridge()) {
+    preloadLogger.error('Failed to setup context bridge');
+    return;
+  }
+
+  try {
+    // Expose the API to the renderer process
+    contextBridge.exposeInMainWorld('knoux', knouxAPI);
+
+    // Also expose a simplified logger for renderer
+    contextBridge.exposeInMainWorld('knouxLogger', {
+      debug: (message: string, data?: any) =>
+        preloadLogger.debug(`[Renderer] ${message}`, data),
+      info: (message: string, data?: any) =>
+        preloadLogger.info(`[Renderer] ${message}`, data),
+      warn: (message: string, data?: any) =>
+        preloadLogger.warn(`[Renderer] ${message}`, data),
+      error: (message: string, error?: Error, data?: any) =>
+        preloadLogger.error(`[Renderer] ${message}`, error, data),
+    });
+
+    preloadLogger.info('Context bridge setup completed successfully');
+
+  } catch (error) {
+    preloadLogger.error('Failed to expose API via context bridge', error as Error);
+  }
+}
+
+// ==================== SECURITY CHECKS ====================
+
+/**
+ * Perform security checks before exposing API
+ */
+function performSecurityChecks(): void {
+  // Check Node.js integration is disabled
+  if ((window as any).require) {
+    preloadLogger.warn('Electron require is available - verify Node.js integration is disabled');
+  }
+
+  // Check for devtools in production
+  if (process.env.NODE_ENV === 'production') {
+    // Limited console access in production
+    const originalConsole = { ...console };
+
+    Object.keys(console).forEach((key) => {
+      if (typeof (console as any)[key] === 'function') {
+        (console as any)[key] = (...args: any[]) => {
+          if (process.env.DEBUG) {
+            (originalConsole as any)[key](...args);
+          }
+        };
+      }
+    });
+  }
+}
+
+// ==================== INITIALIZATION ====================
+
+/**
+ * Initialize the preload script
+ */
+function initialize(): void {
+  preloadLogger.info('Preload script initializing');
+
+  // Perform security checks
+  performSecurityChecks();
+
+  // Setup context bridge
+  setupContextBridge();
+
+  // Add global error handler for renderer
+  window.addEventListener('error', (event) => {
+    preloadLogger.error('Renderer unhandled error', new Error(event.message), {
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    });
+  });
+
+  // Add unhandled promise rejection handler
+  window.addEventListener('unhandledrejection', (event) => {
+    preloadLogger.error('Renderer unhandled promise rejection', new Error(String(event.reason)), {
+      reason: String(event.reason),
+    });
+  });
+
+  preloadLogger.info('Preload script initialized successfully');
+}
+
+// ==================== EXPORTS ====================
+
+// Initialize on script load
+initialize();
+
+// Export types for TypeScript
+export type { KnouxAPI };
+export { knouxAPI };
+
+// ==================== TYPES ====================
+
+/**
+ * Exposed API for renderer process
+ */
+interface KnouxAPI {
+  // System
+  getPlatform: () => Promise<string>;
+  setAutostart: (enabled: boolean) => Promise<{ success: boolean; error?: string }>;
+  restartApp: () => Promise<void>;
+  quitApp: () => Promise<void>;
+
+  // Settings
+  getAllSettings: () => Promise<any>;
+  updateSettings: (updates: any) => Promise<{ success: boolean; error?: string }>;
+  resetSettings: () => Promise<{ success: boolean; error?: string }>;
+  exportSettings: () => Promise<{ success: boolean; data?: string; error?: string }>;
+  importSettings: (data: string) => Promise<{ success: boolean; error?: string }>;
+
   // Clipboard
   getClipboardHistory: (options?: any) => Promise<any[]>;
   addClipboardItem: (item: any) => Promise<{ success: boolean; id?: string; error?: string }>;
@@ -36,34 +546,34 @@ interface KnouxAPI {
   clearClipboardHistory: () => Promise<{ success: boolean; error?: string }>;
   exportClipboardData: (options?: any) => Promise<{ success: boolean; data?: any; error?: string }>;
   importClipboardData: (data: any) => Promise<{ success: boolean; error?: string }>;
-  
+
   // AI
   analyzeContent: (content: string, options?: any) => Promise<any>;
   getSuggestions: (content: string, context?: any) => Promise<any[]>;
   classifyContent: (content: string) => Promise<any>;
   enhancePrompt: (prompt: string) => Promise<{ success: boolean; enhanced?: string; error?: string }>;
   summarizeText: (text: string, maxLength?: number) => Promise<{ success: boolean; summary?: string; error?: string }>;
-  
+
   // Security
   checkSensitive: (content: string) => Promise<any>;
   encryptData: (data: string, options?: any) => Promise<{ success: boolean; encrypted?: string; error?: string }>;
   decryptData: (encrypted: string, options?: any) => Promise<{ success: boolean; decrypted?: string; error?: string }>;
   getPermissions: () => Promise<any>;
-  
+
   // Window Management
   minimizeWindow: () => Promise<void>;
   maximizeWindow: () => Promise<void>;
   closeWindow: () => Promise<void>;
   toggleWindow: () => Promise<void>;
-  
+
   // File Dialogs
   showOpenDialog: (options: any) => Promise<any>;
   showSaveDialog: (options: any) => Promise<any>;
-  
+
   // Events
   onAppEvent: (callback: (event: any) => void) => () => void;
   sendEvent: (eventType: string, data?: any) => Promise<void>;
-  
+
   // Utility
   openExternal: (url: string) => Promise<void>;
   showItemInFolder: (path: string) => Promise<void>;
@@ -83,14 +593,14 @@ const ALLOWED_CHANNELS = new Set([
   IPC_CHANNELS.SYSTEM.SET_AUTOSTART,
   IPC_CHANNELS.SYSTEM.RESTART_APP,
   IPC_CHANNELS.SYSTEM.QUIT_APP,
-  
+
   // Settings channels
   IPC_CHANNELS.SETTINGS.GET_ALL,
   IPC_CHANNELS.SETTINGS.UPDATE,
   IPC_CHANNELS.SETTINGS.RESET,
   IPC_CHANNELS.SETTINGS.EXPORT,
   IPC_CHANNELS.SETTINGS.IMPORT,
-  
+
   // Clipboard channels
   IPC_CHANNELS.CLIPBOARD.GET_HISTORY,
   IPC_CHANNELS.CLIPBOARD.ADD_ITEM,
@@ -99,20 +609,20 @@ const ALLOWED_CHANNELS = new Set([
   IPC_CHANNELS.CLIPBOARD.CLEAR_HISTORY,
   IPC_CHANNELS.CLIPBOARD.EXPORT_DATA,
   IPC_CHANNELS.CLIPBOARD.IMPORT_DATA,
-  
+
   // AI channels
   IPC_CHANNELS.AI.ANALYZE_CONTENT,
   IPC_CHANNELS.AI.GET_SUGGESTIONS,
   IPC_CHANNELS.AI.CLASSIFY_CONTENT,
   IPC_CHANNELS.AI.ENHANCE_PROMPT,
   IPC_CHANNELS.AI.SUMMARIZE_TEXT,
-  
+
   // Security channels
   IPC_CHANNELS.SECURITY.CHECK_SENSITIVE,
   IPC_CHANNELS.SECURITY.ENCRYPT_DATA,
   IPC_CHANNELS.SECURITY.DECRYPT_DATA,
   IPC_CHANNELS.SECURITY.GET_PERMISSIONS,
-  
+
   // Custom channels
   'window:minimize',
   'window:maximize',
@@ -130,26 +640,26 @@ function sanitizeData(data: any): any {
   if (data === null || data === undefined) {
     return data;
   }
-  
+
   // Handle basic types
   if (typeof data !== 'object') {
     return data;
   }
-  
+
   // Handle arrays
   if (Array.isArray(data)) {
     return data.map(sanitizeData);
   }
-  
+
   // Handle objects - remove any functions or complex objects
   const sanitized: Record<string, any> = {};
-  
+
   for (const [key, value] of Object.entries(data)) {
     // Skip functions
     if (typeof value === 'function') {
       continue;
     }
-    
+
     // Skip complex objects that aren't plain objects or arrays
     if (value !== null && typeof value === 'object') {
       const proto = Object.getPrototypeOf(value);
@@ -157,11 +667,11 @@ function sanitizeData(data: any): any {
         continue;
       }
     }
-    
+
     // Recursively sanitize
     sanitized[key] = sanitizeData(value);
   }
-  
+
   return sanitized;
 }
 
@@ -193,20 +703,20 @@ async function safeIpcInvoke<T = any>(
   if (!validateChannel(channel)) {
     throw new Error(`Access to IPC channel "${channel}" is not allowed`);
   }
-  
+
   // Sanitize arguments
   const sanitizedArgs = args.map(sanitizeData);
-  
+
   preloadLogger.debug(`IPC invoke: ${channel}`, { args: sanitizedArgs });
-  
+
   try {
     const result = await ipcRenderer.invoke(channel, ...sanitizedArgs);
-    
+
     // Sanitize response
     const sanitizedResult = sanitizeData(result);
-    
+
     preloadLogger.debug(`IPC response: ${channel}`, { result: sanitizedResult });
-    
+
     return sanitizedResult;
   } catch (error) {
     preloadLogger.error(`IPC invoke failed: ${channel}`, error as Error, { args: sanitizedArgs });
@@ -223,12 +733,12 @@ function safeIpcSend(channel: string, ...args: any[]): void {
     preloadLogger.warn(`Blocked attempt to send to restricted IPC channel: ${channel}`);
     return;
   }
-  
+
   // Sanitize arguments
   const sanitizedArgs = args.map(sanitizeData);
-  
+
   preloadLogger.debug(`IPC send: ${channel}`, { args: sanitizedArgs });
-  
+
   ipcRenderer.send(channel, ...sanitizedArgs);
 }
 
@@ -244,15 +754,15 @@ function safeIpcOn(
     preloadLogger.warn(`Blocked attempt to listen to restricted IPC channel: ${channel}`);
     return () => {};
   }
-  
+
   // Wrap listener to sanitize arguments
   const wrappedListener = (event: IpcRendererEvent, ...args: any[]) => {
     const sanitizedArgs = args.map(sanitizeData);
     listener(event, ...sanitizedArgs);
   };
-  
+
   ipcRenderer.on(channel, wrappedListener);
-  
+
   // Return cleanup function
   return () => {
     ipcRenderer.off(channel, wrappedListener);
@@ -264,85 +774,85 @@ function safeIpcOn(
 const knouxAPI: KnouxAPI = {
   // ========== System Methods ==========
   getPlatform: () => safeIpcInvoke<string>(IPC_CHANNELS.SYSTEM.GET_PLATFORM),
-  
+
   setAutostart: (enabled: boolean) =>
     safeIpcInvoke<{ success: boolean; error?: string }>(
       IPC_CHANNELS.SYSTEM.SET_AUTOSTART,
       enabled
     ),
-  
+
   restartApp: () => safeIpcInvoke<void>(IPC_CHANNELS.SYSTEM.RESTART_APP),
-  
+
   quitApp: () => safeIpcInvoke<void>(IPC_CHANNELS.SYSTEM.QUIT_APP),
-  
+
   // ========== Settings Methods ==========
   getAllSettings: () => safeIpcInvoke<any>(IPC_CHANNELS.SETTINGS.GET_ALL),
-  
+
   updateSettings: (updates: any) =>
     safeIpcInvoke<{ success: boolean; error?: string }>(
       IPC_CHANNELS.SETTINGS.UPDATE,
       updates
     ),
-  
+
   resetSettings: () =>
     safeIpcInvoke<{ success: boolean; error?: string }>(
       IPC_CHANNELS.SETTINGS.RESET
     ),
-  
+
   exportSettings: () =>
     safeIpcInvoke<{ success: boolean; data?: string; error?: string }>(
       IPC_CHANNELS.SETTINGS.EXPORT
     ),
-  
+
   importSettings: (data: string) =>
     safeIpcInvoke<{ success: boolean; error?: string }>(
       IPC_CHANNELS.SETTINGS.IMPORT,
       data
     ),
-  
+
   // ========== Clipboard Methods ==========
   getClipboardHistory: (options?: any) =>
     safeIpcInvoke<any[]>(
       IPC_CHANNELS.CLIPBOARD.GET_HISTORY,
       options
     ),
-  
+
   addClipboardItem: (item: any) =>
     safeIpcInvoke<{ success: boolean; id?: string; error?: string }>(
       IPC_CHANNELS.CLIPBOARD.ADD_ITEM,
       item
     ),
-  
+
   deleteClipboardItem: (id: string) =>
     safeIpcInvoke<{ success: boolean; error?: string }>(
       IPC_CHANNELS.CLIPBOARD.DELETE_ITEM,
       id
     ),
-  
+
   updateClipboardItem: (id: string, updates: any) =>
     safeIpcInvoke<{ success: boolean; error?: string }>(
       IPC_CHANNELS.CLIPBOARD.UPDATE_ITEM,
       id,
       updates
     ),
-  
+
   clearClipboardHistory: () =>
     safeIpcInvoke<{ success: boolean; error?: string }>(
       IPC_CHANNELS.CLIPBOARD.CLEAR_HISTORY
     ),
-  
+
   exportClipboardData: (options?: any) =>
     safeIpcInvoke<{ success: boolean; data?: any; error?: string }>(
       IPC_CHANNELS.CLIPBOARD.EXPORT_DATA,
       options
     ),
-  
+
   importClipboardData: (data: any) =>
     safeIpcInvoke<{ success: boolean; error?: string }>(
       IPC_CHANNELS.CLIPBOARD.IMPORT_DATA,
       data
     ),
-  
+
   // ========== AI Methods ==========
   analyzeContent: (content: string, options?: any) =>
     safeIpcInvoke<any>(
@@ -350,125 +860,125 @@ const knouxAPI: KnouxAPI = {
       content,
       options
     ),
-  
+
   getSuggestions: (content: string, context?: any) =>
     safeIpcInvoke<any[]>(
       IPC_CHANNELS.AI.GET_SUGGESTIONS,
       content,
       context
     ),
-  
+
   classifyContent: (content: string) =>
     safeIpcInvoke<any>(
       IPC_CHANNELS.AI.CLASSIFY_CONTENT,
       content
     ),
-  
+
   enhancePrompt: (prompt: string) =>
     safeIpcInvoke<{ success: boolean; enhanced?: string; error?: string }>(
       IPC_CHANNELS.AI.ENHANCE_PROMPT,
       prompt
     ),
-  
+
   summarizeText: (text: string, maxLength?: number) =>
     safeIpcInvoke<{ success: boolean; summary?: string; error?: string }>(
       IPC_CHANNELS.AI.SUMMARIZE_TEXT,
       text,
       maxLength
     ),
-  
+
   // ========== Security Methods ==========
   checkSensitive: (content: string) =>
     safeIpcInvoke<any>(
       IPC_CHANNELS.SECURITY.CHECK_SENSITIVE,
       content
     ),
-  
+
   encryptData: (data: string, options?: any) =>
     safeIpcInvoke<{ success: boolean; encrypted?: string; error?: string }>(
       IPC_CHANNELS.SECURITY.ENCRYPT_DATA,
       data,
       options
     ),
-  
+
   decryptData: (encrypted: string, options?: any) =>
     safeIpcInvoke<{ success: boolean; decrypted?: string; error?: string }>(
       IPC_CHANNELS.SECURITY.DECRYPT_DATA,
       encrypted,
       options
     ),
-  
+
   getPermissions: () =>
     safeIpcInvoke<any>(
       IPC_CHANNELS.SECURITY.GET_PERMISSIONS
     ),
-  
+
   // ========== Window Management Methods ==========
   minimizeWindow: () => safeIpcInvoke<void>('window:minimize'),
-  
+
   maximizeWindow: () => safeIpcInvoke<void>('window:maximize'),
-  
+
   closeWindow: () => safeIpcInvoke<void>('window:close'),
-  
+
   toggleWindow: () => safeIpcInvoke<void>('window:toggle'),
-  
+
   // ========== File Dialog Methods ==========
   showOpenDialog: (options: any) =>
     safeIpcInvoke<any>('dialog:showOpenDialog', options),
-  
+
   showSaveDialog: (options: any) =>
     safeIpcInvoke<any>('dialog:showSaveDialog', options),
-  
+
   // ========== Event Methods ==========
   onAppEvent: (callback: (event: any) => void) => {
     const unsubscribe = safeIpcOn('app:event', (event, appEvent) => {
       callback(appEvent);
     });
-    
+
     return unsubscribe;
   },
-  
+
   sendEvent: (eventType: string, data?: any) =>
     safeIpcInvoke<void>('app:sendEvent', eventType, data),
-  
+
   // ========== Utility Methods ==========
   openExternal: async (url: string) => {
     // Validate URL for security
     try {
       const parsedUrl = new URL(url);
-      
+
       // Only allow http/https protocols
       if (!parsedUrl.protocol.startsWith('http')) {
         throw new Error('Invalid protocol');
       }
-      
+
       safeIpcSend('shell:openExternal', url);
     } catch (error) {
       preloadLogger.warn('Blocked attempt to open invalid URL', { url });
       throw new Error('Invalid URL');
     }
   },
-  
+
   showItemInFolder: (path: string) => {
     // Basic path validation
     if (typeof path !== 'string' || path.length === 0) {
       throw new Error('Invalid path');
     }
-    
+
     safeIpcSend('shell:showItemInFolder', path);
   },
-  
+
   getAppVersion: async () => {
     // Version is exposed via a custom IPC channel
     const { ipcRenderer } = require('electron');
     return ipcRenderer.invoke('app:getVersion');
   },
-  
+
   getAppPath: async () => {
     const { ipcRenderer } = require('electron');
     return ipcRenderer.invoke('app:getPath', 'exe');
   },
-  
+
   getUserDataPath: async () => {
     const { ipcRenderer } = require('electron');
     return ipcRenderer.invoke('app:getPath', 'userData');
@@ -486,13 +996,13 @@ function validateContextBridge(): boolean {
     preloadLogger.error('contextBridge is not available');
     return false;
   }
-  
+
   // Check if we're in a preload script
   if (typeof window === 'undefined') {
     preloadLogger.error('window is not available');
     return false;
   }
-  
+
   return true;
 }
 
@@ -504,25 +1014,25 @@ function setupContextBridge(): void {
     preloadLogger.error('Failed to setup context bridge');
     return;
   }
-  
+
   try {
     // Expose the API to the renderer process
     contextBridge.exposeInMainWorld('knoux', knouxAPI);
-    
+
     // Also expose a simplified logger for renderer
     contextBridge.exposeInMainWorld('knouxLogger', {
-      debug: (message: string, data?: any) => 
+      debug: (message: string, data?: any) =>
         preloadLogger.debug(`[Renderer] ${message}`, data),
-      info: (message: string, data?: any) => 
+      info: (message: string, data?: any) =>
         preloadLogger.info(`[Renderer] ${message}`, data),
-      warn: (message: string, data?: any) => 
+      warn: (message: string, data?: any) =>
         preloadLogger.warn(`[Renderer] ${message}`, data),
-      error: (message: string, error?: Error, data?: any) => 
+      error: (message: string, error?: Error, data?: any) =>
         preloadLogger.error(`[Renderer] ${message}`, error, data),
     });
-    
+
     preloadLogger.info('Context bridge setup completed successfully');
-    
+
   } catch (error) {
     preloadLogger.error('Failed to expose API via context bridge', error as Error);
   }
@@ -541,17 +1051,17 @@ function performSecurityChecks(): void {
       preloadLogger.warn('Electron remote module is available - this is a security risk');
     }
   }
-  
+
   // Check that we're in a secure context
   if (!window.isSecureContext) {
     preloadLogger.warn('Page is not in a secure context');
   }
-  
+
   // Check for devtools in production
   if (process.env.NODE_ENV === 'production') {
     // Override console methods in production to limit exposure
     const originalConsole = { ...console };
-    
+
     Object.keys(console).forEach((key) => {
       if (typeof (console as any)[key] === 'function') {
         (console as any)[key] = (...args: any[]) => {
@@ -572,13 +1082,13 @@ function performSecurityChecks(): void {
  */
 function initialize(): void {
   preloadLogger.info('Preload script initializing');
-  
+
   // Perform security checks
   performSecurityChecks();
-  
+
   // Setup context bridge
   setupContextBridge();
-  
+
   // Add global error handler for renderer
   window.addEventListener('error', (event) => {
     preloadLogger.error('Renderer unhandled error', new Error(event.message), {
@@ -587,14 +1097,14 @@ function initialize(): void {
       colno: event.colno,
     });
   });
-  
+
   // Add unhandled promise rejection handler
   window.addEventListener('unhandledrejection', (event) => {
     preloadLogger.error('Renderer unhandled promise rejection', new Error(event.reason?.message || 'Unknown rejection'), {
       reason: String(event.reason),
     });
   });
-  
+
   preloadLogger.info('Preload script initialized successfully');
 }
 

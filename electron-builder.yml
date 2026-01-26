@@ -7,18 +7,19 @@ directories:
   output: release
   buildResources: assets
 
-# ASAR: Packages source code into an encrypted/compressed archive for performance and basic protection
-asar: true
-asarUnpack:
-  - "**/*.node" # Unpack native modules
+# ASAR: Disabled for development/testing. Enable in production (asar: true)
+asar: false
+asarUnpack: []
 
 # Compression levels: 'store' (fastest), 'normal', 'maximum' (smallest file)
-compression: maximum
+compression: normal
 
 # Files to include in the final package
 files:
   - from: "."
     filter:
+      - "electron.js"
+      - "main.js"
       - "dist/**/*"
       - "build/**/*"
       - "package.json"
@@ -32,14 +33,11 @@ files:
 
 # Windows Configuration
 win:
-  target: 
-    - nsis
+  target:
     - portable
   icon: assets/icons/icon.ico
   requestedExecutionLevel: asInvoker
-  signingHashAlgorithms:
-    - sha256
-  verifyUpdateCodeSignature: false # Set to true if you have a Code Signing Certificate
+  verifyUpdateCodeSignature: false
 
 # Windows Installer (NSIS) Details
 nsis:

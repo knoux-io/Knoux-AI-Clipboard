@@ -105,7 +105,32 @@ function createWindow() {
     }
 
     console.log('Loading URL:', startURL);
-    mainWindow.loadURL(startURL);
+    // If this is a dev URL (http(s) localhost), verify the server is reachable
+    const isLocalHttp = (u) => typeof u === 'string' && (u.startsWith('http://localhost') || u.startsWith('http://127.0.0.1') || u.startsWith('https://localhost'));
+    const loadWithFallback = async (url) => {
+        try {
+            if (isLocalHttp(url)) {
+                const http = require('http');
+                const parsed = new URL(url);
+                await new Promise((resolve, reject) => {
+                    const req = http.request({ method: 'GET', host: parsed.hostname, port: parsed.port || 80, path: '/', timeout: 2000 }, (res) => {
+                        if (res.statusCode >= 200 && res.statusCode < 400) return resolve();
+                        reject(new Error('Status ' + res.statusCode));
+                    });
+                    req.on('error', reject);
+                    req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
+                    req.end();
+                });
+            }
+            await mainWindow.loadURL(url);
+        } catch (err) {
+            console.error('Dev server unreachable, loading fallback page:', err && err.message);
+            const fallback = `file://${path.join(__dirname, 'public', 'dev-unavailable.html')}`;
+            try { await mainWindow.loadURL(fallback); } catch (e) { console.error('Failed loading fallback page', e); }
+        }
+    };
+
+    loadWithFallback(startURL);
 
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();

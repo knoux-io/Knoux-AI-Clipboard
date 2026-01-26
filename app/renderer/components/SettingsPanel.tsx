@@ -1,95 +1,115 @@
 /**
  * Settings Panel - Main Component
- * Orchestrates all settings components
  */
 
 import React, { useState } from 'react';
-import GeneralSettings from './settings/GeneralSettings';
-import ClipboardSettings from './settings/ClipboardSettings';
-import AISettings from './settings/AISettings';
-import SecuritySettings from './settings/SecuritySettings';
-import UISettings from './settings/UISettings';
 import {
   Settings,
   Globe,
   Clipboard,
-  Brain,
-  Shield,
-  Monitor,
   ChevronRight,
   Save,
-  RefreshCw
+  RefreshCw,
+  X
 } from 'lucide-react';
 
-const SettingsPanel: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'general' | 'clipboard' | 'ai' | 'security' | 'ui'>('general');
+interface SettingsPanelProps {
+  onClose: () => void;
+}
+
+const SettingsPanel: React.FC<SettingsPanelProps> = ({ onClose }) => {
+  const [activeTab, setActiveTab] = useState<'general' | 'clipboard'>('general');
   const [isSaving, setIsSaving] = useState(false);
 
   const tabs = [
     { id: 'general', label: 'General', icon: <Globe className="w-4 h-4" /> },
-    { id: 'clipboard', label: 'Clipboard', icon: <Clipboard className="w-4 h-4" /> },
-    { id: 'ai', label: 'AI', icon: <Brain className="w-4 h-4" /> },
-    { id: 'security', label: 'Security', icon: <Shield className="w-4 h-4" /> },
-    { id: 'ui', label: 'UI', icon: <Monitor className="w-4 h-4" /> }
+    { id: 'clipboard', label: 'Clipboard', icon: <Clipboard className="w-4 h-4" /> }
   ];
 
   const handleSaveAll = async () => {
     setIsSaving(true);
-    // Save logic here
     setTimeout(() => setIsSaving(false), 1000);
   };
 
   const renderContent = () => {
     switch (activeTab) {
       case 'general':
-        return <GeneralSettings onSave={handleSaveAll} />;
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-white mb-4">General Settings</h3>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Theme</label>
+              <select className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600">
+                <option>Dark Mode</option>
+                <option>Light Mode</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Language</label>
+              <select className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600">
+                <option>English</option>
+                <option>العربية</option>
+              </select>
+            </div>
+          </div>
+        );
       case 'clipboard':
-        return <ClipboardSettings />;
-      case 'ai':
-        return <AISettings />;
-      case 'security':
-        return <SecuritySettings />;
-      case 'ui':
-        return <UISettings />;
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-white mb-4">Clipboard Settings</h3>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Auto-sync interval (seconds)</label>
+              <input type="number" defaultValue="5" className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600" />
+            </div>
+            <div>
+              <label className="flex items-center space-x-2">
+                <input type="checkbox" defaultChecked className="w-4 h-4" />
+                <span className="text-sm font-medium text-gray-300">Save history on exit</span>
+              </label>
+            </div>
+          </div>
+        );
       default:
-        return <GeneralSettings />;
+        return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-6">
+      <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-              <Settings className="w-8 h-8 mr-3" />
-              Settings
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Configure your Knoux Clipboard AI experience
-            </p>
+          <div className="flex items-center">
+            <Settings className="w-8 h-8 mr-3 text-purple-400" />
+            <h1 className="text-3xl font-bold">Settings</h1>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <button
               onClick={handleSaveAll}
               disabled={isSaving}
-              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center disabled:opacity-50"
+              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors disabled:opacity-50 flex items-center"
             >
               {isSaving ? (
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
               ) : (
                 <Save className="w-4 h-4 mr-2" />
               )}
-              {isSaving ? 'Saving...' : 'Save All'}
+              {isSaving ? 'Saving...' : 'Save'}
+            </button>
+
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar */}
-          <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
+          <div className="lg:w-48">
+            <div className="bg-black/40 rounded-lg p-4 border border-purple-500/20">
               <nav className="space-y-2">
                 {tabs.map(tab => (
                   <button
@@ -97,8 +117,8 @@ const SettingsPanel: React.FC = () => {
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${
                       activeTab === tab.id
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-gray-300 hover:bg-gray-700'
                     }`}
                   >
                     <div className="flex items-center">
@@ -114,7 +134,7 @@ const SettingsPanel: React.FC = () => {
 
           {/* Content */}
           <div className="flex-1">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <div className="bg-black/40 rounded-lg p-6 border border-purple-500/20">
               {renderContent()}
             </div>
           </div>

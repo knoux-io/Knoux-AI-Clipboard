@@ -4,14 +4,25 @@ const { spawn } = require('child_process');
 
 async function startVite() {
   const { createServer } = require('vite');
-  const server = await createServer({
-    root: process.cwd(),
-    server: { port: 5173 }
-  });
+  // Let Vite load its full config (vite.config.ts) which sets root to app/renderer
+  // and respects server.port (3000) and other settings.
+  const server = await createServer();
   await server.listen();
-  const info = server.config.logger.info;
-  console.log('Vite dev server started on port 3000');
-  return server;
+  // Try to read the actual bound port from the http server if available.
+  let actualPort = null;
+  try {
+    if (server.httpServer && server.httpServer.address) {
+      const addr = server.httpServer.address();
+      actualPort = (addr && addr.port) || null;
+    }
+  } catch (e) {
+    actualPort = null;
+  }
+  // Fallback to configured port if we couldn't detect one
+  const cfgPort = server.config && server.config.server && server.config.server.port;
+  if (!actualPort && cfgPort) actualPort = cfgPort;
+  console.log('Vite dev server started on port', actualPort || '(unknown)');
+  return { server, port: actualPort };
 }
 
 function findElectronExe() {
@@ -39,6 +50,8 @@ async function startElectron(devUrl) {
   const electronExe = findElectronExe();
   const env = Object.assign({}, process.env);
   if (devUrl) env.DEV_SERVER_URL = devUrl;
+  // Ensure Electron runs in development mode so electron.js uses the DEV_SERVER_URL
+  env.NODE_ENV = env.NODE_ENV || 'development';
   if (electronExe) {
     console.log('Launching Electron from', electronExe, 'with DEV_SERVER_URL=', env.DEV_SERVER_URL);
     const child = spawn(electronExe, ['.'], { stdio: 'inherit', env });
@@ -58,10 +71,13 @@ async function startElectron(devUrl) {
   }
 
   try {
-    const server = await startVite();
+    const result = await startVite();
     // determine actual port used by Vite (config override or actual server port)
-    const cfgPort = server.config && server.config.server && server.config.server.port;
-    const candidatePorts = [cfgPort, 5173, 3000, 3001, 8080].filter(Boolean);
+    // `startVite` returns { server, port }
+    const server = result && result.server;
+    const detectedPort = result && result.port;
+    const cfgPort = server && server.config && server.config.server && server.config.server.port;
+    const candidatePorts = [detectedPort, cfgPort, 5173, 3000, 3001, 8080].filter(Boolean);
     const http = require('http');
 
     const checkPort = (port) => new Promise((resolve) => {
