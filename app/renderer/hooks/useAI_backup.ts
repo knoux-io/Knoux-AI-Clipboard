@@ -212,7 +212,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
 
     // Update progress
     const updateProgress = useCallback((progress: number, operation?: string) => {
-        setState(prev => ({
+        setState((prev: AIAnalysisState) => ({
             ...prev,
             progress: Math.min(100, Math.max(0, progress)),
             ...(operation && { currentOperation: operation }),
@@ -229,7 +229,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
 
         logger.error(`AI Error in ${context}:`, aiError);
 
-        setState(prev => ({
+        setState((prev: AIAnalysisState) => ({
             ...prev,
             error: aiError.message,
             isAnalyzing: false,
@@ -284,10 +284,10 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
         if (hookConfig.cacheResults) {
             const cached = analysisCache.current.get(cacheKey);
             if (cached) {
-                setState(prev => ({ ...prev, cacheHits: prev.cacheHits + 1 }));
+                setState((prev: AIAnalysisState) => ({ ...prev, cacheHits: prev.cacheHits + 1 }));
                 return cached;
             }
-            setState(prev => ({ ...prev, cacheMisses: prev.cacheMisses + 1 }));
+            setState((prev: AIAnalysisState) => ({ ...prev, cacheMisses: prev.cacheMisses + 1 }));
         }
 
         return deduplicator.current.execute(cacheKey, async () => {
@@ -296,7 +296,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
             }
 
             activeRequests.current.add(requestId);
-            setState(prev => ({
+            setState((prev: AIAnalysisState) => ({
                 ...prev,
                 isAnalyzing: true,
                 currentOperation: 'Analyzing content...',
@@ -330,7 +330,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
                     analysisCache.current.set(cacheKey, analysis);
                 }
 
-                setState(prev => ({
+                setState((prev: AIAnalysisState) => ({
                     ...prev,
                     lastAnalysis: analysis,
                     isAnalyzing: false,
@@ -345,7 +345,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
             } finally {
                 activeRequests.current.delete(requestId);
                 if (state.isAnalyzing) {
-                    setState(prev => ({
+                    setState((prev: AIAnalysisState) => ({
                         ...prev,
                         isAnalyzing: false,
                         progress: 0,
@@ -370,10 +370,10 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
         if (hookConfig.cacheResults) {
             const cached = classificationCache.current.get(cacheKey);
             if (cached) {
-                setState(prev => ({ ...prev, cacheHits: prev.cacheHits + 1 }));
+                setState((prev: AIAnalysisState) => ({ ...prev, cacheHits: prev.cacheHits + 1 }));
                 return cached;
             }
-            setState(prev => ({ ...prev, cacheMisses: prev.cacheMisses + 1 }));
+            setState((prev: AIAnalysisState) => ({ ...prev, cacheMisses: prev.cacheMisses + 1 }));
         }
 
         return deduplicator.current.execute(cacheKey, async () => {
@@ -382,7 +382,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
             }
 
             activeRequests.current.add(requestId);
-            setState(prev => ({
+            setState((prev: AIAnalysisState) => ({
                 ...prev,
                 isClassifying: true,
                 currentOperation: 'Classifying content...',
@@ -411,7 +411,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
                     classificationCache.current.set(cacheKey, classification);
                 }
 
-                setState(prev => ({
+                setState((prev: AIAnalysisState) => ({
                     ...prev,
                     lastClassification: classification,
                     isClassifying: false,
@@ -425,7 +425,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
             } finally {
                 activeRequests.current.delete(requestId);
                 if (state.isClassifying) {
-                    setState(prev => ({
+                    setState((prev: AIAnalysisState) => ({
                         ...prev,
                         isClassifying: false,
                         progress: 0,
@@ -451,10 +451,10 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
         if (hookConfig.cacheResults) {
             const cached = enhancementCache.current.get(cacheKey);
             if (cached) {
-                setState(prev => ({ ...prev, cacheHits: prev.cacheHits + 1 }));
+                setState((prev: AIAnalysisState) => ({ ...prev, cacheHits: prev.cacheHits + 1 }));
                 return cached;
             }
-            setState(prev => ({ ...prev, cacheMisses: prev.cacheMisses + 1 }));
+            setState((prev: AIAnalysisState) => ({ ...prev, cacheMisses: prev.cacheMisses + 1 }));
         }
 
         return deduplicator.current.execute(cacheKey, async () => {
@@ -463,7 +463,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
             }
 
             activeRequests.current.add(requestId);
-            setState(prev => ({
+            setState((prev: AIAnalysisState) => ({
                 ...prev,
                 isEnhancing: true,
                 currentOperation: 'Enhancing content...',
@@ -512,7 +512,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
                     enhancementCache.current.set(cacheKey, enhanced);
                 }
 
-                setState(prev => ({
+                setState((prev: AIAnalysisState) => ({
                     ...prev,
                     suggestions: enhanced.suggestions,
                     isEnhancing: false,
@@ -526,7 +526,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
             } finally {
                 activeRequests.current.delete(requestId);
                 if (state.isEnhancing) {
-                    setState(prev => ({
+                    setState((prev: AIAnalysisState) => ({
                         ...prev,
                         isEnhancing: false,
                         progress: 0,
@@ -538,7 +538,7 @@ export const useAI = (config: Partial<AIHookConfig> = {}) => {
 
     // Clear error
     const clearError = useCallback(() => {
-        setState(prev => ({ ...prev, error: undefined }));
+        setState((prev: AIAnalysisState) => ({ ...prev, error: undefined }));
     }, []);
 
     // Clear all caches
