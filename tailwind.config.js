@@ -13,40 +13,40 @@ export default {
       colors: {
         knoux: {
           primary: {
-            DEFAULT: '#667EEA', // Smart Blue
-            light: '#8BA1F5',
-            dark: '#4B5FCC',
-            50: '#F0F4FF',
-            100: '#E0E8FF',
-            200: '#C0D0FF',
-            300: '#A0B8FF',
-            400: '#667EEA',
-            500: '#5566D6',
-            600: '#444EC2',
-            700: '#3336AE',
-            800: '#221E9A',
-            900: '#110686',
+            DEFAULT: 'var(--color-primary)',
+            light: 'var(--color-primary-light)',
+            dark: 'var(--color-primary-dark)',
           },
           secondary: {
-            DEFAULT: '#764BA2', // Purple-Blue
-            light: '#9B6BC7',
-            dark: '#542E80',
+            DEFAULT: 'var(--color-secondary)',
           },
           background: {
-            DEFAULT: '#0F0F1A', // Dark Background
-            surface: '#1A1A2E',
-            lighter: '#252540',
+            DEFAULT: 'var(--bg-primary)',
+            surface: 'var(--bg-secondary)',
+            lighter: 'var(--bg-tertiary)',
+            card: 'var(--bg-card)',
+            sidebar: 'var(--bg-sidebar)',
           },
           accent: {
-            DEFAULT: '#00D4AA', // AI Green
-            cyan: '#06b6d4',
-            purple: '#a855f7',
-            pink: '#ec4899',
-            emerald: '#10b981',
+            DEFAULT: 'var(--color-accent)',
           },
-          success: { DEFAULT: '#00D4AA', light: '#33EDC8', dark: '#00A382' },
-          warning: { DEFAULT: '#f59e0b', light: '#fef3c7', dark: '#d97706' },
-          error: { DEFAULT: '#ef4444', light: '#fee2e2', dark: '#dc2626' },
+          text: {
+            primary: 'var(--text-primary)',
+            secondary: 'var(--text-secondary)',
+            tertiary: 'var(--text-tertiary)',
+            muted: 'var(--text-muted)',
+            inverted: 'var(--text-inverted)',
+          },
+          border: {
+            DEFAULT: 'var(--border-primary)',
+            secondary: 'var(--border-secondary)',
+            accent: 'var(--border-accent)',
+            input: 'var(--border-input)',
+          },
+          success: { DEFAULT: 'var(--color-success)' },
+          warning: { DEFAULT: 'var(--color-warning)' },
+          error: { DEFAULT: 'var(--color-error)' },
+          info: { DEFAULT: 'var(--color-info)' },
         },
       },
       fontFamily: {

@@ -22,6 +22,8 @@ import i18n from "./utils/i18n";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
+import BottomNav from "./components/BottomNav";
+
 // Main App Layout Component
 function AppLayout() {
   const location = useLocation();
@@ -57,11 +59,11 @@ function AppLayout() {
         <Route
           path="/about"
           element={
-            <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-8">
+            <div className="min-h-screen bg-knoux-background p-8">
               <div className="container mx-auto max-w-4xl">
                 <button
                   onClick={() => navigate("/")}
-                  className="mb-6 px-4 py-2 text-gray-400 hover:text-white bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-lg transition-all"
+                  className="mb-6 px-4 py-2 text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all"
                 >
                   {i18n.isRTL() ? "← العودة" : "← Back"}
                 </button>
@@ -75,12 +77,14 @@ function AppLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-knoux-background text-white flex">
-      {/* Sidebar */}
-      <Sidebar />
+    <div className="min-h-screen bg-knoux-background text-white flex flex-col md:flex-row">
+      {/* Sidebar - Hidden on mobile */}
+      <div className="hidden md:flex">
+        <Sidebar />
+      </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden mb-16 md:mb-0">
         {/* Header with Digital Clock */}
         <header className="relative bg-knoux-background-surface/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-40">
           <div className="px-6 py-4">

@@ -1,41 +1,39 @@
-/* Dark Theme - Knoux Clipboard AI */
+/* Dark Theme - Knoux Clipboard AI (Midnight) */
 
 /* Dark theme variables */
 :root.dark {
-  /* Color palette */
-  --color-primary: #60a5fa;
-  --color-primary-dark: #3b82f6;
-  --color-primary-light: #93c5fd;
-  --color-secondary: #a78bfa;
-  --color-accent: #22d3ee;
-  --color-success: #34d399;
-  --color-warning: #fbbf24;
-  --color-danger: #f87171;
-  --color-info: #38bdf8;
+  /* Color palette - Midnight */
+  --color-primary: #667eea; /* Smart Blue */
+  --color-secondary: #00d4aa; /* AI Green */
+  --color-accent: #764ba2; /* Purple-Blue */
+  --color-success: #00d4aa;
+  --color-warning: #ffa502;
+  --color-error: #ff4757;
+  --color-info: #667eea;
 
   /* Background colors */
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --bg-card: #1e293b;
-  --bg-sidebar: #1e293b;
-  --bg-modal: #1e293b;
-  --bg-input: #1e293b;
-  --bg-tooltip: #374151;
-  --bg-dropdown: #1e293b;
+  --bg-primary: #0f0f1a; /* Dark Background */
+  --bg-secondary: #1a1a2e; /* Surface */
+  --bg-tertiary: #252540;
+  --bg-card: #1a1a2e;
+  --bg-sidebar: #0f0f1a;
+  --bg-modal: #1a1a2e;
+  --bg-input: #1a1a2e;
+  --bg-tooltip: #252540;
+  --bg-dropdown: #1a1a2e;
 
   /* Text colors */
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-tertiary: #94a3b8;
-  --text-muted: #64748b;
-  --text-inverted: #0f172a;
+  --text-primary: #ffffff;
+  --text-secondary: #8a8a9e;
+  --text-tertiary: #5a5a6e; /* Disabled */
+  --text-muted: #5a5a6e;
+  --text-inverted: #0f0f1a;
 
   /* Border colors */
-  --border-primary: #334155;
-  --border-secondary: #475569;
-  --border-accent: #60a5fa;
-  --border-input: #4b5563;
+  --border-primary: #2a2a3e;
+  --border-secondary: #3a3a4e;
+  --border-accent: #667eea;
+  --border-input: #2a2a3e;
 
   /* Shadow colors */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
@@ -45,21 +43,21 @@
   --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
 
   /* Gradient backgrounds */
-  --gradient-primary: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  --gradient-secondary: linear-gradient(135deg, #10b981, #06b6d4);
-  --gradient-accent: linear-gradient(135deg, #f59e0b, #ef4444);
-  --gradient-dark: linear-gradient(135deg, #1e293b, #0f172a);
+  --gradient-primary: linear-gradient(135deg, #667eea, #764ba2);
+  --gradient-secondary: linear-gradient(135deg, #00d4aa, #00a382);
+  --gradient-accent: linear-gradient(135deg, #ffa502, #ff4757);
+  --gradient-dark: linear-gradient(135deg, #1a1a2e, #0f0f1a);
 
   /* Glass morphism */
-  --glass-bg: rgba(30, 41, 59, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(26, 26, 46, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.05);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 
   /* Animation colors */
-  --glow-primary: 0 0 20px rgba(59, 130, 246, 0.3);
-  --glow-secondary: 0 0 20px rgba(139, 92, 246, 0.3);
-  --glow-success: 0 0 20px rgba(52, 211, 153, 0.3);
-  --glow-danger: 0 0 20px rgba(248, 113, 113, 0.3);
+  --glow-primary: 0 0 20px rgba(102, 126, 234, 0.3);
+  --glow-secondary: 0 0 20px rgba(0, 212, 170, 0.3);
+  --glow-success: 0 0 20px rgba(0, 212, 170, 0.3);
+  --glow-error: 0 0 20px rgba(255, 71, 87, 0.3);
 }
 
 /* Dark theme base styles */
@@ -96,350 +94,4 @@
   background-color: var(--bg-input);
   border-color: var(--border-input);
   color: var(--text-primary);
-}
-
-.dark input:focus,
-.dark textarea:focus,
-.dark select:focus {
-  border-color: var(--color-primary);
-  box-shadow: var(--glow-primary);
-}
-
-/* Dark theme buttons */
-.dark .btn-primary {
-  background: var(--gradient-primary);
-  color: white;
-}
-
-.dark .btn-primary:hover {
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  box-shadow: var(--glow-primary);
-}
-
-.dark .btn-secondary {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-  border-color: var(--border-primary);
-}
-
-.dark .btn-secondary:hover {
-  background-color: var(--bg-secondary);
-  border-color: var(--border-accent);
-}
-
-/* Dark theme navigation */
-.dark .sidebar {
-  background-color: var(--bg-sidebar);
-  border-right-color: var(--border-primary);
-}
-
-.dark .nav-item {
-  color: var(--text-secondary);
-}
-
-.dark .nav-item:hover {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-}
-
-.dark .nav-item.active {
-  background: var(--gradient-primary);
-  color: white;
-}
-
-/* Dark theme tables */
-.dark table {
-  border-color: var(--border-primary);
-}
-
-.dark th {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  border-color: var(--border-primary);
-}
-
-.dark td {
-  background-color: var(--bg-card);
-  color: var(--text-secondary);
-  border-color: var(--border-primary);
-}
-
-.dark tr:hover td {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-}
-
-/* Dark theme code blocks */
-.dark pre,
-.dark code {
-  background-color: #1a202c;
-  color: #e2e8f0;
-  border-color: var(--border-primary);
-}
-
-.dark .code-block {
-  background-color: #0f172a;
-  color: #cbd5e1;
-}
-
-.dark .code-keyword { color: #f472b6; }
-.dark .code-string { color: #34d399; }
-.dark .code-number { color: #60a5fa; }
-.dark .code-comment { color: #94a3b8; }
-.dark .code-function { color: #fbbf24; }
-.dark .code-variable { color: #a78bfa; }
-
-/* Dark theme scrollbars */
-.dark ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: var(--border-primary);
-  border-radius: 5px;
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-accent);
-}
-
-/* Dark theme tooltips */
-.dark .tooltip {
-  background-color: var(--bg-tooltip);
-  color: var(--text-primary);
-  border-color: var(--border-primary);
-}
-
-.dark .tooltip::before {
-  border-top-color: var(--bg-tooltip);
-}
-
-/* Dark theme dropdowns */
-.dark .dropdown {
-  background-color: var(--bg-dropdown);
-  border-color: var(--border-primary);
-  box-shadow: var(--shadow-xl);
-}
-
-.dark .dropdown-item {
-  color: var(--text-secondary);
-}
-
-.dark .dropdown-item:hover {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-}
-
-/* Dark theme modals */
-.dark .modal-overlay {
-  background-color: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(8px);
-}
-
-.dark .modal-content {
-  background-color: var(--bg-modal);
-  border-color: var(--border-primary);
-}
-
-/* Dark theme progress bars */
-.dark .progress-bar {
-  background-color: var(--bg-tertiary);
-}
-
-.dark .progress-fill {
-  background: var(--gradient-primary);
-}
-
-/* Dark theme badges */
-.dark .badge {
-  background-color: var(--bg-tertiary);
-  color: var(--text-primary);
-  border-color: var(--border-primary);
-}
-
-.dark .badge-success {
-  background-color: rgba(52, 211, 153, 0.2);
-  color: var(--color-success);
-}
-
-.dark .badge-warning {
-  background-color: rgba(251, 191, 36, 0.2);
-  color: var(--color-warning);
-}
-
-.dark .badge-danger {
-  background-color: rgba(248, 113, 113, 0.2);
-  color: var(--color-danger);
-}
-
-.dark .badge-info {
-  background-color: rgba(56, 189, 248, 0.2);
-  color: var(--color-info);
-}
-
-/* Dark theme toasts */
-.dark .toast {
-  background-color: var(--bg-card);
-  border-color: var(--border-primary);
-  color: var(--text-primary);
-}
-
-.dark .toast-success {
-  border-left-color: var(--color-success);
-  background-color: rgba(52, 211, 153, 0.1);
-}
-
-.dark .toast-warning {
-  border-left-color: var(--color-warning);
-  background-color: rgba(251, 191, 36, 0.1);
-}
-
-.dark .toast-danger {
-  border-left-color: var(--color-danger);
-  background-color: rgba(248, 113, 113, 0.1);
-}
-
-/* Dark theme glass effect */
-.dark .glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-}
-
-/* Dark theme animations */
-.dark .pulse {
-  animation: dark-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes dark-pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-/* Dark theme transitions */
-.dark * {
-  transition: background-color 0.3s ease,
-              border-color 0.3s ease,
-              color 0.3s ease,
-              box-shadow 0.3s ease;
-}
-
-/* Dark theme focus states */
-.dark :focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-}
-
-.dark :focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-}
-
-/* Dark theme selection */
-.dark ::selection {
-  background-color: rgba(59, 130, 246, 0.3);
-  color: var(--text-primary);
-}
-
-.dark ::-moz-selection {
-  background-color: rgba(59, 130, 246, 0.3);
-  color: var(--text-primary);
-}
-
-/* Dark theme borders */
-.dark .border-light {
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.dark .border-medium {
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.dark .border-heavy {
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-/* Dark theme shadows */
-.dark .shadow-light {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.dark .shadow-medium {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-}
-
-.dark .shadow-heavy {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
-}
-
-/* Dark theme gradients */
-.dark .gradient-primary {
-  background: var(--gradient-primary);
-}
-
-.dark .gradient-secondary {
-  background: var(--gradient-secondary);
-}
-
-.dark .gradient-dark {
-  background: var(--gradient-dark);
-}
-
-/* Dark theme text */
-.dark .text-muted {
-  color: var(--text-muted);
-}
-
-.dark .text-subtle {
-  color: var(--text-tertiary);
-}
-
-.dark .text-highlight {
-  color: var(--color-primary);
-}
-
-/* Dark theme utility classes */
-.dark .bg-dark {
-  background-color: var(--bg-primary);
-}
-
-.dark .bg-darker {
-  background-color: #0a0f1a;
-}
-
-.dark .bg-darkest {
-  background-color: #050811;
-}
-
-/* Dark theme responsive adjustments */
-@media (max-width: 768px) {
-  .dark .mobile-glass {
-    background: rgba(30, 41, 59, 0.9);
-    backdrop-filter: blur(16px);
-  }
-}
-
-/* Dark theme print styles */
-@media print {
-  .dark {
-    background-color: white !important;
-    color: black !important;
-  }
-  
-  .dark .card,
-  .dark .modal {
-    background-color: white !important;
-    border-color: #e5e7eb !important;
-    box-shadow: none !important;
-  }
 }
