@@ -38,15 +38,20 @@ async function createWindow() {
     };
   });
 
-  // Register priority IPC handlers
-  const { registerClipboardIPC } = require("./app/backend/ipc/clipboard-ipc");
+  // Register priority IPC handlers with enhanced functionality
+  const { registerClipboardIPC, cleanupClipboardIPC } = require("./app/backend/ipc/clipboard-ipc");
   const { registerAIIPC } = require("./app/backend/ipc/ai-ipc");
-  const { registerStorageIPC } = require("./app/backend/ipc/storage-ipc");
+  const { registerStorageIPC, cleanupStorageIPC } = require("./app/backend/ipc/storage-ipc");
 
-  // Register mock handlers as fallback (for compatibility)
-  registerClipboardIPC();
-  registerAIIPC();
-  registerStorageIPC();
+  // Register enhanced handlers as primary
+  try {
+    registerClipboardIPC();
+    registerAIIPC();
+    registerStorageIPC();
+    console.log('✅ Enhanced IPC handlers registered successfully');
+  } catch (error) {
+    console.error('❌ Enhanced IPC registration failed:', error);
+  }
 
   // Initialize backend services and IPC handlers
   try {
