@@ -1,4 +1,4 @@
- Project: Knoux-Clipboard-AI
+🎯 Project: Knoux-Clipboard-AI
 ================================================================================
 [DIR] app
     [DIR] assets
@@ -9,7 +9,7 @@
             [FILE] ai-database.ts [20.02 KB | 0.0196 MB | 0 %]
             [FILE] ai-engine.ts [26.35 KB | 0.0257 MB | 0 %]
             [FILE] classifier.ts [30.32 KB | 0.0296 MB | 0.01 %]
-            [FILE] enhancer.ts [24.77 KB | 0.0242 MB | 0 %]
+            [FILE] enhancer.ts [49.63 KB | 0.0485 MB | 0.01 %]
             [FILE] prompt-library.ts [26.4 KB | 0.0258 MB | 0 %]
             [FILE] summarizer.ts [32.13 KB | 0.0314 MB | 0.01 %]
         [DIR] clipboard
@@ -18,13 +18,13 @@
             [FILE] normalizer.ts [22.46 KB | 0.0219 MB | 0 %]
             [FILE] watcher.ts [25.75 KB | 0.0251 MB | 0 %]
         [DIR] ipc
-            [FILE] enhanced-handlers.ts [14.48 KB | 0.0141 MB | 0 %]
-            [FILE] handlers.ts [9.7 KB | 0.0095 MB | 0 %]
+            [FILE] enhanced-handlers.ts [18.69 KB | 0.0182 MB | 0 %]
+            [FILE] handlers.ts [9.75 KB | 0.0095 MB | 0 %]
         [DIR] main
             [FILE] lifecycle.ts [23.92 KB | 0.0234 MB | 0 %]
             [FILE] main.ts [4.94 KB | 0.0048 MB | 0 %]
             [FILE] preload.js [1.88 KB | 0.0018 MB | 0 %]
-            [FILE] preload.ts [30.75 KB | 0.03 MB | 0.01 %]
+            [FILE] preload.ts [1.36 KB | 0.0013 MB | 0 %]
             [FILE] tray.ts [15.73 KB | 0.0154 MB | 0 %]
             [FILE] window-manager.ts [15.71 KB | 0.0153 MB | 0 %]
         [DIR] security
@@ -35,8 +35,8 @@
             [FILE] sensitive-detector.ts [2.73 KB | 0.0027 MB | 0 %]
         [DIR] services
             [FILE] aiService.ts [14.98 KB | 0.0146 MB | 0 %]
-            [FILE] databaseService.ts [14.63 KB | 0.0143 MB | 0 %]
-            [FILE] languageService.ts [11.19 KB | 0.0109 MB | 0 %]
+            [FILE] databaseService.ts [15.4 KB | 0.015 MB | 0 %]
+            [FILE] languageService.ts [11.43 KB | 0.0112 MB | 0 %]
             [FILE] settingsService.ts [4.77 KB | 0.0047 MB | 0 %]
             [FILE] themeService.ts [9.53 KB | 0.0093 MB | 0 %]
         [DIR] storage
@@ -53,6 +53,8 @@
         [FILE] service-manager.ts [9.91 KB | 0.0097 MB | 0 %]
     [DIR] renderer
         [DIR] components
+            [DIR] icons
+                [FILE] index.tsx [1.54 KB | 0.0015 MB | 0 %]
             [DIR] settings
                 [FILE] GeneralSettings.tsx [5.75 KB | 0.0056 MB | 0 %]
             [FILE] AboutKnoux.tsx [19.58 KB | 0.0191 MB | 0 %]
@@ -60,6 +62,7 @@
             [FILE] ActionButton.tsx [0.92 KB | 0.0009 MB | 0 %]
             [FILE] AIProcessor.tsx [43.48 KB | 0.0425 MB | 0.01 %]
             [FILE] AppInfo.tsx [9.78 KB | 0.0096 MB | 0 %]
+            [FILE] BottomNav.tsx [1.71 KB | 0.0017 MB | 0 %]
             [FILE] ClipboardItem.tsx [10.42 KB | 0.0102 MB | 0 %]
             [FILE] ClipboardList.tsx [18.59 KB | 0.0182 MB | 0 %]
             [FILE] ClipboardPreview.tsx [11.86 KB | 0.0116 MB | 0 %]
@@ -74,11 +77,12 @@
             [FILE] Layout.tsx [0.51 KB | 0.0005 MB | 0 %]
             [FILE] LoadingOverlay.tsx [0.57 KB | 0.0006 MB | 0 %]
             [FILE] LoadingScreen.tsx [0.96 KB | 0.0009 MB | 0 %]
+            [FILE] LoadingSkeleton.tsx [2.84 KB | 0.0028 MB | 0 %]
             [FILE] SearchBar.tsx [33.43 KB | 0.0326 MB | 0.01 %]
-            [FILE] SettingsPanel.tsx [16.82 KB | 0.0164 MB | 0 %]
-            [FILE] Sidebar.tsx [3.32 KB | 0.0032 MB | 0 %]
+            [FILE] SettingsPanel.tsx [18.2 KB | 0.0178 MB | 0 %]
+            [FILE] Sidebar.tsx [4.07 KB | 0.004 MB | 0 %]
             [FILE] SidebarClean.tsx [2.97 KB | 0.0029 MB | 0 %]
-            [FILE] SplashScreen.tsx [3.06 KB | 0.003 MB | 0 %]
+            [FILE] SplashScreen.tsx [5.02 KB | 0.0049 MB | 0 %]
             [FILE] StatusCard.css [3.08 KB | 0.003 MB | 0 %]
             [FILE] StatusCard.tsx [1.65 KB | 0.0016 MB | 0 %]
             [FILE] SystemBar.tsx [10.42 KB | 0.0102 MB | 0 %]
@@ -94,12 +98,12 @@
             [FILE] ClipboardContext.tsx [2.59 KB | 0.0025 MB | 0 %]
             [FILE] NotificationContext.tsx [2.31 KB | 0.0023 MB | 0 %]
             [FILE] SettingsContext.tsx [0.98 KB | 0.001 MB | 0 %]
-            [FILE] ThemeContext.tsx [1.33 KB | 0.0013 MB | 0 %]
+            [FILE] ThemeContext.tsx [1.99 KB | 0.0019 MB | 0 %]
         [DIR] hooks
             [FILE] useAI_backup.ts [18.8 KB | 0.0184 MB | 0 %]
             [FILE] useAI.ts [18.8 KB | 0.0184 MB | 0 %]
             [FILE] useAIFixed.ts [18.8 KB | 0.0184 MB | 0 %]
-            [FILE] useClipboard.ts [9.97 KB | 0.0097 MB | 0 %]
+            [FILE] useClipboard.ts [10.36 KB | 0.0101 MB | 0 %]
             [FILE] useDatabase.ts [6.39 KB | 0.0062 MB | 0 %]
             [FILE] useLanguage.ts [2.64 KB | 0.0026 MB | 0 %]
             [FILE] useSearch.ts [11.52 KB | 0.0112 MB | 0 %]
@@ -111,7 +115,7 @@
             [FILE] en.json [3.33 KB | 0.0033 MB | 0 %]
         [DIR] layouts
         [DIR] pages
-            [FILE] DashboardPage.tsx [10.03 KB | 0.0098 MB | 0 %]
+            [FILE] DashboardPage.tsx [12.66 KB | 0.0124 MB | 0 %]
         [DIR] services
             [FILE] ClipboardService.ts [6.03 KB | 0.0059 MB | 0 %]
             [FILE] initialization.ts [0.23 KB | 0.0002 MB | 0 %]
@@ -119,8 +123,11 @@
         [DIR] styles
             [FILE] animations.css [14.14 KB | 0.0138 MB | 0 %]
             [FILE] global.css [7.65 KB | 0.0075 MB | 0 %]
-            [FILE] theme-dark.css [9.01 KB | 0.0088 MB | 0 %]
-            [FILE] theme-light.css [10.67 KB | 0.0104 MB | 0 %]
+            [FILE] theme-ai.css [2.49 KB | 0.0024 MB | 0 %]
+            [FILE] theme-contrast.css [2.53 KB | 0.0025 MB | 0 %]
+            [FILE] theme-dark.css [2.54 KB | 0.0025 MB | 0 %]
+            [FILE] theme-light.css [2.5 KB | 0.0024 MB | 0 %]
+            [FILE] theme-professional.css [2.8 KB | 0.0027 MB | 0 %]
             [FILE] theme.ts [0.69 KB | 0.0007 MB | 0 %]
         [DIR] types
             [FILE] electron.d.ts [0.53 KB | 0.0005 MB | 0 %]
@@ -136,27 +143,28 @@
             [FILE] Dashboard.css [6.79 KB | 0.0066 MB | 0 %]
             [FILE] Dashboard.tsx [10.54 KB | 0.0103 MB | 0 %]
             [FILE] SecurityCenter.tsx [22.66 KB | 0.0221 MB | 0 %]
+            [FILE] SmartActions.tsx [3.89 KB | 0.0038 MB | 0 %]
             [FILE] VIP.css [8.86 KB | 0.0086 MB | 0 %]
-            [FILE] VIP.tsx [8.84 KB | 0.0086 MB | 0 %]
-        [FILE] App.tsx [5.05 KB | 0.0049 MB | 0 %]
+            [FILE] VIP.tsx [4.47 KB | 0.0044 MB | 0 %]
+        [FILE] App.tsx [5.5 KB | 0.0054 MB | 0 %]
         [FILE] AppClean.tsx [6.3 KB | 0.0062 MB | 0 %]
         [FILE] AppFinal.tsx [6.29 KB | 0.0061 MB | 0 %]
         [FILE] AppIntegrated.tsx [19.46 KB | 0.019 MB | 0 %]
         [FILE] index.html [1.38 KB | 0.0014 MB | 0 %]
         [FILE] index.tsx [0.28 KB | 0.0003 MB | 0 %]
-        [FILE] main.tsx [0.47 KB | 0.0005 MB | 0 %]
+        [FILE] main.tsx [0.64 KB | 0.0006 MB | 0 %]
         [FILE] store.ts [0.33 KB | 0.0003 MB | 0 %]
     [DIR] shared
-        [FILE] config-schema.ts [18.63 KB | 0.0182 MB | 0 %]
-        [FILE] constants.ts [0.23 KB | 0.0002 MB | 0 %]
-        [FILE] enums.ts [21.93 KB | 0.0214 MB | 0 %]
+        [FILE] config-schema.ts [19.41 KB | 0.019 MB | 0 %]
+        [FILE] constants.ts [7.94 KB | 0.0078 MB | 0 %]
+        [FILE] enums.ts [7.04 KB | 0.0069 MB | 0 %]
         [FILE] i18n-complete.ts [22.92 KB | 0.0224 MB | 0 %]
         [FILE] i18n.ts [0.79 KB | 0.0008 MB | 0 %]
         [FILE] localized-logger.ts [0.03 KB | 0 MB | 0 %]
-        [FILE] logger.ts [17.32 KB | 0.0169 MB | 0 %]
+        [FILE] logger.ts [16.83 KB | 0.0164 MB | 0 %]
         [FILE] settings-manager.ts [26.14 KB | 0.0255 MB | 0 %]
         [FILE] theme-manager.ts [11.92 KB | 0.0116 MB | 0 %]
-        [FILE] types.ts [20.38 KB | 0.0199 MB | 0 %]
+        [FILE] types.ts [13.24 KB | 0.0129 MB | 0 %]
         [FILE] vip-manager.ts [14.22 KB | 0.0139 MB | 0 %]
     [DIR] tests
         [DIR] e2e
@@ -173,13 +181,21 @@
     [FILE] main.ts [10.79 KB | 0.0105 MB | 0 %]
     [FILE] setupTests.ts [4.83 KB | 0.0047 MB | 0 %]
 [DIR] assets
+    [DIR] fonts
     [DIR] icons
         [FILE] icon.icns [1.96 KB | 0.0019 MB | 0 %]
         [FILE] icon.ico [1.96 KB | 0.0019 MB | 0 %]
         [FILE] icon.png [1.96 KB | 0.0019 MB | 0 %]
         [FILE] tray.png [0.34 KB | 0.0003 MB | 0 %]
+    [DIR] logo
+    [DIR] marketing
+        [DIR] app-store
+        [DIR] social
+        [DIR] source
+        [DIR] website
     [FILE] app-icon.ico [68.74 KB | 0.0671 MB | 0.01 %]
     [FILE] README-ICONS.md [8.87 KB | 0.0087 MB | 0 %]
+    [FILE] README.md [1.3 KB | 0.0013 MB | 0 %]
     [FILE] splash.png [2143.6 KB | 2.0934 MB | 0.4 %]
     [FILE] tray-icon.ico [176.4 KB | 0.1723 MB | 0.03 %]
 [DIR] data
@@ -195,9 +211,13 @@
 [DIR] docs
     [FILE] AI-DESIGN.md [12.99 KB | 0.0127 MB | 0 %]
     [FILE] ARCHITECTURE.md [9.21 KB | 0.009 MB | 0 %]
+    [FILE] BRAND_GUIDELINES.md [5.81 KB | 0.0057 MB | 0 %]
+    [FILE] design-tokens.json [1.44 KB | 0.0014 MB | 0 %]
+    [FILE] DEVELOPMENT_ASSETS.md [3.47 KB | 0.0034 MB | 0 %]
     [FILE] FEATURES.md [9.1 KB | 0.0089 MB | 0 %]
     [FILE] index.html [3.46 KB | 0.0034 MB | 0 %]
     [FILE] INTEGRATION-GUIDE.md [15.51 KB | 0.0151 MB | 0 %]
+    [FILE] MARKETING_ASSETS.md [2.76 KB | 0.0027 MB | 0 %]
     [FILE] README.md [8.09 KB | 0.0079 MB | 0 %]
     [FILE] ROADMAP.md [9.49 KB | 0.0093 MB | 0 %]
     [FILE] SECURITY.md [1.55 KB | 0.0015 MB | 0 %]
@@ -503,7 +523,7 @@
         [FILE] d3dcompiler_47.dll [4801.48 KB | 4.6889 MB | 0.89 %]
         [FILE] ffmpeg.dll [2812.5 KB | 2.7466 MB | 0.52 %]
         [FILE] icudtl.dat [10297.73 KB | 10.0564 MB | 1.91 %]
-        [FILE] Knoux-Clipboard-AI.exe [159469.5 KB | 155.7319 MB | 29.58 %]
+        [FILE] Knoux-Clipboard-AI.exe [159469.5 KB | 155.7319 MB | 29.54 %]
         [FILE] libEGL.dll [469 KB | 0.458 MB | 0.09 %]
         [FILE] libGLESv2.dll [7245 KB | 7.0752 MB | 1.34 %]
         [FILE] LICENSE [1.07 KB | 0.001 MB | 0 %]
@@ -592,7 +612,7 @@
         [FILE] d3dcompiler_47.dll [4801.48 KB | 4.6889 MB | 0.89 %]
         [FILE] ffmpeg.dll [2812.5 KB | 2.7466 MB | 0.52 %]
         [FILE] icudtl.dat [10297.73 KB | 10.0564 MB | 1.91 %]
-        [FILE] Knoux Clipboard AI.exe [159565 KB | 155.8252 MB | 29.59 %]
+        [FILE] Knoux Clipboard AI.exe [159565 KB | 155.8252 MB | 29.56 %]
         [FILE] libEGL.dll [469 KB | 0.458 MB | 0.09 %]
         [FILE] libGLESv2.dll [7245 KB | 7.0752 MB | 1.34 %]
         [FILE] LICENSE.electron.txt [1.07 KB | 0.001 MB | 0 %]
@@ -603,7 +623,7 @@
         [FILE] vk_swiftshader_icd.json [0.1 KB | 0.0001 MB | 0 %]
         [FILE] vk_swiftshader.dll [5128 KB | 5.0078 MB | 0.95 %]
         [FILE] vulkan-1.dll [910 KB | 0.8887 MB | 0.17 %]
-    [FILE] knoux-clipboard-ai-1.0.0-x64.nsis.7z [55290.92 KB | 53.995 MB | 10.25 %]
+    [FILE] knoux-clipboard-ai-1.0.0-x64.nsis.7z [55290.92 KB | 53.995 MB | 10.24 %]
 [DIR] scripts
     [FILE] analyze-code.js [10.11 KB | 0.0099 MB | 0 %]
     [FILE] dev-run.md [4.39 KB | 0.0043 MB | 0 %]
@@ -637,12 +657,14 @@
 [FILE] INSTALLATION.md [11.04 KB | 0.0108 MB | 0 %]
 [FILE] KNOUX.signature [0 KB | 0 MB | 0 %]
 [FILE] LICENSE [1.05 KB | 0.001 MB | 0 %]
-[FILE] main.js [3.48 KB | 0.0034 MB | 0 %]
-[FILE] package-lock.json [319.41 KB | 0.3119 MB | 0.06 %]
+[FILE] main.js [4.19 KB | 0.0041 MB | 0 %]
+[FILE] New Text Document (2).txt [143.48 KB | 0.1401 MB | 0.03 %]
+[FILE] New Text Document.txt [479.54 KB | 0.4683 MB | 0.09 %]
+[FILE] package-lock.json [337.49 KB | 0.3296 MB | 0.06 %]
 [FILE] package-simple.json [0.38 KB | 0.0004 MB | 0 %]
-[FILE] package.json [1.48 KB | 0.0014 MB | 0 %]
+[FILE] package.json [1.61 KB | 0.0016 MB | 0 %]
 [FILE] postcss.config.js [0.07 KB | 0.0001 MB | 0 %]
-[FILE] preload.js [0.55 KB | 0.0005 MB | 0 %]
+[FILE] preload.js [1.19 KB | 0.0012 MB | 0 %]
 [FILE] PROJECT-STRUCTURE.md [6.66 KB | 0.0065 MB | 0 %]
 [FILE] README.md [6.48 KB | 0.0063 MB | 0 %]
 [FILE] RELEASES.md [6.92 KB | 0.0068 MB | 0 %]
@@ -650,7 +672,8 @@
 [FILE] run.bat [0.78 KB | 0.0008 MB | 0 %]
 [FILE] run.sh [0.65 KB | 0.0006 MB | 0 %]
 [FILE] SETUP-SUMMARY.md [12.89 KB | 0.0126 MB | 0 %]
-[FILE] tailwind.config.js [5.03 KB | 0.0049 MB | 0 %]
+[FILE] tailwind.config.js [5.37 KB | 0.0052 MB | 0 %]
+[FILE] tsconfig.electron.json [0.65 KB | 0.0006 MB | 0 %]
 [FILE] tsconfig.fixed.json [0.94 KB | 0.0009 MB | 0 %]
 [FILE] tsconfig.json [1.79 KB | 0.0018 MB | 0 %]
 [FILE] vite.config.ts [2.11 KB | 0.0021 MB | 0 %]
