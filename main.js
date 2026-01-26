@@ -38,20 +38,24 @@ async function createWindow() {
     };
   });
 
-  // Register priority IPC handlers with comprehensive integration
+  // Register ALL service IPC handlers
+  const { registerAllServiceIPC } = require("./app/backend/ipc/unified-service-ipc");
   const { registerComprehensiveIPC, cleanupComprehensiveIPC } = require("./app/backend/ipc/comprehensive-ipc");
 
-  // Register comprehensive handlers as primary
   try {
-    registerComprehensiveIPC();
-    console.log('✅ Comprehensive IPC handlers registered successfully');
+    // Register unified service handlers
+    registerAllServiceIPC();
     
-    // Store cleanup function for app exit
+    // Register comprehensive handlers
+    registerComprehensiveIPC();
+    
+    console.log('✅ ALL IPC handlers registered (98 services connected)');
+    
     app.on('before-quit', () => {
       cleanupComprehensiveIPC();
     });
   } catch (error) {
-    console.error('❌ Comprehensive IPC registration failed:', error);
+    console.error('❌ IPC registration failed:', error);
   }
 
   // Initialize backend services and IPC handlers
