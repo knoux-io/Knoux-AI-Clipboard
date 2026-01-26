@@ -5,7 +5,7 @@
  * Clipboard Intelligence • Desktop Precision • Premium Engineering
  */
 
-import { llog } from "../../shared/localized-logger";
+import { createLogger } from "../../shared/logger";
 import { CLIPBOARD, SECURITY, AI } from "../../shared/constants";
 import {
   ClipboardItem,
@@ -119,7 +119,7 @@ export class HistoryStore {
       return;
     }
 
-    this.llog.info("Initializing history store");
+    this.logger.info("Initializing history store");
 
     try {
       // Initialize dependencies
@@ -145,12 +145,12 @@ export class HistoryStore {
       }
 
       this.isInitialized = true;
-      this.llog.info("History store initialized successfully", {
+      this.logger.info("History store initialized successfully", {
         itemCount: this.stats.totalItems,
         totalSize: this.formatBytes(this.stats.totalSizeBytes),
       });
     } catch (error) {
-      this.llog.error("Failed to initialize history store", error as Error);
+      this.logger.error("Failed to initialize history store", error as Error);
       throw error;
     }
   }
@@ -161,14 +161,16 @@ export class HistoryStore {
   private async loadFromStorage(): Promise<void> {
     try {
       // In production, this would load from SQLite/JSON file
-      this.llog.debug("Loading items from storage", { path: this.storagePath });
+      this.logger.debug("Loading items from storage", {
+        path: this.storagePath,
+      });
 
       // Simulate loading
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      this.llog.debug("Storage loading completed (simulated)");
+      this.logger.debug("Storage loading completed (simulated)");
     } catch (error) {
-      this.llog.warn(
+      this.logger.warn(
         "Failed to load from storage, starting fresh",
         error as Error,
       );
@@ -182,7 +184,7 @@ export class HistoryStore {
   private async setupEncryption(): Promise<void> {
     try {
       // In production, this would load or generate encryption keys
-      this.llog.debug("Setting up encryption system");
+      this.logger.debug("Setting up encryption system");
 
       // For now, create a mock key
       this.encryptionKey = Buffer.from(
@@ -190,9 +192,9 @@ export class HistoryStore {
         "utf8",
       );
 
-      this.llog.info("Encryption system ready");
+      this.logger.info("Encryption system ready");
     } catch (error) {
-      this.llog.error("Failed to setup encryption", error as Error);
+      this.logger.error("Failed to setup encryption", error as Error);
       this.config.encryptionEnabled = false;
     }
   }
@@ -207,7 +209,7 @@ export class HistoryStore {
       this.createBackup();
     }, intervalMs);
 
-    this.llog.debug("Backup schedule started", {
+    this.logger.debug("Backup schedule started", {
       intervalHours: this.config.backupIntervalHours,
     });
   }

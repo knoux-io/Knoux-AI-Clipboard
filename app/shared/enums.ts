@@ -11,43 +11,67 @@
  * Clipboard content format types
  */
 export enum ClipboardFormat {
-  TEXT = 'text',
-  HTML = 'html',
-  RTF = 'rtf',
-  IMAGE = 'image',
-  FILES = 'files',
-  CUSTOM = 'custom',
+  TEXT = "text",
+  HTML = "html",
+  RTF = "rtf",
+  IMAGE = "image",
+  FILES = "files",
+  CUSTOM = "custom",
 }
 
 /**
  * Clipboard monitoring state
  */
 export enum ClipboardState {
-  ACTIVE = 'active',
-  PAUSED = 'paused',
-  DISABLED = 'disabled',
-  ERROR = 'error',
+  ACTIVE = "active",
+  PAUSED = "paused",
+  DISABLED = "disabled",
+  ERROR = "error",
 }
 
 /**
  * Clipboard item storage status
  */
 export enum StorageStatus {
-  PERSISTENT = 'persistent',
-  TEMPORARY = 'temporary',
-  ENCRYPTED = 'encrypted',
-  ARCHIVED = 'archived',
-  DELETED = 'deleted',
+  PERSISTENT = "persistent",
+  TEMPORARY = "temporary",
+  ENCRYPTED = "encrypted",
+  ARCHIVED = "archived",
+  DELETED = "deleted",
 }
 
 /**
  * Clipboard change detection mode
  */
 export enum DetectionMode {
-  POLLING = 'polling',
-  EVENT_DRIVEN = 'event_driven',
-  HYBRID = 'hybrid',
-  MANUAL = 'manual',
+  POLLING = "polling",
+  EVENT_DRIVEN = "event_driven",
+  HYBRID = "hybrid",
+  MANUAL = "manual",
+}
+
+/**
+ * Storage backend types for clipboard history
+ */
+export enum StorageType {
+  LOCAL_SQLITE = "local_sqlite",
+  LOCAL_JSON = "local_json",
+  LOCAL_INDEXEDDB = "local_indexeddb",
+  CLOUD_FIREBASE = "cloud_firebase",
+  CLOUD_MONGODB = "cloud_mongodb",
+  CLOUD_DYNAMODB = "cloud_dynamodb",
+  HYBRID = "hybrid",
+}
+
+/**
+ * Compression methods for clipboard data
+ */
+export enum CompressionMethod {
+  NONE = "none",
+  GZIP = "gzip",
+  BROTLI = "brotli",
+  ZSTD = "zstd",
+  LZ4 = "lz4",
 }
 
 // ==================== AI ENUMS ====================
@@ -56,24 +80,24 @@ export enum DetectionMode {
  * AI model types available
  */
 export enum AIModelType {
-  LOCAL_LLAMA = 'local_llama',
-  LOCAL_GPT2 = 'local_gpt2',
-  CLOUD_OPENAI = 'cloud_openai',
-  CLOUD_ANTHROPIC = 'cloud_anthropic',
-  CLOUD_GEMINI = 'cloud_gemini',
-  CUSTOM_MODEL = 'custom_model',
+  LOCAL_LLAMA = "local_llama",
+  LOCAL_GPT2 = "local_gpt2",
+  CLOUD_OPENAI = "cloud_openai",
+  CLOUD_ANTHROPIC = "cloud_anthropic",
+  CLOUD_GEMINI = "cloud_gemini",
+  CUSTOM_MODEL = "custom_model",
 }
 
 /**
  * AI analysis status
  */
 export enum AIAnalysisStatus {
-  PENDING = 'pending',
-  PROCESSING = 'processing',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  CACHED = 'cached',
-  SKIPPED = 'skipped',
+  PENDING = "pending",
+  PROCESSING = "processing",
+  COMPLETED = "completed",
+  FAILED = "failed",
+  CACHED = "cached",
+  SKIPPED = "skipped",
 }
 
 /**
@@ -91,16 +115,16 @@ export enum AITaskPriority {
  * AI suggestion categories
  */
 export enum SuggestionCategory {
-  CODE_QUALITY = 'code_quality',
-  SECURITY = 'security',
-  PERFORMANCE = 'performance',
-  READABILITY = 'readability',
-  BEST_PRACTICES = 'best_practices',
-  OPTIMIZATION = 'optimization',
-  DEBUGGING = 'debugging',
-  FORMATTING = 'formatting',
-  REFACTORING = 'refactoring',
-  DOCUMENTATION = 'documentation',
+  CODE_QUALITY = "code_quality",
+  SECURITY = "security",
+  PERFORMANCE = "performance",
+  READABILITY = "readability",
+  BEST_PRACTICES = "best_practices",
+  OPTIMIZATION = "optimization",
+  DEBUGGING = "debugging",
+  FORMATTING = "formatting",
+  REFACTORING = "refactoring",
+  DOCUMENTATION = "documentation",
 }
 
 // ==================== SECURITY ENUMS ====================
@@ -109,21 +133,21 @@ export enum SuggestionCategory {
  * Encryption algorithms supported
  */
 export enum EncryptionAlgorithm {
-  AES_GCM = 'AES-GCM',
-  AES_CBC = 'AES-CBC',
-  CHACHA20_POLY1305 = 'ChaCha20-Poly1305',
-  RSA_OAEP = 'RSA-OAEP',
-  RSA_PSS = 'RSA-PSS',
+  AES_GCM = "AES-GCM",
+  AES_CBC = "AES-CBC",
+  CHACHA20_POLY1305 = "ChaCha20-Poly1305",
+  RSA_OAEP = "RSA-OAEP",
+  RSA_PSS = "RSA-PSS",
 }
 
 /**
  * Key derivation functions
  */
 export enum KeyDerivationFunction {
-  PBKDF2 = 'PBKDF2',
-  SCRYPT = 'scrypt',
-  ARGON2ID = 'argon2id',
-  BCRYPT = 'bcrypt',
+  PBKDF2 = "PBKDF2",
+  SCRYPT = "scrypt",
+  ARGON2ID = "argon2id",
+  BCRYPT = "bcrypt",
 }
 
 /**
@@ -141,14 +165,14 @@ export enum SecurityAlertLevel {
  * Permission types for security
  */
 export enum PermissionType {
-  CLIPBOARD_READ = 'clipboard_read',
-  CLIPBOARD_WRITE = 'clipboard_write',
-  AI_ANALYSIS = 'ai_analysis',
-  FILE_ACCESS = 'file_access',
-  NETWORK_ACCESS = 'network_access',
-  SYSTEM_INFO = 'system_info',
-  AUTOSTART = 'autostart',
-  NOTIFICATIONS = 'notifications',
+  CLIPBOARD_READ = "clipboard_read",
+  CLIPBOARD_WRITE = "clipboard_write",
+  AI_ANALYSIS = "ai_analysis",
+  FILE_ACCESS = "file_access",
+  NETWORK_ACCESS = "network_access",
+  SYSTEM_INFO = "system_info",
+  AUTOSTART = "autostart",
+  NOTIFICATIONS = "notifications",
 }
 
 // ==================== CONTENT ENUMS ====================
@@ -157,78 +181,78 @@ export enum PermissionType {
  * Primary content categories
  */
 export enum ContentCategory {
-  CODE = 'code',
-  TEXT = 'text',
-  DATA = 'data',
-  MEDIA = 'media',
-  DOCUMENT = 'document',
-  EXECUTABLE = 'executable',
-  OTHER = 'other',
+  CODE = "code",
+  TEXT = "text",
+  DATA = "data",
+  MEDIA = "media",
+  DOCUMENT = "document",
+  EXECUTABLE = "executable",
+  OTHER = "other",
 }
 
 /**
  * Programming languages (for code detection)
  */
 export enum ProgrammingLanguage {
-  JAVASCRIPT = 'javascript',
-  TYPESCRIPT = 'typescript',
-  PYTHON = 'python',
-  JAVA = 'java',
-  CSHARP = 'csharp',
-  CPP = 'cpp',
-  C = 'c',
-  GO = 'go',
-  RUST = 'rust',
-  PHP = 'php',
-  RUBY = 'ruby',
-  SWIFT = 'swift',
-  KOTLIN = 'kotlin',
-  DART = 'dart',
-  POWERSHELL = 'powershell',
-  BASH = 'bash',
-  SQL = 'sql',
-  HTML = 'html',
-  CSS = 'css',
-  JSON = 'json',
-  YAML = 'yaml',
-  XML = 'xml',
-  MARKDOWN = 'markdown',
-  TOML = 'toml',
-  INI = 'ini',
-  UNKNOWN = 'unknown',
+  JAVASCRIPT = "javascript",
+  TYPESCRIPT = "typescript",
+  PYTHON = "python",
+  JAVA = "java",
+  CSHARP = "csharp",
+  CPP = "cpp",
+  C = "c",
+  GO = "go",
+  RUST = "rust",
+  PHP = "php",
+  RUBY = "ruby",
+  SWIFT = "swift",
+  KOTLIN = "kotlin",
+  DART = "dart",
+  POWERSHELL = "powershell",
+  BASH = "bash",
+  SQL = "sql",
+  HTML = "html",
+  CSS = "css",
+  JSON = "json",
+  YAML = "yaml",
+  XML = "xml",
+  MARKDOWN = "markdown",
+  TOML = "toml",
+  INI = "ini",
+  UNKNOWN = "unknown",
 }
 
 /**
  * Data formats
  */
 export enum DataFormat {
-  JSON = 'json',
-  XML = 'xml',
-  YAML = 'yaml',
-  CSV = 'csv',
-  TSV = 'tsv',
-  TOML = 'toml',
-  INI = 'ini',
-  PROPERTIES = 'properties',
-  PLIST = 'plist',
-  PROTOBUF = 'protobuf',
+  JSON = "json",
+  XML = "xml",
+  YAML = "yaml",
+  CSV = "csv",
+  TSV = "tsv",
+  TOML = "toml",
+  INI = "ini",
+  PROPERTIES = "properties",
+  PLIST = "plist",
+  PROTOBUF = "protobuf",
 }
 
 /**
  * Text content types
  */
 export enum TextType {
-  PLAIN = 'plain',
-  EMAIL = 'email',
-  URL = 'url',
-  PROMPT = 'prompt',
-  COMMAND = 'command',
-  LOG = 'log',
-  ERROR = 'error',
-  CONFIG = 'config',
-  LICENSE = 'license',
-  README = 'readme',
-  DOCUMENTATION = 'documentation',
+  PLAIN = "plain",
+  EMAIL = "email",
+  URL = "url",
+  PROMPT = "prompt",
+  COMMAND = "command",
+  LOG = "log",
+  ERROR = "error",
+  CONFIG = "config",
+  LICENSE = "license",
+  README = "readme",
+  DOCUMENTATION = "documentation",
 }
 
 // ==================== UI ENUMS ====================
@@ -237,51 +261,51 @@ export enum TextType {
  * Application themes
  */
 export enum Theme {
-  DARK = 'dark',
-  LIGHT = 'light',
-  SYSTEM = 'system',
-  CUSTOM = 'custom',
+  DARK = "dark",
+  LIGHT = "light",
+  SYSTEM = "system",
+  CUSTOM = "custom",
 }
 
 /**
  * UI view modes
  */
 export enum ViewMode {
-  GRID = 'grid',
-  LIST = 'list',
-  DETAIL = 'detail',
-  COMPACT = 'compact',
-  EXPANDED = 'expanded',
-  PREVIEW = 'preview',
+  GRID = "grid",
+  LIST = "list",
+  DETAIL = "detail",
+  COMPACT = "compact",
+  EXPANDED = "expanded",
+  PREVIEW = "preview",
 }
 
 /**
  * UI component states
  */
 export enum ComponentState {
-  DEFAULT = 'default',
-  HOVER = 'hover',
-  FOCUSED = 'focused',
-  ACTIVE = 'active',
-  DISABLED = 'disabled',
-  LOADING = 'loading',
-  ERROR = 'error',
-  SUCCESS = 'success',
-  WARNING = 'warning',
+  DEFAULT = "default",
+  HOVER = "hover",
+  FOCUSED = "focused",
+  ACTIVE = "active",
+  DISABLED = "disabled",
+  LOADING = "loading",
+  ERROR = "error",
+  SUCCESS = "success",
+  WARNING = "warning",
 }
 
 /**
  * Animation easing functions
  */
 export enum EasingFunction {
-  LINEAR = 'linear',
-  EASE_IN = 'ease-in',
-  EASE_OUT = 'ease-out',
-  EASE_IN_OUT = 'ease-in-out',
-  SMOOTH_STEP = 'smooth-step',
-  BOUNCE = 'bounce',
-  ELASTIC = 'elastic',
-  SPRING = 'spring',
+  LINEAR = "linear",
+  EASE_IN = "ease-in",
+  EASE_OUT = "ease-out",
+  EASE_IN_OUT = "ease-in-out",
+  SMOOTH_STEP = "smooth-step",
+  BOUNCE = "bounce",
+  ELASTIC = "elastic",
+  SPRING = "spring",
 }
 
 // ==================== SYSTEM ENUMS ====================
@@ -290,46 +314,46 @@ export enum EasingFunction {
  * Operating systems supported
  */
 export enum OperatingSystem {
-  WINDOWS = 'windows',
-  MACOS = 'macos',
-  LINUX = 'linux',
-  UNKNOWN = 'unknown',
+  WINDOWS = "windows",
+  MACOS = "macos",
+  LINUX = "linux",
+  UNKNOWN = "unknown",
 }
 
 /**
  * Architecture types
  */
 export enum Architecture {
-  X64 = 'x64',
-  ARM64 = 'arm64',
-  IA32 = 'ia32',
-  ARM = 'arm',
-  UNKNOWN = 'unknown',
+  X64 = "x64",
+  ARM64 = "arm64",
+  IA32 = "ia32",
+  ARM = "arm",
+  UNKNOWN = "unknown",
 }
 
 /**
  * Application update channels
  */
 export enum UpdateChannel {
-  STABLE = 'stable',
-  BETA = 'beta',
-  ALPHA = 'alpha',
-  DEV = 'dev',
-  CUSTOM = 'custom',
+  STABLE = "stable",
+  BETA = "beta",
+  ALPHA = "alpha",
+  DEV = "dev",
+  CUSTOM = "custom",
 }
 
 /**
  * Application lifecycle states
  */
 export enum AppLifecycleState {
-  BOOTING = 'booting',
-  READY = 'ready',
-  ACTIVE = 'active',
-  IDLE = 'idle',
-  BACKGROUND = 'background',
-  SUSPENDED = 'suspended',
-  SHUTTING_DOWN = 'shutting_down',
-  TERMINATED = 'terminated',
+  BOOTING = "booting",
+  READY = "ready",
+  ACTIVE = "active",
+  IDLE = "idle",
+  BACKGROUND = "background",
+  SUSPENDED = "suspended",
+  SHUTTING_DOWN = "shutting_down",
+  TERMINATED = "terminated",
 }
 
 // ==================== STORAGE ENUMS ====================
@@ -338,47 +362,47 @@ export enum AppLifecycleState {
  * Database table names
  */
 export enum DatabaseTable {
-  CLIPBOARD_HISTORY = 'clipboard_history',
-  SETTINGS = 'settings',
-  TAGS = 'tags',
-  AI_CACHE = 'ai_cache',
-  SECURITY_EVENTS = 'security_events',
-  USER_SESSIONS = 'user_sessions',
-  BACKUP_METADATA = 'backup_metadata',
+  CLIPBOARD_HISTORY = "clipboard_history",
+  SETTINGS = "settings",
+  TAGS = "tags",
+  AI_CACHE = "ai_cache",
+  SECURITY_EVENTS = "security_events",
+  USER_SESSIONS = "user_sessions",
+  BACKUP_METADATA = "backup_metadata",
 }
 
 /**
  * Storage engines
  */
 export enum StorageEngine {
-  SQLITE = 'sqlite',
-  INDEXEDDB = 'indexeddb',
-  LOCAL_STORAGE = 'local_storage',
-  FILE_SYSTEM = 'file_system',
-  MEMORY = 'memory',
+  SQLITE = "sqlite",
+  INDEXEDDB = "indexeddb",
+  LOCAL_STORAGE = "local_storage",
+  FILE_SYSTEM = "file_system",
+  MEMORY = "memory",
 }
 
 /**
  * Backup frequency options
  */
 export enum BackupFrequency {
-  HOURLY = 'hourly',
-  DAILY = 'daily',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly',
-  MANUAL = 'manual',
+  HOURLY = "hourly",
+  DAILY = "daily",
+  WEEKLY = "weekly",
+  MONTHLY = "monthly",
+  MANUAL = "manual",
 }
 
 /**
  * Export formats
  */
 export enum ExportFormat {
-  JSON = 'json',
-  CSV = 'csv',
-  SQL = 'sql',
-  HTML = 'html',
-  MARKDOWN = 'markdown',
-  PLAIN_TEXT = 'plain_text',
+  JSON = "json",
+  CSV = "csv",
+  SQL = "sql",
+  HTML = "html",
+  MARKDOWN = "markdown",
+  PLAIN_TEXT = "plain_text",
 }
 
 // ==================== ERROR ENUMS ====================
@@ -387,13 +411,13 @@ export enum ExportFormat {
  * Error categories
  */
 export enum ErrorCategory {
-  CLIPBOARD = 'clipboard',
-  AI = 'ai',
-  SECURITY = 'security',
-  STORAGE = 'storage',
-  UI = 'ui',
-  NETWORK = 'network',
-  SYSTEM = 'system',
-  VALIDATION = 'validation',
-  UNKNOWN = 'unknown',
+  CLIPBOARD = "clipboard",
+  AI = "ai",
+  SECURITY = "security",
+  STORAGE = "storage",
+  UI = "ui",
+  NETWORK = "network",
+  SYSTEM = "system",
+  VALIDATION = "validation",
+  UNKNOWN = "unknown",
 }

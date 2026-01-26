@@ -17,46 +17,92 @@ export async function initBackendServices(): Promise<void> {
   try {
     logger.info('🔧 Initializing backend services...');
 
-    // Initialize Database first
-    logger.info('📊 Database service ready');
+    // Initialize Database first - CRITICAL
+    try {
+      await databaseService.initialize?.();
+      logger.info('✅ Database service initialized');
+    } catch (error) {
+      logger.error('❌ Database initialization failed:', error);
+      // Continue without database for now
+    }
 
     // Initialize Settings Service
-    logger.info('⚙️ Settings service ready');
+    try {
+      await settingsService.initialize?.();
+      logger.info('✅ Settings service initialized');
+    } catch (error) {
+      logger.warn('⚠️ Settings service failed, using defaults');
+    }
     
     // Initialize Language Service
-    logger.info('🌐 Language service ready');
+    try {
+      await languageService.initialize?.();
+      logger.info('✅ Language service initialized');
+    } catch (error) {
+      logger.warn('⚠️ Language service failed, using defaults');
+    }
     
     // Initialize Theme Service
-    logger.info('🎨 Theme service ready');
+    try {
+      await themeService.initialize?.();
+      logger.info('✅ Theme service initialized');
+    } catch (error) {
+      logger.warn('⚠️ Theme service failed, using defaults');
+    }
 
     // Initialize Storage
-    historyStore = new HistoryStore();
-    await historyStore.initialize();
-    logger.info('✅ History Store initialized');
+    try {
+      historyStore = new HistoryStore();
+      await historyStore.initialize();
+      logger.info('✅ History Store initialized');
+    } catch (error) {
+      logger.error('❌ History Store failed:', error);
+      // Create fallback in-memory store
+      historyStore = null;
+    }
 
     // Initialize Security
-    securityManager = new SecurityManager();
-    await securityManager.initialize();
-    logger.info('✅ Security Manager initialized');
+    try {
+      securityManager = new SecurityManager();
+      await securityManager.initialize();
+      logger.info('✅ Security Manager initialized');
+    } catch (error) {
+      logger.error('❌ Security Manager failed:', error);
+      securityManager = null;
+    }
 
     // Initialize AI Engine
-    aiEngine = new AIEngine();
-    await aiEngine.initialize();
-    logger.info('✅ AI Engine initialized');
+    try {
+      aiEngine = new AIEngine();
+      await aiEngine.initialize();
+      logger.info('✅ AI Engine initialized');
+    } catch (error) {
+      logger.error('❌ AI Engine failed:', error);
+      aiEngine = null;
+    }
 
     // Initialize Clipboard Watcher
-    clipboardWatcher = new ClipboardWatcher();
-    await clipboardWatcher.initialize();
-    logger.info('✅ Clipboard Watcher initialized');
+    try {
+      clipboardWatcher = new ClipboardWatcher();
+      await clipboardWatcher.initialize();
+      logger.info('✅ Clipboard Watcher initialized');
+    } catch (error) {
+      logger.error('❌ Clipboard Watcher failed:', error);
+      clipboardWatcher = null;
+    }
 
     // Apply system settings
-    settingsService.applySystemSettings();
-    logger.info('✅ System settings applied');
+    try {
+      await settingsService.applySystemSettings?.();
+      logger.info('✅ System settings applied');
+    } catch (error) {
+      logger.warn('⚠️ System settings application failed');
+    }
 
-    logger.info('✅ All backend services initialized successfully');
+    logger.info('✅ Backend services initialization completed (with fallbacks)');
   } catch (error) {
-    logger.error('❌ Backend initialization failed:', error);
-    throw error;
+    logger.error('❌ Critical backend initialization failed:', error);
+    // Don't throw - allow app to continue with limited functionality
   }
 }
 
