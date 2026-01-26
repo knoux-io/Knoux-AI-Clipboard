@@ -358,7 +358,7 @@ export class HistoryStore {
 
       return item;
     } catch (error) {
-      this.llog.error("Failed to add item to history", error as Error, {
+      this.logger.error("Failed to add item to history", error as Error, {
         itemId,
         contentLength: content.length,
       });
@@ -372,7 +372,7 @@ export class HistoryStore {
   private async encryptItemContent(item: ClipboardItem): Promise<void> {
     try {
       // In production, use actual encryption
-      this.llog.debug("Encrypting item content", { itemId: item.id });
+      this.logger.debug("Encrypting item content", { itemId: item.id });
 
       // Mark as encrypted
       (item.metadata as any).encrypted = true;
