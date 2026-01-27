@@ -5,21 +5,22 @@
  * Clipboard Intelligence • Desktop Precision • Premium Engineering
  */
 
-import { logger, createLogger } from '../../shared/logger';
-import { CLIPBOARD, SECURITY, AI } from '../../shared/constants';
-import { 
-  ClipboardItem, 
-  ClipboardMetadata, 
+import { createLogger } from "../../shared/logger";
+import { CLIPBOARD, SECURITY, AI } from "../../shared/constants";
+import {
+  ClipboardItem,
+  ClipboardMetadata,
   ContentClassification,
-  SearchFilter 
-} from '../../shared/types';
-import { 
-  ClipboardFormat, 
-  StorageType, 
-  CompressionMethod 
-} from '../../shared/enums';
-import { ContentClassifier } from '../ai/classifier';
-import { ContentSummarizer } from '../ai/summarizer';
+  SearchFilter,
+} from "../../shared/types";
+import {
+  ClipboardFormat,
+  StorageType,
+  CompressionMethod,
+} from "../../shared/enums";
+import { ContentClassifier } from "../ai/classifier";
+import { ContentSummarizer } from "../ai/summarizer";
+import { createLogger } from "../../shared/logger";
 
 /**
  * Storage configuration
@@ -59,7 +60,7 @@ export interface SearchResult {
 }
 
 export class HistoryStore {
-  private logger = createLogger({ module: 'history-store' });
+  private logger = createLogger({ module: "history-store" });
   private classifier: ContentClassifier;
   private summarizer: ContentSummarizer;
   private storagePath: string;
@@ -69,7 +70,7 @@ export class HistoryStore {
   private isInitialized = false;
   private encryptionKey: Buffer | null = null;
   private backupInterval: NodeJS.Timeout | null = null;
-  private readonly ENCRYPTION_ALGORITHM = 'aes-256-gcm';
+  private readonly ENCRYPTION_ALGORITHM = "aes-256-gcm";
 
   constructor(classifier: ContentClassifier, summarizer: ContentSummarizer) {
     this.classifier = classifier;
@@ -118,7 +119,7 @@ export class HistoryStore {
       return;
     }
 
-    this.logger.info('Initializing history store');
+    this.logger.info("Initializing history store");
 
     try {
       // Initialize dependencies
@@ -144,13 +145,12 @@ export class HistoryStore {
       }
 
       this.isInitialized = true;
-      this.logger.info('History store initialized successfully', {
+      this.logger.info("History store initialized successfully", {
         itemCount: this.stats.totalItems,
         totalSize: this.formatBytes(this.stats.totalSizeBytes),
       });
-
     } catch (error) {
-      this.logger.error('Failed to initialize history store', error as Error);
+      this.logger.error("Failed to initialize history store", error as Error);
       throw error;
     }
   }
@@ -161,15 +161,19 @@ export class HistoryStore {
   private async loadFromStorage(): Promise<void> {
     try {
       // In production, this would load from SQLite/JSON file
-      this.logger.debug('Loading items from storage', { path: this.storagePath });
-      
-      // Simulate loading
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      this.logger.debug('Storage loading completed (simulated)');
+      this.logger.debug("Loading items from storage", {
+        path: this.storagePath,
+      });
 
+      // Simulate loading
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      this.logger.debug("Storage loading completed (simulated)");
     } catch (error) {
-      this.logger.warn('Failed to load from storage, starting fresh', error as Error);
+      this.logger.warn(
+        "Failed to load from storage, starting fresh",
+        error as Error,
+      );
       this.items.clear();
     }
   }
@@ -180,15 +184,17 @@ export class HistoryStore {
   private async setupEncryption(): Promise<void> {
     try {
       // In production, this would load or generate encryption keys
-      this.logger.debug('Setting up encryption system');
-      
-      // For now, create a mock key
-      this.encryptionKey = Buffer.from('mock-encryption-key-32-bytes-length', 'utf8');
-      
-      this.logger.info('Encryption system ready');
+      this.logger.debug("Setting up encryption system");
 
+      // For now, create a mock key
+      this.encryptionKey = Buffer.from(
+        "mock-encryption-key-32-bytes-length",
+        "utf8",
+      );
+
+      this.logger.info("Encryption system ready");
     } catch (error) {
-      this.logger.error('Failed to setup encryption', error as Error);
+      this.logger.error("Failed to setup encryption", error as Error);
       this.config.encryptionEnabled = false;
     }
   }
@@ -198,12 +204,14 @@ export class HistoryStore {
    */
   private startBackupSchedule(): void {
     const intervalMs = this.config.backupIntervalHours * 60 * 60 * 1000;
-    
+
     this.backupInterval = setInterval(() => {
       this.createBackup();
     }, intervalMs);
 
-    this.logger.debug('Backup schedule started', { intervalHours: this.config.backupIntervalHours });
+    this.logger.debug("Backup schedule started", {
+      intervalHours: this.config.backupIntervalHours,
+    });
   }
 
   /**
@@ -211,16 +219,15 @@ export class HistoryStore {
    */
   private async createBackup(): Promise<void> {
     try {
-      const backupPath = `${this.storagePath}.backup.${Date.now()}.json`;
-      this.logger.info('Creating backup', { path: backupPath });
-      
-      // In production, this would copy the database/file
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      this.logger.debug('Backup created successfully');
+      const backupPath = ".backup.json";
+      this.logger.info("Creating backup", { path: backupPath });
 
+      // In production, this would copy the database/file
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      this.logger.debug("Backup created successfully");
     } catch (error) {
-      this.logger.error('Failed to create backup', error as Error);
+      this.logger.error("Failed to create backup", error as Error);
     }
   }
 
@@ -229,18 +236,17 @@ export class HistoryStore {
    */
   private async saveToStorage(): Promise<void> {
     try {
-      this.logger.debug('Saving items to storage', { 
+      this.logger.debug("Saving items to storage", {
         itemCount: this.items.size,
         path: this.storagePath,
       });
-      
-      // In production, this would save to SQLite/JSON file
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      this.logger.debug('Storage save completed');
 
+      // In production, this would save to SQLite/JSON file
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      this.logger.debug("Storage save completed");
     } catch (error) {
-      this.logger.error('Failed to save to storage', error as Error);
+      this.logger.error("Failed to save to storage", error as Error);
     }
   }
 
@@ -250,16 +256,16 @@ export class HistoryStore {
   public async addItem(
     content: string,
     format: ClipboardFormat,
-    metadata: Partial<ClipboardMetadata> = {}
+    metadata: Partial<ClipboardMetadata> = {},
   ): Promise<ClipboardItem> {
     if (!this.isInitialized) {
       await this.initialize();
     }
 
     const startTime = Date.now();
-    const itemId = `item_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    this.logger.debug('Adding item to history', {
+    const itemId = item__;
+
+    this.logger.debug("Adding item to history", {
       itemId,
       contentLength: content.length,
       format,
@@ -273,9 +279,9 @@ export class HistoryStore {
       });
 
       // Summarize content
-      let summary = '';
+      let summary = "";
       let keyPoints: string[] = [];
-      
+
       if (content.length > 100) {
         const summaryResult = await this.summarizer.summarize(content, {
           compressionRatio: 0.3,
@@ -292,15 +298,15 @@ export class HistoryStore {
         format,
         metadata: {
           timestamp: new Date(),
-          sourceApp: metadata.sourceApp || 'unknown',
+          sourceApp: metadata.sourceApp || "unknown",
           sourceWindow: metadata.sourceWindow,
           contentType: classification.primaryType,
           language: classification.language,
           isSensitive: classification.isSensitive,
           sensitiveType: classification.sensitiveType,
-          sizeBytes: Buffer.byteLength(content, 'utf8'),
-          lineCount: content.split('\n').length,
-          wordCount: content.split(/\s+/).filter(w => w.length > 0).length,
+          sizeBytes: Buffer.byteLength(content, "utf8"),
+          lineCount: content.split("\n").length,
+          wordCount: content.split(/\s+/).filter((w) => w.length > 0).length,
           hasHtml: metadata.hasHtml || false,
           hasRtf: metadata.hasRtf || false,
           hasImage: metadata.hasImage || false,
@@ -317,7 +323,11 @@ export class HistoryStore {
       };
 
       // Encrypt sensitive content if needed
-      if (classification.isSensitive && this.config.encryptionEnabled && this.encryptionKey) {
+      if (
+        classification.isSensitive &&
+        this.config.encryptionEnabled &&
+        this.encryptionKey
+      ) {
         await this.encryptItemContent(item);
       }
 
@@ -328,7 +338,7 @@ export class HistoryStore {
 
       // Store item
       this.items.set(itemId, item);
-      this.updateStats(item, 'add');
+      this.updateStats(item, "add");
 
       // Auto prune if needed
       if (this.config.autoPrune) {
@@ -339,7 +349,7 @@ export class HistoryStore {
       await this.saveToStorage();
 
       const processingTime = Date.now() - startTime;
-      this.logger.info('Item added to history', {
+      this.logger.info("Item added to history", {
         itemId,
         contentType: classification.primaryType,
         isSensitive: classification.isSensitive,
@@ -347,9 +357,8 @@ export class HistoryStore {
       });
 
       return item;
-
     } catch (error) {
-      this.logger.error('Failed to add item to history', error as Error, {
+      this.logger.error("Failed to add item to history", error as Error, {
         itemId,
         contentLength: content.length,
       });
@@ -363,16 +372,17 @@ export class HistoryStore {
   private async encryptItemContent(item: ClipboardItem): Promise<void> {
     try {
       // In production, use actual encryption
-      this.logger.debug('Encrypting item content', { itemId: item.id });
-      
+      this.logger.debug("Encrypting item content", { itemId: item.id });
+
       // Mark as encrypted
       (item.metadata as any).encrypted = true;
       (item.metadata as any).encryptionTimestamp = new Date();
-      
-      this.stats.encryptedCount++;
 
+      this.stats.encryptedCount++;
     } catch (error) {
-      this.logger.error('Failed to encrypt item', error as Error, { itemId: item.id });
+      this.logger.error("Failed to encrypt item", error as Error, {
+        itemId: item.id,
+      });
       throw error;
     }
   }
@@ -383,7 +393,7 @@ export class HistoryStore {
   private shouldCompressItem(item: ClipboardItem): boolean {
     const age = Date.now() - item.metadata.timestamp.getTime();
     const ageDays = age / (1000 * 60 * 60 * 24);
-    
+
     // Compress items older than 7 days and larger than 1KB
     return ageDays > 7 && item.metadata.sizeBytes > 1024;
   }
@@ -394,48 +404,62 @@ export class HistoryStore {
   private async compressItem(item: ClipboardItem): Promise<void> {
     try {
       // In production, use actual compression
-      this.logger.debug('Compressing item', { 
+      this.logger.debug("Compressing item", {
         itemId: item.id,
         originalSize: item.metadata.sizeBytes,
       });
-      
+
       // Mark as compressed
       (item.metadata as any).compressed = true;
       (item.metadata as any).compressionMethod = CompressionMethod.GZIP;
-      
+
       // Update stats with compression ratio
       this.stats.compressionRatio = 0.7; // Simulated 30% compression
-
     } catch (error) {
-      this.logger.warn('Failed to compress item', error as Error, { itemId: item.id });
+      this.logger.warn("Failed to compress item", error as Error, {
+        itemId: item.id,
+      });
     }
   }
 
   /**
    * Update statistics
    */
-  private updateStats(item: ClipboardItem, operation: 'add' | 'remove' | 'update'): void {
+  private updateStats(
+    item: ClipboardItem,
+    operation: "add" | "remove" | "update",
+  ): void {
     const contentType = item.classification.primaryType;
-    
+
     switch (operation) {
-      case 'add':
+      case "add":
         this.stats.totalItems++;
         this.stats.totalSizeBytes += item.metadata.sizeBytes;
-        this.stats.itemsByType[contentType] = (this.stats.itemsByType[contentType] || 0) + 1;
-        
-        if (!this.stats.oldestItemDate || item.metadata.timestamp < this.stats.oldestItemDate) {
+        this.stats.itemsByType[contentType] =
+          (this.stats.itemsByType[contentType] || 0) + 1;
+
+        if (
+          !this.stats.oldestItemDate ||
+          item.metadata.timestamp < this.stats.oldestItemDate
+        ) {
           this.stats.oldestItemDate = item.metadata.timestamp;
         }
-        
-        if (!this.stats.newestItemDate || item.metadata.timestamp > this.stats.newestItemDate) {
+
+        if (
+          !this.stats.newestItemDate ||
+          item.metadata.timestamp > this.stats.newestItemDate
+        ) {
           this.stats.newestItemDate = item.metadata.timestamp;
         }
         break;
 
-      case 'remove':
+      case "remove":
         this.stats.totalItems--;
         this.stats.totalSizeBytes -= item.metadata.sizeBytes;
-        this.stats.itemsByType[contentType] = Math.max(0, (this.stats.itemsByType[contentType] || 0) - 1);
+        this.stats.itemsByType[contentType] = Math.max(
+          0,
+          (this.stats.itemsByType[contentType] || 0) - 1,
+        );
         break;
     }
 
@@ -450,31 +474,36 @@ export class HistoryStore {
    */
   private async autoPrune(): Promise<void> {
     // Check if we need to prune
-    const needsSizePrune = this.stats.totalSizeBytes > this.config.maxSizeMB * 1024 * 1024;
+    const needsSizePrune =
+      this.stats.totalSizeBytes > this.config.maxSizeMB * 1024 * 1024;
     const needsCountPrune = this.stats.totalItems > this.config.maxItems;
-    
+
     if (!needsSizePrune && !needsCountPrune) {
       return;
     }
 
-    this.logger.info('Auto-pruning history store', {
+    this.logger.info("Auto-pruning history store", {
       currentItems: this.stats.totalItems,
       maxItems: this.config.maxItems,
       currentSize: this.formatBytes(this.stats.totalSizeBytes),
-      maxSize: `${this.config.maxSizeMB}MB`,
+      maxSize: MB,
     });
 
     // Get all items sorted by oldest first
     const itemsArray = Array.from(this.items.values());
-    itemsArray.sort((a, b) => a.metadata.timestamp.getTime() - b.metadata.timestamp.getTime());
+    itemsArray.sort(
+      (a, b) => a.metadata.timestamp.getTime() - b.metadata.timestamp.getTime(),
+    );
 
     let removedCount = 0;
     let removedSize = 0;
 
     // Remove oldest items until under limits
     for (const item of itemsArray) {
-      if (this.stats.totalItems <= this.config.maxItems && 
-          this.stats.totalSizeBytes <= this.config.maxSizeMB * 1024 * 1024) {
+      if (
+        this.stats.totalItems <= this.config.maxItems &&
+        this.stats.totalSizeBytes <= this.config.maxSizeMB * 1024 * 1024
+      ) {
         break;
       }
 
@@ -485,15 +514,15 @@ export class HistoryStore {
 
       // Remove the item
       this.items.delete(item.id);
-      this.updateStats(item, 'remove');
-      
+      this.updateStats(item, "remove");
+
       removedCount++;
       removedSize += item.metadata.sizeBytes;
     }
 
     if (removedCount > 0) {
       await this.saveToStorage();
-      this.logger.info('Auto-prune completed', {
+      this.logger.info("Auto-prune completed", {
         removedCount,
         removedSize: this.formatBytes(removedSize),
         remainingItems: this.stats.totalItems,
@@ -507,13 +536,16 @@ export class HistoryStore {
    */
   public getItem(id: string): ClipboardItem | undefined {
     const item = this.items.get(id);
-    
+
     if (item) {
       item.accessCount++;
       item.lastAccessed = new Date();
-      this.logger.debug('Item accessed', { itemId: id, accessCount: item.accessCount });
+      this.logger.debug("Item accessed", {
+        itemId: id,
+        accessCount: item.accessCount,
+      });
     }
-    
+
     return item;
   }
 
@@ -521,9 +553,10 @@ export class HistoryStore {
    * Get all items
    */
   public getAllItems(limit?: number): ClipboardItem[] {
-    const items = Array.from(this.items.values())
-      .sort((a, b) => b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime());
-    
+    const items = Array.from(this.items.values()).sort(
+      (a, b) => b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime(),
+    );
+
     return limit ? items.slice(0, limit) : items;
   }
 
@@ -532,8 +565,11 @@ export class HistoryStore {
    */
   public getItemsByType(contentType: string): ClipboardItem[] {
     return Array.from(this.items.values())
-      .filter(item => item.classification.primaryType === contentType)
-      .sort((a, b) => b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime());
+      .filter((item) => item.classification.primaryType === contentType)
+      .sort(
+        (a, b) =>
+          b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime(),
+      );
   }
 
   /**
@@ -541,8 +577,11 @@ export class HistoryStore {
    */
   public getItemsByTag(tag: string): ClipboardItem[] {
     return Array.from(this.items.values())
-      .filter(item => item.metadata.tags.includes(tag))
-      .sort((a, b) => b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime());
+      .filter((item) => item.metadata.tags.includes(tag))
+      .sort(
+        (a, b) =>
+          b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime(),
+      );
   }
 
   /**
@@ -550,8 +589,11 @@ export class HistoryStore {
    */
   public getFavoriteItems(): ClipboardItem[] {
     return Array.from(this.items.values())
-      .filter(item => item.favorites)
-      .sort((a, b) => b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime());
+      .filter((item) => item.favorites)
+      .sort(
+        (a, b) =>
+          b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime(),
+      );
   }
 
   /**
@@ -559,99 +601,109 @@ export class HistoryStore {
    */
   public getPinnedItems(): ClipboardItem[] {
     return Array.from(this.items.values())
-      .filter(item => item.pinned)
-      .sort((a, b) => b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime());
+      .filter((item) => item.pinned)
+      .sort(
+        (a, b) =>
+          b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime(),
+      );
   }
 
   /**
    * Search items
    */
-  public searchItems(query: string, filters: SearchFilter[] = []): SearchResult {
+  public searchItems(
+    query: string,
+    filters: SearchFilter[] = [],
+  ): SearchResult {
     const startTime = Date.now();
-    
+
     let results = Array.from(this.items.values());
-    
+
     // Apply text search
     if (query.trim()) {
       const searchTerms = query.toLowerCase().split(/\s+/);
-      results = results.filter(item => {
-        const searchableText = (
-          item.content.toLowerCase() + 
-          ' ' + (item.summary || '').toLowerCase() +
-          ' ' + item.metadata.tags.join(' ').toLowerCase()
-        );
-        
-        return searchTerms.every(term => searchableText.includes(term));
+      results = results.filter((item) => {
+        const searchableText =
+          item.content.toLowerCase() +
+          " " +
+          (item.summary || "").toLowerCase() +
+          " " +
+          item.metadata.tags.join(" ").toLowerCase();
+
+        return searchTerms.every((term) => searchableText.includes(term));
       });
     }
-    
+
     // Apply filters
     for (const filter of filters) {
       switch (filter.type) {
-        case 'contentType':
+        case "contentType":
           if (filter.value) {
-            results = results.filter(item => 
-              item.classification.primaryType === filter.value
+            results = results.filter(
+              (item) => item.classification.primaryType === filter.value,
             );
           }
           break;
-          
-        case 'dateRange':
+
+        case "dateRange":
           if (filter.startDate && filter.endDate) {
-            results = results.filter(item => 
-              item.metadata.timestamp >= filter.startDate! &&
-              item.metadata.timestamp <= filter.endDate!
+            results = results.filter(
+              (item) =>
+                item.metadata.timestamp >= filter.startDate! &&
+                item.metadata.timestamp <= filter.endDate!,
             );
           }
           break;
-          
-        case 'hasSensitive':
+
+        case "hasSensitive":
           if (filter.value !== undefined) {
-            results = results.filter(item => 
-              item.classification.isSensitive === filter.value
+            results = results.filter(
+              (item) => item.classification.isSensitive === filter.value,
             );
           }
           break;
-          
-        case 'minSize':
+
+        case "minSize":
           if (filter.value) {
-            results = results.filter(item => 
-              item.metadata.sizeBytes >= (filter.value as number)
+            results = results.filter(
+              (item) => item.metadata.sizeBytes >= (filter.value as number),
             );
           }
           break;
-          
-        case 'maxSize':
+
+        case "maxSize":
           if (filter.value) {
-            results = results.filter(item => 
-              item.metadata.sizeBytes <= (filter.value as number)
+            results = results.filter(
+              (item) => item.metadata.sizeBytes <= (filter.value as number),
             );
           }
           break;
-          
-        case 'tags':
+
+        case "tags":
           if (filter.value && Array.isArray(filter.value)) {
             const requiredTags = filter.value as string[];
-            results = results.filter(item =>
-              requiredTags.every(tag => item.metadata.tags.includes(tag))
+            results = results.filter((item) =>
+              requiredTags.every((tag) => item.metadata.tags.includes(tag)),
             );
           }
           break;
       }
     }
-    
+
     // Sort by relevance/date
-    results.sort((a, b) => b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime());
-    
+    results.sort(
+      (a, b) => b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime(),
+    );
+
     const searchTimeMs = Date.now() - startTime;
-    
-    this.logger.debug('Search completed', {
+
+    this.logger.debug("Search completed", {
       query,
       filterCount: filters.length,
       resultCount: results.length,
       searchTimeMs,
     });
-    
+
     return {
       items: results,
       totalMatches: results.length,
@@ -665,18 +717,21 @@ export class HistoryStore {
    */
   public updateItem(id: string, updates: Partial<ClipboardItem>): boolean {
     const item = this.items.get(id);
-    
+
     if (!item) {
       return false;
     }
-    
+
     // Apply updates
     Object.assign(item, updates);
     item.version = (item.version || 0) + 1;
-    
-    this.logger.debug('Item updated', { itemId: id, updates: Object.keys(updates) });
+
+    this.logger.debug("Item updated", {
+      itemId: id,
+      updates: Object.keys(updates),
+    });
     this.saveToStorage(); // Async, no await
-    
+
     return true;
   }
 
@@ -685,19 +740,19 @@ export class HistoryStore {
    */
   public toggleFavorite(id: string): boolean {
     const item = this.items.get(id);
-    
+
     if (!item) {
       return false;
     }
-    
+
     item.favorites = !item.favorites;
     item.version = (item.version || 0) + 1;
-    
-    this.logger.debug('Favorite toggled', { 
-      itemId: id, 
-      isFavorite: item.favorites 
+
+    this.llog.debug("Favorite toggled", {
+      itemId: id,
+      isFavorite: item.favorites,
     });
-    
+
     this.saveToStorage(); // Async, no await
     return true;
   }
@@ -707,19 +762,19 @@ export class HistoryStore {
    */
   public togglePinned(id: string): boolean {
     const item = this.items.get(id);
-    
+
     if (!item) {
       return false;
     }
-    
+
     item.pinned = !item.pinned;
     item.version = (item.version || 0) + 1;
-    
-    this.logger.debug('Pinned toggled', { 
-      itemId: id, 
-      isPinned: item.pinned 
+
+    this.llog.debug("Pinned toggled", {
+      itemId: id,
+      isPinned: item.pinned,
     });
-    
+
     this.saveToStorage(); // Async, no await
     return true;
   }
@@ -729,19 +784,19 @@ export class HistoryStore {
    */
   public addTag(id: string, tag: string): boolean {
     const item = this.items.get(id);
-    
+
     if (!item) {
       return false;
     }
-    
+
     if (!item.metadata.tags.includes(tag)) {
       item.metadata.tags.push(tag);
       item.version = (item.version || 0) + 1;
-      
-      this.logger.debug('Tag added', { itemId: id, tag });
+
+      this.llog.debug("Tag added", { itemId: id, tag });
       this.saveToStorage(); // Async, no await
     }
-    
+
     return true;
   }
 
@@ -750,20 +805,20 @@ export class HistoryStore {
    */
   public removeTag(id: string, tag: string): boolean {
     const item = this.items.get(id);
-    
+
     if (!item) {
       return false;
     }
-    
+
     const index = item.metadata.tags.indexOf(tag);
     if (index !== -1) {
       item.metadata.tags.splice(index, 1);
       item.version = (item.version || 0) + 1;
-      
-      this.logger.debug('Tag removed', { itemId: id, tag });
+
+      this.llog.debug("Tag removed", { itemId: id, tag });
       this.saveToStorage(); // Async, no await
     }
-    
+
     return true;
   }
 
@@ -772,26 +827,26 @@ export class HistoryStore {
    */
   public deleteItem(id: string): boolean {
     const item = this.items.get(id);
-    
+
     if (!item) {
       return false;
     }
-    
+
     // Don't delete pinned items without force
     if (item.pinned) {
-      this.logger.warn('Attempted to delete pinned item', { itemId: id });
+      this.llog.warn("Attempted to delete pinned item", { itemId: id });
       return false;
     }
-    
+
     this.items.delete(id);
-    this.updateStats(item, 'remove');
-    
-    this.logger.info('Item deleted', { 
-      itemId: id, 
+    this.updateStats(item, "remove");
+
+    this.llog.info("Item deleted", {
+      itemId: id,
       contentType: item.classification.primaryType,
       age: this.formatAge(Date.now() - item.metadata.timestamp.getTime()),
     });
-    
+
     this.saveToStorage(); // Async, no await
     return true;
   }
@@ -801,27 +856,29 @@ export class HistoryStore {
    */
   public clearAll(includePinned: boolean = false): number {
     let itemsToDelete: ClipboardItem[] = [];
-    
+
     if (includePinned) {
       itemsToDelete = Array.from(this.items.values());
     } else {
-      itemsToDelete = Array.from(this.items.values()).filter(item => !item.pinned);
+      itemsToDelete = Array.from(this.items.values()).filter(
+        (item) => !item.pinned,
+      );
     }
-    
+
     const deleteCount = itemsToDelete.length;
-    
+
     // Remove items
     for (const item of itemsToDelete) {
       this.items.delete(item.id);
-      this.updateStats(item, 'remove');
+      this.updateStats(item, "remove");
     }
-    
-    this.logger.info('All items cleared', { 
+
+    this.llog.info("All items cleared", {
       deletedCount: deleteCount,
       remainingCount: this.items.size,
       includePinned,
     });
-    
+
     this.saveToStorage(); // Async, no await
     return deleteCount;
   }
@@ -838,26 +895,30 @@ export class HistoryStore {
    */
   public exportItems(includeSensitive: boolean = false): string {
     const itemsToExport = Array.from(this.items.values())
-      .filter(item => includeSensitive || !item.classification.isSensitive)
-      .map(item => ({
+      .filter((item) => includeSensitive || !item.classification.isSensitive)
+      .map((item) => ({
         ...item,
         // Don't include encryption keys in export
-        metadata: { ...item.metadata, encrypted: undefined, encryptionKey: undefined },
+        metadata: {
+          ...item.metadata,
+          encrypted: undefined,
+          encryptionKey: undefined,
+        },
       }));
-    
+
     const exportData = {
-      version: '1.0.0',
+      version: "1.0.0",
       exportDate: new Date().toISOString(),
       itemCount: itemsToExport.length,
       totalSize: this.stats.totalSizeBytes,
       items: itemsToExport,
     };
-    
-    this.logger.info('Items exported', { 
+
+    this.llog.info("Items exported", {
       itemCount: itemsToExport.length,
       includeSensitive,
     });
-    
+
     return JSON.stringify(exportData, null, 2);
   }
 
@@ -867,20 +928,20 @@ export class HistoryStore {
   public async importItems(json: string): Promise<number> {
     try {
       const importData = JSON.parse(json);
-      
+
       if (!importData.items || !Array.isArray(importData.items)) {
-        throw new Error('Invalid import format');
+        throw new Error("Invalid import format");
       }
-      
+
       let importedCount = 0;
-      
+
       for (const itemData of importData.items) {
         try {
           // Validate required fields
           if (!itemData.id || !itemData.content) {
             continue;
           }
-          
+
           // Create or update item
           const existingItem = this.items.get(itemData.id);
           if (existingItem) {
@@ -890,27 +951,27 @@ export class HistoryStore {
           } else {
             // Add new
             this.items.set(itemData.id, itemData as ClipboardItem);
-            this.updateStats(itemData as ClipboardItem, 'add');
+            this.updateStats(itemData as ClipboardItem, "add");
           }
-          
+
           importedCount++;
-          
         } catch (error) {
-          this.logger.warn('Failed to import item', error as Error, { itemId: itemData.id });
+          this.llog.warn("Failed to import item", error as Error, {
+            itemId: itemData.id,
+          });
         }
       }
-      
+
       await this.saveToStorage();
-      
-      this.logger.info('Items imported', { 
+
+      this.llog.info("Items imported", {
         importedCount,
         totalItems: this.stats.totalItems,
       });
-      
+
       return importedCount;
-      
     } catch (error) {
-      this.logger.error('Failed to import items', error as Error);
+      this.llog.error("Failed to import items", error as Error);
       throw error;
     }
   }
@@ -919,13 +980,13 @@ export class HistoryStore {
    * Format bytes to human readable
    */
   private formatBytes(bytes: number): string {
-    if (bytes === 0) return '0 Bytes';
-    
+    if (bytes === 0) return "0 Bytes";
+
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   }
 
   /**
@@ -936,7 +997,7 @@ export class HistoryStore {
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
-    
+
     if (days > 0) return `${days}d ${hours % 24}h`;
     if (hours > 0) return `${hours}h ${minutes % 60}m`;
     if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
@@ -954,17 +1015,17 @@ export class HistoryStore {
    * Cleanup resources
    */
   public async cleanup(): Promise<void> {
-    this.logger.info('Cleaning up history store');
-    
+    this.llog.info("Cleaning up history store");
+
     // Clear backup interval
     if (this.backupInterval) {
       clearInterval(this.backupInterval);
       this.backupInterval = null;
     }
-    
+
     // Save final state
     await this.saveToStorage();
-    
-    this.logger.info('History store cleanup completed');
+
+    this.llog.info("History store cleanup completed");
   }
 }

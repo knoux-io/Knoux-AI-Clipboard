@@ -1,0 +1,122 @@
+{
+  "Root": "F:\\Knoux-Clipboard-AI",
+  "ScannedAt": "2026-01-27T02:17:29",
+  "RendererFilesScanned": 97,
+  "MatchesFound": 4,
+  "Entries": [
+    {
+      "RendererFile": "app\\renderer\\components\\AnalyticsDashboardUI.tsx",
+      "ImportString": "import { analyticsDashboard, AnalyticsDashboard, UsageMetrics, RealTimeMetrics } from '../../../backend/ai/analytics-dashboard'",
+      "ImportPath": "../../../backend/ai/analytics-dashboard",
+      "ResolvedPath": null,
+      "Exists": false,
+      "SizeBytes": 0,
+      "NodeOnly": false,
+      "Suggestion": "use-ipc"
+    },
+    {
+      "RendererFile": "app\\renderer\\components\\GamifiedClipboard.tsx",
+      "ImportString": "import { gamifiedClipboard } from '../../../backend/ai/gamified-clipboard'",
+      "ImportPath": "../../../backend/ai/gamified-clipboard",
+      "ResolvedPath": null,
+      "Exists": false,
+      "SizeBytes": 0,
+      "NodeOnly": false,
+      "Suggestion": "use-ipc"
+    },
+    {
+      "RendererFile": "app\\renderer\\components\\PatternRecognitionDashboard.tsx",
+      "ImportString": "import { patternRecognizer } from '../../../backend/ai/pattern-recognizer'",
+      "ImportPath": "../../../backend/ai/pattern-recognizer",
+      "ResolvedPath": null,
+      "Exists": false,
+      "SizeBytes": 0,
+      "NodeOnly": false,
+      "Suggestion": "use-ipc"
+    },
+    {
+      "RendererFile": "app\\renderer\\AppIntegrated.tsx",
+      "ImportString": "import { getServiceManager } from '../backend/service-manager'",
+      "ImportPath": "../backend/service-manager",
+      "ResolvedPath": "app\\backend\\service-manager.ts",
+      "Exists": true,
+      "SizeBytes": 10144,
+      "NodeOnly": false,
+      "Suggestion": "move-to-shared"
+    }
+  ],
+  "Modules": [
+    {
+      "ModuleKey": "app\\backend\\service-manager.ts",
+      "Exists": true,
+      "SizeBytes": 10144,
+      "References": [
+        {
+          "RendererFile": "app\\renderer\\AppIntegrated.tsx",
+          "ImportString": "import { getServiceManager } from '../backend/service-manager'",
+          "ImportPath": "../backend/service-manager",
+          "ResolvedPath": "app\\backend\\service-manager.ts",
+          "Exists": true,
+          "SizeBytes": 10144,
+          "NodeOnly": false,
+          "Suggestion": "move-to-shared"
+        }
+      ],
+      "SuggestedChannel": "service-manager"
+    },
+    {
+      "ModuleKey": "../../../backend/ai/analytics-dashboard",
+      "Exists": false,
+      "SizeBytes": 0,
+      "References": [
+        {
+          "RendererFile": "app\\renderer\\components\\AnalyticsDashboardUI.tsx",
+          "ImportString": "import { analyticsDashboard, AnalyticsDashboard, UsageMetrics, RealTimeMetrics } from '../../../backend/ai/analytics-dashboard'",
+          "ImportPath": "../../../backend/ai/analytics-dashboard",
+          "ResolvedPath": null,
+          "Exists": false,
+          "SizeBytes": 0,
+          "NodeOnly": false,
+          "Suggestion": "use-ipc"
+        }
+      ],
+      "SuggestedChannel": "analytics-dashboard"
+    },
+    {
+      "ModuleKey": "../../../backend/ai/pattern-recognizer",
+      "Exists": false,
+      "SizeBytes": 0,
+      "References": [
+        {
+          "RendererFile": "app\\renderer\\components\\PatternRecognitionDashboard.tsx",
+          "ImportString": "import { patternRecognizer } from '../../../backend/ai/pattern-recognizer'",
+          "ImportPath": "../../../backend/ai/pattern-recognizer",
+          "ResolvedPath": null,
+          "Exists": false,
+          "SizeBytes": 0,
+          "NodeOnly": false,
+          "Suggestion": "use-ipc"
+        }
+      ],
+      "SuggestedChannel": "pattern-recognizer"
+    },
+    {
+      "ModuleKey": "../../../backend/ai/gamified-clipboard",
+      "Exists": false,
+      "SizeBytes": 0,
+      "References": [
+        {
+          "RendererFile": "app\\renderer\\components\\GamifiedClipboard.tsx",
+          "ImportString": "import { gamifiedClipboard } from '../../../backend/ai/gamified-clipboard'",
+          "ImportPath": "../../../backend/ai/gamified-clipboard",
+          "ResolvedPath": null,
+          "Exists": false,
+          "SizeBytes": 0,
+          "NodeOnly": false,
+          "Suggestion": "use-ipc"
+        }
+      ],
+      "SuggestedChannel": "gamified-clipboard"
+    }
+  ]
+}

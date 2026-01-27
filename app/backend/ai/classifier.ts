@@ -5,7 +5,7 @@
  * Clipboard Intelligence • Desktop Precision • Premium Engineering
  */
 
-import { logger, createLogger } from '../../shared/logger';
+import { llog } from '../../shared/localized-logger';
 import { CONTENT_TYPES, SECURITY, AI } from '../../shared/constants';
 import { ContentClassification, ClassificationPattern, TextLocation } from '../../shared/types';
 import { ProgrammingLanguage, TextType, DataFormat, ContentCategory } from '../../shared/enums';
@@ -56,7 +56,7 @@ export interface ClassifierStats {
 }
 
 export class ContentClassifier {
-  private logger = createLogger({ module: 'classifier' });
+  // Logger is provided via llog injection from localized-logger
   private classificationCache: Map<string, ContentClassification> = new Map();
   private patternRules: PatternRule[] = [];
   private languagePatterns: LanguagePattern[] = [];
@@ -70,10 +70,10 @@ export class ContentClassifier {
    * Initialize classification patterns and rules
    */
   private initializePatterns(): void {
-    this.logger.info('Initializing classification patterns');
+    this.llog.info('Initializing classification patterns');
 
     // ==================== CODE PATTERNS ====================
-    
+
     // JavaScript/TypeScript patterns
     this.addPatternRule({
       pattern: /(?:function\s+\w+|const\s+\w+\s*=\s*\(|let\s+\w+\s*=\s*\(|var\s+\w+\s*=\s*\(|=>|import\s+|export\s+|console\.log)/,
@@ -127,7 +127,7 @@ export class ContentClassifier {
 
     // Bash/Shell patterns
     this.addPatternRule({
-      pattern: /(?:#!/bin/|#!/usr/bin/|echo\s+|cd\s+|ls\s+|grep\s+|awk\s+|sed\s+)/,
+      pattern: /(?:#!\\/bin\\/|#!\\/usr\\/bin\\/|echo\s+|cd\s+|ls\s+|grep\s+|awk\s+|sed\s+)/,
       type: CONTENT_TYPES.CODE.BASH,
       confidence: 0.8,
       category: ContentCategory.CODE,
@@ -303,7 +303,7 @@ export class ContentClassifier {
 
     this.initializeLanguagePatterns();
 
-    this.logger.info(`Initialized ${this.patternRules.length} pattern rules and ${this.languagePatterns.length} language patterns`);
+    this.llog.info('Initialized pattern rules and language patterns', { ruleCount: this.patternRules.length });
   }
 
   /**
@@ -430,7 +430,7 @@ export class ContentClassifier {
         /^#+\s+.+$/,
         /^\*\*\s*.+\*\*\s*$/,
         /^-\s+\[[ x]\]\s*.+$/,
-        /^```[a-zA-Z]*$/,
+        /^[a-zA-Z]*$/,
       ],
       extensions: ['.md', '.markdown', '.mdown'],
       mimeTypes: ['text/markdown'],
@@ -453,22 +453,22 @@ export class ContentClassifier {
       return;
     }
 
-    this.logger.info('Initializing content classifier');
+    this.llog.info('Initializing content classifier');
 
     try {
       // Load any custom patterns from storage
       await this.loadCustomPatterns();
-      
+
       // Warm up the classifier with sample data
       await this.warmUp();
-      
+
       this.isInitialized = true;
-      this.logger.info('Content classifier initialized successfully', {
+      this.llog.info('Content classifier initialized successfully', {
         patternCount: this.patternRules.length,
         languagePatternCount: this.languagePatterns.length,
       });
     } catch (error) {
-      this.logger.error('Failed to initialize classifier', error as Error);
+      this.llog.error('Failed to initialize classifier', error as Error);
       throw error;
     }
   }
@@ -478,7 +478,7 @@ export class ContentClassifier {
    */
   private async loadCustomPatterns(): Promise<void> {
     // In production, this would load user-defined patterns
-    this.logger.debug('Would load custom patterns from storage');
+    this.llog.debug('Would load custom patterns from storage');
   }
 
   /**
@@ -497,7 +497,7 @@ export class ContentClassifier {
       await this.classify(sample, { detailedAnalysis: false });
     }
 
-    this.logger.debug('Classifier warmed up with sample data');
+    this.llog.debug('Classifier warmed up with sample data');
   }
 
   /**
@@ -508,7 +508,7 @@ export class ContentClassifier {
     options: ClassificationOptions = {}
   ): Promise<ContentClassification> {
     const startTime = Date.now();
-    
+
     if (!this.isInitialized) {
       await this.initialize();
     }
@@ -517,11 +517,11 @@ export class ContentClassifier {
     const cacheKey = this.generateCacheKey(content, options);
     const cachedResult = this.classificationCache.get(cacheKey);
     if (cachedResult && this.isCacheValid(cachedResult)) {
-      this.logger.debug('Classification cache hit', { cacheKey });
+      this.llog.debug('Classification cache hit', { cacheKey });
       return cachedResult;
     }
 
-    this.logger.debug('Classifying content', {
+    this.llog.debug('Classifying content', {
       contentLength: content.length,
       options,
     });
@@ -536,16 +536,16 @@ export class ContentClassifier {
 
       // Analyze content
       const analysis = this.analyzeContent(content, options);
-      
+
       // Determine primary type
       const primaryType = this.determinePrimaryType(analysis, options);
-      
+
       // Check for sensitive content
       const sensitiveAnalysis = this.analyzeSensitiveContent(content);
-      
+
       // Detect programming language
       const language = this.detectProgrammingLanguage(content, primaryType);
-      
+
       // Create classification object
       const classification: ContentClassification = {
         primaryType,
@@ -563,7 +563,7 @@ export class ContentClassifier {
       this.cleanupCache();
 
       const processingTime = Date.now() - startTime;
-      this.logger.info('Content classification completed', {
+      this.llog.info('Content classification completed', {
         contentLength: content.length,
         primaryType,
         confidence: classification.confidence,
@@ -574,10 +574,10 @@ export class ContentClassifier {
       return classification;
 
     } catch (error) {
-      this.logger.error('Content classification failed', error as Error, {
+      this.llog.error('Content classification failed', error as Error, {
         contentLength: content.length,
       });
-      
+
       // Return a fallback classification
       return this.createFallbackClassification(content);
     }
@@ -596,10 +596,10 @@ export class ContentClassifier {
     // Apply all pattern rules
     for (const rule of this.patternRules) {
       const matches = this.applyPatternRule(content, rule);
-      
+
       if (matches.length > 0) {
         patterns.push(...matches);
-        
+
         // Update scores based on matches
         const currentScore = scores.get(rule.type) || 0;
         scores.set(rule.type, currentScore + (rule.confidence * matches.length));
@@ -622,12 +622,12 @@ export class ContentClassifier {
   private applyPatternRule(content: string, rule: PatternRule): ClassificationPattern[] {
     const patterns: ClassificationPattern[] = [];
     const regex = new RegExp(rule.pattern.source, rule.pattern.flags + 'g');
-    
+
     let match;
     while ((match = regex.exec(content)) !== null) {
       const lineNumber = this.getLineNumber(content, match.index);
       const column = this.getColumn(content, match.index);
-      
+
       patterns.push({
         type: rule.type,
         pattern: rule.pattern.source,
@@ -640,7 +640,7 @@ export class ContentClassifier {
         },
       });
     }
-    
+
     return patterns;
   }
 
@@ -652,25 +652,25 @@ export class ContentClassifier {
     options: ClassificationOptions
   ): string {
     const threshold = options.confidenceThreshold || AI.CONFIDENCE_THRESHOLD;
-    
+
     // Convert scores to array and sort by score
     const scoresArray = Array.from(analysis.scores.entries())
       .sort((a, b) => b[1] - a[1]);
-    
+
     // If we have a high-confidence match, use it
     if (scoresArray.length > 0 && scoresArray[0][1] >= threshold) {
       return scoresArray[0][0];
     }
-    
+
     // Check for specific type patterns
     if (this.isLikelyCode(analysis.scores)) {
       return CONTENT_TYPES.CODE.JAVASCRIPT; // Default to JavaScript for code
     }
-    
+
     if (this.isLikelyText(analysis.scores)) {
       return CONTENT_TYPES.TEXT.PLAIN; // Default to plain text
     }
-    
+
     // Fallback to unknown
     return 'unknown';
   }
@@ -681,13 +681,13 @@ export class ContentClassifier {
   private isLikelyCode(scores: Map<string, number>): boolean {
     const codeTypes = Object.values(CONTENT_TYPES.CODE);
     let codeScore = 0;
-    
+
     for (const [type, score] of scores.entries()) {
       if (codeTypes.includes(type as any)) {
         codeScore += score;
       }
     }
-    
+
     return codeScore > 1.0;
   }
 
@@ -697,13 +697,13 @@ export class ContentClassifier {
   private isLikelyText(scores: Map<string, number>): boolean {
     const textTypes = Object.values(CONTENT_TYPES.TEXT);
     let textScore = 0;
-    
+
     for (const [type, score] of scores.entries()) {
       if (textTypes.includes(type as any)) {
         textScore += score;
       }
     }
-    
+
     return textScore > 0.5;
   }
 
@@ -716,14 +716,14 @@ export class ContentClassifier {
   ): string[] {
     const secondaryTypes: string[] = [];
     const threshold = 0.3;
-    
+
     // Get all types with significant scores, excluding primary
     for (const [type, score] of analysis.scores.entries()) {
       if (type !== primaryType && score >= threshold) {
         secondaryTypes.push(type);
       }
     }
-    
+
     // Limit to top 3 secondary types
     return secondaryTypes.slice(0, 3);
   }
@@ -737,19 +737,19 @@ export class ContentClassifier {
   ): number {
     const primaryScore = analysis.scores.get(primaryType) || 0;
     const totalScore = Array.from(analysis.scores.values()).reduce((a, b) => a + b, 0);
-    
+
     if (totalScore === 0) {
       return 0.1; // Very low confidence
     }
-    
+
     // Confidence is primary score normalized by total score
     let confidence = primaryScore / totalScore;
-    
+
     // Boost confidence for high scores
     if (primaryScore > 2.0) {
       confidence = Math.min(1.0, confidence * 1.3);
     }
-    
+
     return Math.min(1.0, Math.max(0.1, confidence));
   }
 
@@ -761,7 +761,7 @@ export class ContentClassifier {
     sensitiveType?: string;
   } {
     const sensitiveTypes = Object.values(CONTENT_TYPES.SENSITIVE);
-    
+
     for (const rule of this.patternRules) {
       if (sensitiveTypes.includes(rule.type as any)) {
         if (rule.pattern.test(content)) {
@@ -772,7 +772,7 @@ export class ContentClassifier {
         }
       }
     }
-    
+
     return { isSensitive: false };
   }
 
@@ -785,33 +785,33 @@ export class ContentClassifier {
     if (!codeTypes.includes(primaryType as any)) {
       return undefined;
     }
-    
+
     // Try to match against language patterns
     let bestMatch: { language: ProgrammingLanguage; confidence: number } | null = null;
-    
+
     for (const langPattern of this.languagePatterns) {
       let matchCount = 0;
-      
+
       for (const pattern of langPattern.patterns) {
         if (pattern.test(content)) {
           matchCount++;
         }
       }
-      
+
       if (matchCount > 0) {
         const confidence = langPattern.confidence * (matchCount / langPattern.patterns.length);
-        
+
         if (!bestMatch || confidence > bestMatch.confidence) {
           bestMatch = { language: langPattern.language, confidence };
         }
       }
     }
-    
+
     // If we found a good match, return it
     if (bestMatch && bestMatch.confidence > 0.5) {
       return bestMatch.language;
     }
-    
+
     // Try to infer from primary type
     const typeToLanguage: Record<string, ProgrammingLanguage> = {
       [CONTENT_TYPES.CODE.JAVASCRIPT]: ProgrammingLanguage.JAVASCRIPT,
@@ -827,7 +827,7 @@ export class ContentClassifier {
       [CONTENT_TYPES.CODE.XML]: ProgrammingLanguage.XML,
       [CONTENT_TYPES.CODE.SQL]: ProgrammingLanguage.SQL,
     };
-    
+
     return typeToLanguage[primaryType];
   }
 
@@ -838,7 +838,7 @@ export class ContentClassifier {
     if (!language) {
       return undefined;
     }
-    
+
     const frameworkPatterns: Record<ProgrammingLanguage, Array<{ pattern: RegExp; framework: string }>> = {
       [ProgrammingLanguage.JAVASCRIPT]: [
         { pattern: /React\.|import.*from 'react'/, framework: 'React' },
@@ -859,18 +859,18 @@ export class ContentClassifier {
         { pattern: /@angular|NgModule/, framework: 'Angular' },
       ],
     };
-    
+
     const patterns = frameworkPatterns[language];
     if (!patterns) {
       return undefined;
     }
-    
+
     for (const { pattern, framework } of patterns) {
       if (pattern.test(content)) {
         return framework;
       }
     }
-    
+
     return undefined;
   }
 
@@ -894,7 +894,7 @@ export class ContentClassifier {
     // Simple heuristic for fallback
     const lines = content.split('\n');
     const avgLineLength = content.length / (lines.length || 1);
-    
+
     let primaryType: string;
     if (lines.length > 1 && avgLineLength < 100) {
       primaryType = CONTENT_TYPES.TEXT.PLAIN;
@@ -903,7 +903,7 @@ export class ContentClassifier {
     } else {
       primaryType = CONTENT_TYPES.TEXT.PLAIN;
     }
-    
+
     return {
       primaryType,
       secondaryTypes: [],
@@ -936,7 +936,7 @@ export class ContentClassifier {
   private generateCacheKey(content: string, options: ClassificationOptions): string {
     const optionsHash = JSON.stringify(options);
     const contentHash = btoa(content.substring(0, 100)).replace(/[^a-zA-Z0-9]/g, '_');
-    return `classify_${contentHash}_${optionsHash}`;
+    return classify__;
   }
 
   /**
@@ -947,7 +947,7 @@ export class ContentClassifier {
     if (classification.confidence >= 0.9) {
       return true;
     }
-    
+
     // Otherwise use standard cache duration
     const cacheDuration = AI.CACHE_DURATION_MINUTES * 60 * 1000;
     return true; // Always valid in this simplified implementation
@@ -959,17 +959,17 @@ export class ContentClassifier {
   private cleanupCache(): void {
     if (this.classificationCache.size > 1000) {
       const keysToDelete: string[] = [];
-      
+
       for (const [key, classification] of this.classificationCache.entries()) {
         if (!this.isCacheValid(classification)) {
           keysToDelete.push(key);
         }
       }
-      
+
       keysToDelete.forEach(key => this.classificationCache.delete(key));
-      
+
       if (keysToDelete.length > 0) {
-        this.logger.debug('Cleaned up classification cache', { count: keysToDelete.length });
+        this.llog.debug('Cleaned up classification cache', { count: keysToDelete.length });
       }
     }
   }
@@ -979,7 +979,7 @@ export class ContentClassifier {
    */
   public clearCache(): void {
     this.classificationCache.clear();
-    this.logger.debug('Classification cache cleared');
+    this.llog.debug('Classification cache cleared');
   }
 
   /**
@@ -987,7 +987,7 @@ export class ContentClassifier {
    */
   public getStats(): ClassifierStats {
     const classifications = Array.from(this.classificationCache.values());
-    
+
     return {
       totalClassifications: classifications.length,
       cacheHits: 0, // Would track in production
@@ -1006,9 +1006,9 @@ export class ContentClassifier {
       ...rule,
       category: this.inferCategory(rule.type),
     };
-    
+
     this.patternRules.push(fullRule);
-    this.logger.info('Custom pattern added', { type: rule.type, pattern: rule.pattern });
+    this.llog.info('Custom pattern added', { type: rule.type, pattern: rule.pattern });
   }
 
   /**
@@ -1018,19 +1018,19 @@ export class ContentClassifier {
     if (Object.values(CONTENT_TYPES.CODE).includes(type as any)) {
       return ContentCategory.CODE;
     }
-    
+
     if (Object.values(CONTENT_TYPES.TEXT).includes(type as any)) {
       return ContentCategory.TEXT;
     }
-    
+
     if (Object.values(CONTENT_TYPES.SENSITIVE).includes(type as any)) {
       return ContentCategory.OTHER;
     }
-    
+
     if (Object.values(CONTENT_TYPES.MEDIA).includes(type as any)) {
       return ContentCategory.MEDIA;
     }
-    
+
     return ContentCategory.OTHER;
   }
 
@@ -1063,9 +1063,16 @@ export class ContentClassifier {
   public async extractByType(content: string, type: string): Promise<string[]> {
     const patterns = await this.getContentPatterns(content);
     const matchingPatterns = patterns.filter(p => p.type === type);
-    
+
     return matchingPatterns.map(pattern => {
       return content.substring(pattern.location.start, pattern.location.end);
     });
   }
 }
+
+
+
+
+
+
+
